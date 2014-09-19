@@ -1,0 +1,34 @@
+{
+  "name": "vision",
+  "description": "Templates rendering support for hapi.js",
+  "version": "1.0.0",
+  "repository": "git://github.com/hapijs/vision",
+  "main": "index",
+  "keywords": [
+    "view",
+    "render",
+    "template",
+    "hapi"
+  ],
+  "engines": {
+    "node": ">=0.10.32"
+  },
+  "dependencies": {
+    "boom": "2.x.x",
+    "hoek": "2.x.x",
+    "joi": "^4.6.x"
+  },
+  "devDependencies": {
+    "hapi": "6.x.x",
+    "lab": "4.x.x"
+  },
+  "scripts": {
+    "test": "make test-cov"
+  },
+  "licenses": [
+    {
+      "type": "BSD",
+      "url": "http://github.com/hapijs/vision/raw/master/LICENSE"
+    }
+  ]
+}
