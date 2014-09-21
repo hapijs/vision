@@ -15,8 +15,6 @@ var internals = {};
 // Test shortcuts
 
 var lab = exports.lab = Lab.script();
-var before = lab.before;
-var after = lab.after;
 var describe = lab.describe;
 var it = lab.it;
 var expect = Lab.expect;
@@ -26,31 +24,26 @@ describe('Vision', function () {
 
     it('should not fail if rendered template returns undefined', function (done) {
 
-        var server = new Hapi.Server({
-            views: {
-                engines: {
-                    html: {
-                        module: {
-                            compile: function (template, options) {
+        var server = new Hapi.Server();
+        server.handler('viewTest', Vision.handler);
+        server.views({
+            engines: {
+                html: {
+                    module: {
+                        compile: function (template, options) {
 
-                                return function (context, options) {
+                            return function (context, options) {
 
-                                    return undefined;
-                                }
+                                return undefined;
                             }
-                        },
-                        path: __dirname + '/templates/valid'
-                    }
+                        }
+                    },
+                    path: __dirname + '/templates/valid'
                 }
             }
         });
 
-        var handler = function (request, reply) {
-
-            return reply.view('test.html');
-        };
-
-        server.route({ method: 'GET', path: '/', config: { handler: handler } });
+        server.route({ method: 'GET', path: '/', handler: { viewTest: { template: 'test.html' } } });
 
         server.inject('/', function (res) {
 
@@ -61,23 +54,18 @@ describe('Vision', function () {
 
     it('should render handlebars template', function (done) {
 
-        var server = new Hapi.Server({
-            views: {
-                engines: {
-                    html: {
-                        module: require('handlebars'),
-                        path: __dirname + '/templates/valid'
-                    }
+        var server = new Hapi.Server();
+        server.handler('viewTest', Vision.handler);
+        server.views({
+            engines: {
+                html: {
+                    module: require('handlebars'),
+                    path: __dirname + '/templates/valid'
                 }
             }
         });
 
-        var handler = function (request, reply) {
-
-            return reply.view('test.html', { message: "Hello World!" });
-        };
-
-        server.route({ method: 'GET', path: '/handlebars', config: { handler: handler } });
+        server.route({ method: 'GET', path: '/handlebars', handler: { viewTest: { template: 'test.html', context: { message: 'Hello World!' } } } });
 
         server.inject('/handlebars', function (res) {
 
@@ -89,24 +77,19 @@ describe('Vision', function () {
 
     it('sets content type', function (done) {
 
-        var server = new Hapi.Server({
-            views: {
-                engines: {
-                    html: {
-                        module: require('handlebars'),
-                        path: __dirname + '/templates/valid',
-                        contentType: 'something/else'
-                    }
+        var server = new Hapi.Server();
+        server.handler('viewTest', Vision.handler);
+        server.views({
+            engines: {
+                html: {
+                    module: require('handlebars'),
+                    path: __dirname + '/templates/valid',
+                    contentType: 'something/else'
                 }
             }
         });
 
-        var handler = function (request, reply) {
-
-            return reply.view('test', { message: "Hello World!" });
-        };
-
-        server.route({ method: 'GET', path: '/', config: { handler: handler } });
+        server.route({ method: 'GET', path: '/', handler: { viewTest: { template: 'test', context: { message: 'Hello World!' } } } });
         server.inject('/', function (res) {
 
             expect(res.headers['content-type']).to.equal('something/else');
@@ -116,27 +99,16 @@ describe('Vision', function () {
         });
     });
 
-    it('returns error on invalid template path', function (done) {
+    it('errors on invalid template path', function (done) {
 
-        var server = new Hapi.Server({
-            debug: false,
-            views: {
-                engines: { 'html': require('handlebars') },
-                path: __dirname + '/templates/invalid'
-            }
+        var server = new Hapi.Server({ debug: false });
+        server.handler('viewTest', Vision.handler);
+        server.views({
+            engines: { 'html': require('handlebars') },
+            path: __dirname + '/templates/invalid'
         });
 
-        var handler = function (request, reply) {
-
-            reply.view('test', { message: 'Ohai' });
-        };
-
-        var handler = function (request, reply) {
-
-            return reply.view('test', { message: 'Hello, World!' });
-        };
-
-        server.route({ method: 'GET', path: '/', handler: handler });
+        server.route({ method: 'GET', path: '/', handler: { viewTest: { template: 'test', context: { message: 'Hello, World!' } } } });
         server.inject('/', function (res) {
 
             expect(res.statusCode).to.equal(500);
@@ -146,21 +118,16 @@ describe('Vision', function () {
 
     it('returns a compiled Handlebars template reply', function (done) {
 
-        var server = new Hapi.Server({
-            views: {
-                engines: { 'html': require('handlebars') },
-                path: __dirname + '/templates/valid'
-            }
+        var server = new Hapi.Server();
+        server.handler('viewTest', Vision.handler);
+        server.views({
+            engines: { 'html': require('handlebars') },
+            path: __dirname + '/templates/valid'
         });
 
-        var handler = function (request, reply) {
+        server.route({ method: 'GET', path: '/', handler: { viewTest: { template: 'test', context: { message: 'Hello, World!' } } } });
 
-            return reply.view('test', { message: 'Hello, World!' });
-        };
-
-        server.route({ method: 'GET', path: '/views', config: { handler: handler } });
-
-        server.inject('/views', function (res) {
+        server.inject('/', function (res) {
 
             expect(res.result).to.exist;
             expect(res.result).to.have.string('Hello, World!');
@@ -169,24 +136,18 @@ describe('Vision', function () {
         });
     });
 
-    it('returns an error absolute path given and allowAbsolutePath is false (by default)', function (done) {
+    it('errors absolute path given and allowAbsolutePath is false (by default)', function (done) {
 
-        var server = new Hapi.Server({
-            debug: false,
-            views: {
-                engines: { 'html': require('handlebars') },
-                path: __dirname + '/templates/valid'
-            }
+        var server = new Hapi.Server({ debug: false });
+        server.handler('viewTest', Vision.handler);
+        server.views({
+            engines: { 'html': require('handlebars') },
+            path: __dirname + '/templates/valid'
         });
 
-        var absoluteHandler = function (request, reply) {
+        server.route({ method: 'GET', path: '/', handler: { viewTest: { template: __dirname + '/templates/valid/test', context: { message: 'Hello, World!' } } } });
 
-            return reply.view(__dirname + '/templates/valid/test', { message: 'Hello, World!' });
-        };
-
-        server.route({ method: 'GET', path: '/views/abspath', config: { handler: absoluteHandler } });
-
-        server.inject('/views/abspath', function (res) {
+        server.inject('/', function (res) {
 
             expect(res.result).to.exist;
             expect(res.statusCode).to.equal(500);
@@ -194,24 +155,18 @@ describe('Vision', function () {
         });
     });
 
-    it('returns an error if path given includes ../ and allowInsecureAccess is false (by default)', function (done) {
+    it('errors if path given includes ../ and allowInsecureAccess is false (by default)', function (done) {
 
-        var server = new Hapi.Server({
-            debug: false,
-            views: {
-                engines: { 'html': require('handlebars') },
-                path: __dirname + '/templates/valid'
-            }
+        var server = new Hapi.Server({ debug: false });
+        server.handler('viewTest', Vision.handler);
+        server.views({
+            engines: { 'html': require('handlebars') },
+            path: __dirname + '/templates/valid'
         });
 
-        var insecureHandler = function (request, reply) {
+        server.route({ method: 'GET', path: '/', handler: { viewTest: { template: '../test', context: { message: 'Hello, World!' } } } });
 
-            return reply.view('../test', { message: 'Hello, World!' });
-        };
-
-        server.route({ method: 'GET', path: '/views/insecure', config: { handler: insecureHandler } });
-
-        server.inject('/views/insecure', function (res) {
+        server.inject('/', function (res) {
 
             expect(res.result).to.exist;
             expect(res.statusCode).to.equal(500);
@@ -221,23 +176,17 @@ describe('Vision', function () {
 
     it('allows if path given includes ../ and allowInsecureAccess is true', function (done) {
 
-        var server = new Hapi.Server({
-            debug: false,
-            views: {
-                engines: { 'html': require('handlebars') },
-                allowInsecureAccess: true,
-                path: __dirname + '/templates/valid/helpers'
-            }
+        var server = new Hapi.Server();
+        server.handler('viewTest', Vision.handler);
+        server.views({
+            engines: { 'html': require('handlebars') },
+            allowInsecureAccess: true,
+            path: __dirname + '/templates/valid/helpers'
         });
 
-        var insecureHandler = function (request, reply) {
+        server.route({ method: 'GET', path: '/', handler: { viewTest: { template: '../test', context: { message: 'Hello, World!' } } } });
 
-            return reply.view('../test', { message: 'Hello, World!' });
-        };
-
-        server.route({ method: 'GET', path: '/views/insecure', config: { handler: insecureHandler } });
-
-        server.inject('/views/insecure', function (res) {
+        server.inject('/', function (res) {
 
             expect(res.result).to.exist;
             expect(res.result).to.have.string('Hello, World!');
@@ -246,24 +195,18 @@ describe('Vision', function () {
         });
     });
 
-    it('returns an error if template does not exist', function (done) {
+    it('errors if template does not exist', function (done) {
 
-        var server = new Hapi.Server({
-            debug: false,
-            views: {
-                engines: { 'html': require('handlebars') },
-                path: __dirname + '/templates/valid'
-            }
+        var server = new Hapi.Server({ debug: false });
+        server.handler('viewTest', Vision.handler);
+        server.views({
+            engines: { 'html': require('handlebars') },
+            path: __dirname + '/templates/valid'
         });
 
-        var nonexistentHandler = function (request, reply) {
+        server.route({ method: 'GET', path: '/', handler: { viewTest: { template: 'testNope', context: { message: 'Hello, World!' } } } });
 
-            return reply.view('testNope', { message: 'Hello, World!' });
-        };
-
-        server.route({ method: 'GET', path: '/views/nonexistent', config: { handler: nonexistentHandler } });
-
-        server.inject('/views/nonexistent', function (res) {
+        server.inject('/', function (res) {
 
             expect(res.result).to.exist;
             expect(res.statusCode).to.equal(500);
@@ -271,24 +214,18 @@ describe('Vision', function () {
         });
     });
 
-    it('returns an error if engine.compile throws', function (done) {
+    it('errors if engine.compile throws', function (done) {
 
-        var server = new Hapi.Server({
-            debug: false,
-            views: {
-                engines: { 'html': require('handlebars') },
-                path: __dirname + '/templates/valid'
-            }
+        var server = new Hapi.Server({ debug: false });
+        server.handler('viewTest', Vision.handler);
+        server.views({
+            engines: { 'html': require('handlebars') },
+            path: __dirname + '/templates/valid'
         });
 
-        var invalidHandler = function (request, reply) {
+        server.route({ method: 'GET', path: '/', handler: { viewTest: { template: 'badmustache', context: { message: 'Hello, World!' }, options: { path: __dirname + '/templates/valid/invalid' } } } });
 
-            return reply.view('badmustache', { message: 'Hello, World!' }, { path: __dirname + '/templates/valid/invalid' });
-        };
-
-        server.route({ method: 'GET', path: '/views/invalid', config: { handler: invalidHandler } });
-
-        server.inject('/views/invalid', function (res) {
+        server.inject('/', function (res) {
 
             expect(res.result).to.exist;
             expect(res.statusCode).to.equal(500);
@@ -300,21 +237,17 @@ describe('Vision', function () {
 
         it('returns response', function (done) {
 
-            var layoutServer = new Hapi.Server();
-            layoutServer.views({
+            var server = new Hapi.Server();
+            server.handler('viewTest', Vision.handler);
+            server.views({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
                 layout: true
             });
 
-            var handler = function (request, reply) {
+            server.route({ method: 'GET', path: '/', handler: { viewTest: { template: 'valid/test', context: { title: 'test', message: 'Hapi' } } } });
 
-                return reply.view('valid/test', { title: 'test', message: 'Hapi' });
-            };
-
-            layoutServer.route({ method: 'GET', path: '/', handler: handler });
-
-            layoutServer.inject('/', function (res) {
+            server.inject('/', function (res) {
 
                 expect(res.result).to.exist;
                 expect(res.statusCode).to.equal(200);
@@ -325,22 +258,18 @@ describe('Vision', function () {
 
         it('returns response with basePath and absolute path', function (done) {
 
-            var layoutServer = new Hapi.Server();
-            layoutServer.views({
+            var server = new Hapi.Server();
+            server.handler('viewTest', Vision.handler);
+            server.views({
                 engines: { 'html': require('handlebars') },
                 basePath: '/none/shall/pass',
                 path: __dirname + '/templates',
                 layout: true
             });
 
-            var handler = function (request, reply) {
+            server.route({ method: 'GET', path: '/', handler: { viewTest: { template: 'valid/test', context: { title: 'test', message: 'Hapi' } } } });
 
-                return reply.view('valid/test', { title: 'test', message: 'Hapi' });
-            };
-
-            layoutServer.route({ method: 'GET', path: '/', handler: handler });
-
-            layoutServer.inject('/', function (res) {
+            server.inject('/', function (res) {
 
                 expect(res.result).to.exist;
                 expect(res.statusCode).to.equal(200);
@@ -351,21 +280,17 @@ describe('Vision', function () {
 
         it('returns response with layout override', function (done) {
 
-            var layoutServer = new Hapi.Server();
-            layoutServer.views({
+            var server = new Hapi.Server();
+            server.handler('viewTest', Vision.handler);
+            server.views({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
                 layout: true
             });
 
-            var handler = function (request, reply) {
+            server.route({ method: 'GET', path: '/', handler: { viewTest: { template: 'valid/test', context: { title: 'test', message: 'Hapi' }, options: { layout: 'otherLayout' } } } });
 
-                return reply.view('valid/test', { title: 'test', message: 'Hapi' }, { layout: 'otherLayout' });
-            };
-
-            layoutServer.route({ method: 'GET', path: '/', handler: handler });
-
-            layoutServer.inject('/', function (res) {
+            server.inject('/', function (res) {
 
                 expect(res.result).to.exist;
                 expect(res.statusCode).to.equal(200);
@@ -376,21 +301,17 @@ describe('Vision', function () {
 
         it('returns response with custom server layout', function (done) {
 
-            var layoutServer = new Hapi.Server();
-            layoutServer.views({
+            var server = new Hapi.Server();
+            server.handler('viewTest', Vision.handler);
+            server.views({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
                 layout: 'otherLayout'
             });
 
-            var handler = function (request, reply) {
+            server.route({ method: 'GET', path: '/', handler: { viewTest: { template: 'valid/test', context: { title: 'test', message: 'Hapi' } } } });
 
-                return reply.view('valid/test', { title: 'test', message: 'Hapi' });
-            };
-
-            layoutServer.route({ method: 'GET', path: '/', handler: handler });
-
-            layoutServer.inject('/', function (res) {
+            server.inject('/', function (res) {
 
                 expect(res.result).to.exist;
                 expect(res.statusCode).to.equal(200);
@@ -401,8 +322,9 @@ describe('Vision', function () {
 
         it('returns response with custom server layout and path', function (done) {
 
-            var layoutServer = new Hapi.Server();
-            layoutServer.views({
+            var server = new Hapi.Server();
+            server.handler('viewTest', Vision.handler);
+            server.views({
                 engines: { 'html': require('handlebars') },
                 basePath: __dirname,
                 path: 'templates',
@@ -410,14 +332,9 @@ describe('Vision', function () {
                 layout: 'elsewhere'
             });
 
-            var handler = function (request, reply) {
+            server.route({ method: 'GET', path: '/', handler: { viewTest: { template: 'valid/test', context: { title: 'test', message: 'Hapi' } } } });
 
-                return reply.view('valid/test', { title: 'test', message: 'Hapi' });
-            };
-
-            layoutServer.route({ method: 'GET', path: '/', handler: handler });
-
-            layoutServer.inject('/', function (res) {
+            server.inject('/', function (res) {
 
                 expect(res.result).to.exist;
                 expect(res.statusCode).to.equal(200);
@@ -428,21 +345,17 @@ describe('Vision', function () {
 
         it('errors on missing layout', function (done) {
 
-            var layoutServer = new Hapi.Server({ debug: false });
-            layoutServer.views({
+            var server = new Hapi.Server({ debug: false });
+            server.handler('viewTest', Vision.handler);
+            server.views({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
                 layout: 'missingLayout'
             });
 
-            var handler = function (request, reply) {
+            server.route({ method: 'GET', path: '/', handler: { viewTest: { template: 'valid/test', context: { title: 'test', message: 'Hapi' } } } });
 
-                return reply.view('valid/test', { title: 'test', message: 'Hapi' });
-            };
-
-            layoutServer.route({ method: 'GET', path: '/', handler: handler });
-
-            layoutServer.inject('/', function (res) {
+            server.inject('/', function (res) {
 
                 expect(res.statusCode).to.equal(500);
                 done();
@@ -451,21 +364,17 @@ describe('Vision', function () {
 
         it('errors on invalid layout', function (done) {
 
-            var layoutServer = new Hapi.Server({ debug: false });
-            layoutServer.views({
+            var server = new Hapi.Server({ debug: false });
+            server.handler('viewTest', Vision.handler);
+            server.views({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
                 layout: 'invalidLayout'
             });
 
-            var handler = function (request, reply) {
+            server.route({ method: 'GET', path: '/', handler: { viewTest: { template: 'valid/test', context: { title: 'test', message: 'Hapi' } } } });
 
-                return reply.view('valid/test', { title: 'test', message: 'Hapi' });
-            };
-
-            layoutServer.route({ method: 'GET', path: '/', handler: handler });
-
-            layoutServer.inject('/', function (res) {
+            server.inject('/', function (res) {
 
                 expect(res.statusCode).to.equal(500);
                 done();
@@ -474,21 +383,17 @@ describe('Vision', function () {
 
         it('returns response without layout', function (done) {
 
-            var layoutServer = new Hapi.Server();
-            layoutServer.views({
+            var server = new Hapi.Server();
+            server.handler('viewTest', Vision.handler);
+            server.views({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
                 layout: true
             });
 
-            var handler = function (request, reply) {
+            server.route({ method: 'GET', path: '/', handler: { viewTest: { template: 'valid/test', context: { title: 'test', message: 'Hapi' }, options: { layout: false } } } });
 
-                return reply.view('valid/test', { title: 'test', message: 'Hapi' }, { layout: false });
-            };
-
-            layoutServer.route({ method: 'GET', path: '/', handler: handler });
-
-            layoutServer.inject('/', function (res) {
+            server.inject('/', function (res) {
 
                 expect(res.result).to.exist;
                 expect(res.statusCode).to.equal(200);
@@ -497,23 +402,19 @@ describe('Vision', function () {
             });
         });
 
-        it('returns error on layoutKeyword conflict', function (done) {
+        it('errors on layoutKeyword conflict', function (done) {
 
-            var layoutServer = new Hapi.Server({ debug: false });
-            layoutServer.views({
+            var server = new Hapi.Server({ debug: false });
+            server.handler('viewTest', Vision.handler);
+            server.views({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates/valid',
                 layout: true
             });
 
-            var handler = function (request, reply) {
+            server.route({ method: 'GET', path: '/', handler: { viewTest: { template: 'test', context: { message: 'Hello, World!', content: 'fail' } } } });
 
-                return reply.view('test', { message: 'Hello, World!', content: 'fail' });
-            };
-
-            layoutServer.route({ method: 'GET', path: '/conflict', handler: handler });
-
-            layoutServer.inject('/conflict', function (res) {
+            server.inject('/', function (res) {
 
                 expect(res.result).to.exist;
                 expect(res.statusCode).to.equal(500);
@@ -521,115 +422,22 @@ describe('Vision', function () {
             });
         });
 
-        it('returns an error absolute path given and allowAbsolutePath is false (by default)', function (done) {
+        it('errors absolute path given and allowAbsolutePath is false (by default)', function (done) {
 
-            var layoutServer = new Hapi.Server({ debug: false });
-            layoutServer.views({
+            var server = new Hapi.Server({ debug: false });
+            server.handler('viewTest', Vision.handler);
+            server.views({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates/valid',
                 layout: true
             });
 
-            var handler = function (request, reply) {
+            server.route({ method: 'GET', path: '/', handler: { viewTest: { template: 'test', context: { title: 'test', message: 'Hapi' }, options: { path: __dirname + '/templates/valid/invalid' } } } });
 
-                return reply.view('test', { message: 'Hello, World!' }, { path: __dirname + '/templates/valid/invalid' });
-            };
-
-            layoutServer.route({ method: 'GET', path: '/abspath', handler: handler });
-
-            layoutServer.inject('/abspath', function (res) {
+            server.inject('/', function (res) {
 
                 expect(res.result).to.exist;
                 expect(res.statusCode).to.equal(500);
-                done();
-            });
-        });
-    });
-
-    describe('Caching', function () {
-
-        it('should not throw if local cache disabled', function (done) {
-
-            var fn = function () {
-
-                var testServer = new Hapi.Server({
-                    views: {
-                        engines: { 'html': require('handlebars') },
-                        path: __dirname + '/templates/valid'
-                    }
-                });
-
-                var handler = function (request, reply) {
-
-                    return reply.view('test.html', { message: "Hello World!" });
-                };
-
-                testServer.route({ method: 'GET', path: '/handlebars', config: { handler: handler } });
-                testServer.inject('/handlebars', function (res) {
-
-                    expect(res.result).to.exist;
-                    expect(res.statusCode).to.equal(200);
-                    testServer.inject('/handlebars', function (res) {
-
-                        expect(res.result).to.exist;
-                        expect(res.statusCode).to.equal(200);
-                        // done();
-                    });
-                });
-            };
-            expect(fn).to.not.throw();
-            done();
-        });
-
-        it('should use the cache if all caching enabled', function (done) {
-
-            var testServer = new Hapi.Server({
-                views: {
-                    engines: { 'html': require('handlebars') },
-                    path: __dirname + '/templates/valid',
-                    isCached: true
-                }
-            });
-
-            var handler = function (request, reply) {
-
-                return reply.view('test.html', { message: "Hello World!" });
-            };
-
-            testServer.route({ method: 'GET', path: '/handlebars', config: { handler: handler } });
-            testServer.inject('/handlebars', function (res) {
-
-                expect(res.result).to.exist;
-                expect(res.statusCode).to.equal(200);
-                testServer.inject('/handlebars', function (res) {
-
-                    expect(res.result).to.exist;
-                    expect(res.statusCode).to.equal(200);
-                    done();
-                });
-            });
-        });
-
-        it('should not throw if global cache disabled', function (done) {
-
-            var testServer = new Hapi.Server({
-                views: {
-                    engines: { 'html': require('handlebars') },
-                    path: __dirname + '/templates/valid',
-                    isCached: false
-                }
-            });
-
-            var handler = function (request, reply) {
-
-                return reply.view('test.html', { message: "Hello World!" });
-            };
-
-            testServer.route({ method: 'GET', path: '/handlebars', config: { handler: handler } });
-            testServer.inject('/handlebars', function (res) {
-
-                expect(res.result).to.exist;
-                expect(res.statusCode).to.equal(200);
                 done();
             });
         });
@@ -639,30 +447,24 @@ describe('Vision', function () {
 
         it('should render jade template', function (done) {
 
-            var server = new Hapi.Server({
-                debug: false,
-                views: {
-                    path: __dirname + '/templates/valid',
-                    engines: {
-                        'html': require('handlebars'),
-                        'jade': require('jade'),
-                        'hbar': {
-                            module: {
-                                compile: function (engine) { return engine.compile; }
-                            }
+            var server = new Hapi.Server();
+            server.handler('viewTest', Vision.handler);
+            server.views({
+                path: __dirname + '/templates/valid',
+                engines: {
+                    'html': require('handlebars'),
+                    'jade': require('jade'),
+                    'hbar': {
+                        module: {
+                            compile: function (engine) { return engine.compile; }
                         }
                     }
                 }
             });
 
-            var testMultiHandlerJade = function (request, reply) {
+            server.route({ method: 'GET', path: '/', handler: { viewTest: { template: 'testMulti.jade', context: { message: 'Hello World!' } } } });
 
-                return reply.view('testMulti.jade', { message: "Hello World!" });
-            };
-
-            server.route({ method: 'GET', path: '/jade', config: { handler: testMultiHandlerJade } });
-
-            server.inject('/jade', function (res) {
+            server.inject('/', function (res) {
 
                 expect(res.result).to.exist;
                 expect(res.statusCode).to.equal(200);
@@ -672,30 +474,24 @@ describe('Vision', function () {
 
         it('should render handlebars template', function (done) {
 
-            var server = new Hapi.Server({
-                debug: false,
-                views: {
-                    path: __dirname + '/templates/valid',
-                    engines: {
-                        'html': require('handlebars'),
-                        'jade': require('jade'),
-                        'hbar': {
-                            module: {
-                                compile: function (engine) { return engine.compile; }
-                            }
+            var server = new Hapi.Server();
+            server.handler('viewTest', Vision.handler);
+            server.views({
+                path: __dirname + '/templates/valid',
+                engines: {
+                    'html': require('handlebars'),
+                    'jade': require('jade'),
+                    'hbar': {
+                        module: {
+                            compile: function (engine) { return engine.compile; }
                         }
                     }
                 }
             });
 
-            var handler = function (request, reply) {
+            server.route({ method: 'GET', path: '/', handler: { viewTest: { template: 'test.html', context: { message: 'Hello World!' } } } });
 
-                return reply.view('test.html', { message: "Hello World!" });
-            };
-
-            server.route({ method: 'GET', path: '/handlebars', config: { handler: handler } });
-
-            server.inject('/handlebars', function (res) {
+            server.inject('/', function (res) {
 
                 expect(res.result).to.exist;
                 expect(res.statusCode).to.equal(200);
@@ -705,30 +501,24 @@ describe('Vision', function () {
 
         it('should return 500 on unknown extension', function (done) {
 
-            var server = new Hapi.Server({
-                debug: false,
-                views: {
-                    path: __dirname + '/templates/valid',
-                    engines: {
-                        'html': require('handlebars'),
-                        'jade': require('jade'),
-                        'hbar': {
-                            module: {
-                                compile: function (engine) { return engine.compile; }
-                            }
+            var server = new Hapi.Server({ debug: false });
+            server.handler('viewTest', Vision.handler);
+            server.views({
+                path: __dirname + '/templates/valid',
+                engines: {
+                    'html': require('handlebars'),
+                    'jade': require('jade'),
+                    'hbar': {
+                        module: {
+                            compile: function (engine) { return engine.compile; }
                         }
                     }
                 }
             });
 
-            var testMultiHandlerUnknown = function (request, reply) {
+            server.route({ method: 'GET', path: '/', handler: { viewTest: { template: 'test', context: { message: 'Hello World!' } } } });
 
-                return reply.view('test', { message: "Hello World!" });
-            };
-
-            server.route({ method: 'GET', path: '/unknown', config: { handler: testMultiHandlerUnknown } });
-
-            server.inject('/unknown', function (res) {
+            server.inject('/', function (res) {
 
                 expect(res.statusCode).to.equal(500);
                 done();
@@ -737,30 +527,24 @@ describe('Vision', function () {
 
         it('should return 500 on missing extension engine', function (done) {
 
-            var server = new Hapi.Server({
-                debug: false,
-                views: {
-                    path: __dirname + '/templates/valid',
-                    engines: {
-                        'html': require('handlebars'),
-                        'jade': require('jade'),
-                        'hbar': {
-                            module: {
-                                compile: function (engine) { return engine.compile; }
-                            }
+            var server = new Hapi.Server({ debug: false });
+            server.handler('viewTest', Vision.handler);
+            server.views({
+                path: __dirname + '/templates/valid',
+                engines: {
+                    'html': require('handlebars'),
+                    'jade': require('jade'),
+                    'hbar': {
+                        module: {
+                            compile: function (engine) { return engine.compile; }
                         }
                     }
                 }
             });
 
-            var testMultiHandlerMissing = function (request, reply) {
+            server.route({ method: 'GET', path: '/', handler: { viewTest: { template: 'test.xyz', context: { message: 'Hello World!' } } } });
 
-                return reply.view('test.xyz', { message: "Hello World!" });
-            };
-
-            server.route({ method: 'GET', path: '/missing', config: { handler: testMultiHandlerMissing } });
-
-            server.inject('/missing', function (res) {
+            server.inject('/', function (res) {
 
                 expect(res.statusCode).to.equal(500);
                 done();
@@ -768,7 +552,7 @@ describe('Vision', function () {
         });
     });
 
-    describe('#render', function () {
+    describe('render()', function () {
 
         it('renders with async compile', function (done) {
 
@@ -801,7 +585,7 @@ describe('Vision', function () {
             });
         });
 
-        it('returns error on sync compile that throws', function (done) {
+        it('errors on sync compile that throws', function (done) {
 
             var views = new Vision.Manager({
                 path: __dirname + '/templates',
@@ -1195,21 +979,101 @@ describe('Vision', function () {
                 done();
             });
         });
+
+        it('reuses cached compilation', function (done) {
+
+            var gen = 0;
+            var views = new Vision.Manager({
+                path: __dirname + '/templates',
+                engines: {
+                    html: {
+                        compileMode: 'async',
+                        module: {
+                            compile: function (string, options, callback) {
+
+                                ++gen;
+                                var compiled = Handlebars.compile(string, options);
+                                var renderer = function (context, opt, next) {
+
+                                    return next(null, compiled(context, opt));
+                                };
+
+                                return callback(null, renderer);
+                            }
+                        }
+                    }
+                }
+            });
+
+            views.render('valid/test', { title: 'test', message: 'Hapi' }, null, function (err, rendered, config) {
+
+                expect(rendered).to.exist;
+                expect(rendered).to.contain('Hapi');
+
+                views.render('valid/test', { title: 'test', message: 'Hapi' }, null, function (err, rendered, config) {
+
+                    expect(rendered).to.exist;
+                    expect(rendered).to.contain('Hapi');
+
+                    expect(gen).to.equal(1);
+                    done();
+                });
+            });
+        });
+
+        it('disables caching', function (done) {
+
+            var gen = 0;
+            var views = new Vision.Manager({
+                path: __dirname + '/templates',
+                engines: {
+                    html: {
+                        compileMode: 'async',
+                        module: {
+                            compile: function (string, options, callback) {
+
+                                ++gen;
+                                var compiled = Handlebars.compile(string, options);
+                                var renderer = function (context, opt, next) {
+
+                                    return next(null, compiled(context, opt));
+                                };
+
+                                return callback(null, renderer);
+                            }
+                        }
+                    }
+                },
+                isCached: false
+            });
+
+            views.render('valid/test', { title: 'test', message: 'Hapi' }, null, function (err, rendered, config) {
+
+                expect(rendered).to.exist;
+                expect(rendered).to.contain('Hapi');
+
+                views.render('valid/test', { title: 'test', message: 'Hapi' }, null, function (err, rendered, config) {
+
+                    expect(rendered).to.exist;
+                    expect(rendered).to.contain('Hapi');
+
+                    expect(gen).to.equal(2);
+                    done();
+                });
+            });
+        });
     });
 
-    describe('#handler', function () {
+    describe('handler()', function () {
 
         it('handles routes to views', function (done) {
 
-            var options = {
-                views: {
-                    engines: { html: require('handlebars') },
-                    path: __dirname + '/templates'
-                }
-            };
-
-            var server = new Hapi.Server(options);
+            var server = new Hapi.Server();
             server.handler('viewTest', Vision.handler);
+            server.views({
+                engines: { html: require('handlebars') },
+                path: __dirname + '/templates'
+            });
 
             server.route({ method: 'GET', path: '/{param}', handler: { viewTest: 'valid/handler' } });
             server.inject({
@@ -1224,15 +1088,12 @@ describe('Vision', function () {
 
         it('handles custom context', function (done) {
 
-            var options = {
-                views: {
-                    engines: { jade: Jade },
-                    path: __dirname + '/templates'
-                }
-            };
-
-            var server = new Hapi.Server(options);
+            var server = new Hapi.Server();
             server.handler('viewTest', Vision.handler);
+            server.views({
+                engines: { jade: Jade },
+                path: __dirname + '/templates'
+            });
 
             server.route({ method: 'GET', path: '/', handler: { viewTest: { template: 'valid/index', context: { message: 'heyloo' } } } });
             server.inject('/', function (res) {
@@ -1244,16 +1105,13 @@ describe('Vision', function () {
 
         it('handles custom options', function (done) {
 
-            var options = {
-                views: {
-                    engines: { html: require('handlebars') },
-                    path: __dirname + '/templates',
-                    layoutPath: __dirname + '/templates/layout'
-                }
-            };
-
-            var server = new Hapi.Server(options);
+            var server = new Hapi.Server();
             server.handler('viewTest', Vision.handler);
+            server.views({
+                engines: { html: require('handlebars') },
+                path: __dirname + '/templates',
+                layoutPath: __dirname + '/templates/layout'
+            });
 
             server.route({ method: 'GET', path: '/', handler: { viewTest: { template: 'valid/options', options: { layout: 'elsewhere' } } } });
             server.inject('/', function (res) {
@@ -1270,15 +1128,12 @@ describe('Vision', function () {
                 reply('PreHello');
             };
 
-            var options = {
-                views: {
-                    engines: { html: require('handlebars') },
-                    path: __dirname + '/templates'
-                }
-            };
-
-            var server = new Hapi.Server(options);
+            var server = new Hapi.Server();
             server.handler('viewTest', Vision.handler);
+            server.views({
+                engines: { html: require('handlebars') },
+                path: __dirname + '/templates'
+            });
 
             server.route({
                 method: 'GET',
@@ -1299,18 +1154,27 @@ describe('Vision', function () {
                 done();
             });
         });
+    });
+
+    describe('response()', function () {
 
         it('does not override Content-Type', function (done) {
 
-            var options = {
-                views: {
-                    engines: { jade: Jade },
-                    path: __dirname + '/templates'
-                }
+            var server = new Hapi.Server();
+
+            var handler = function (request, reply) {
+
+                var views = new Vision.Manager({
+                    engines: { html: require('handlebars') },
+                    path: __dirname + '/templates/valid'
+                });
+
+                var response = Vision.response(views, 'test.html', { message: 'hi' }, {}, request);
+                return reply(response).type('text/plain');
             };
 
-            var server = new Hapi.Server(options);
-            server.route({ method: 'GET', path: '/', handler: function (request, reply) { reply.view('valid/index').type('text/plain'); } });
+            server.on('internalError', function () { console.log(arguments[1].stack) });
+            server.route({ method: 'GET', path: '/', handler: handler });
             server.inject('/', function (res) {
 
                 expect(res.headers['content-type']).to.contain('text/plain');
