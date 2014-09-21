@@ -26,7 +26,7 @@ describe('Vision', function () {
 
         var server = new Hapi.Server();
         server.handler('viewTest', Vision.handler);
-        server.views({
+        server._views = new Vision.Manager({
             engines: {
                 html: {
                     module: {
@@ -52,11 +52,11 @@ describe('Vision', function () {
         });
     });
 
-    it('should render handlebars template', function (done) {
+    it('renders handlebars template', function (done) {
 
         var server = new Hapi.Server();
         server.handler('viewTest', Vision.handler);
-        server.views({
+        server._views = new Vision.Manager({
             engines: {
                 html: {
                     module: require('handlebars'),
@@ -79,7 +79,7 @@ describe('Vision', function () {
 
         var server = new Hapi.Server();
         server.handler('viewTest', Vision.handler);
-        server.views({
+        server._views = new Vision.Manager({
             engines: {
                 html: {
                     module: require('handlebars'),
@@ -103,7 +103,7 @@ describe('Vision', function () {
 
         var server = new Hapi.Server({ debug: false });
         server.handler('viewTest', Vision.handler);
-        server.views({
+        server._views = new Vision.Manager({
             engines: { 'html': require('handlebars') },
             path: __dirname + '/templates/invalid'
         });
@@ -120,7 +120,7 @@ describe('Vision', function () {
 
         var server = new Hapi.Server();
         server.handler('viewTest', Vision.handler);
-        server.views({
+        server._views = new Vision.Manager({
             engines: { 'html': require('handlebars') },
             path: __dirname + '/templates/valid'
         });
@@ -140,7 +140,7 @@ describe('Vision', function () {
 
         var server = new Hapi.Server({ debug: false });
         server.handler('viewTest', Vision.handler);
-        server.views({
+        server._views = new Vision.Manager({
             engines: { 'html': require('handlebars') },
             path: __dirname + '/templates/valid'
         });
@@ -159,7 +159,7 @@ describe('Vision', function () {
 
         var server = new Hapi.Server({ debug: false });
         server.handler('viewTest', Vision.handler);
-        server.views({
+        server._views = new Vision.Manager({
             engines: { 'html': require('handlebars') },
             path: __dirname + '/templates/valid'
         });
@@ -178,7 +178,7 @@ describe('Vision', function () {
 
         var server = new Hapi.Server();
         server.handler('viewTest', Vision.handler);
-        server.views({
+        server._views = new Vision.Manager({
             engines: { 'html': require('handlebars') },
             allowInsecureAccess: true,
             path: __dirname + '/templates/valid/helpers'
@@ -199,7 +199,7 @@ describe('Vision', function () {
 
         var server = new Hapi.Server({ debug: false });
         server.handler('viewTest', Vision.handler);
-        server.views({
+        server._views = new Vision.Manager({
             engines: { 'html': require('handlebars') },
             path: __dirname + '/templates/valid'
         });
@@ -218,7 +218,7 @@ describe('Vision', function () {
 
         var server = new Hapi.Server({ debug: false });
         server.handler('viewTest', Vision.handler);
-        server.views({
+        server._views = new Vision.Manager({
             engines: { 'html': require('handlebars') },
             path: __dirname + '/templates/valid'
         });
@@ -239,7 +239,7 @@ describe('Vision', function () {
 
             var server = new Hapi.Server();
             server.handler('viewTest', Vision.handler);
-            server.views({
+            server._views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
                 layout: true
@@ -260,7 +260,7 @@ describe('Vision', function () {
 
             var server = new Hapi.Server();
             server.handler('viewTest', Vision.handler);
-            server.views({
+            server._views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 basePath: '/none/shall/pass',
                 path: __dirname + '/templates',
@@ -282,7 +282,7 @@ describe('Vision', function () {
 
             var server = new Hapi.Server();
             server.handler('viewTest', Vision.handler);
-            server.views({
+            server._views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
                 layout: true
@@ -303,7 +303,7 @@ describe('Vision', function () {
 
             var server = new Hapi.Server();
             server.handler('viewTest', Vision.handler);
-            server.views({
+            server._views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
                 layout: 'otherLayout'
@@ -324,7 +324,7 @@ describe('Vision', function () {
 
             var server = new Hapi.Server();
             server.handler('viewTest', Vision.handler);
-            server.views({
+            server._views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 basePath: __dirname,
                 path: 'templates',
@@ -347,7 +347,7 @@ describe('Vision', function () {
 
             var server = new Hapi.Server({ debug: false });
             server.handler('viewTest', Vision.handler);
-            server.views({
+            server._views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
                 layout: 'missingLayout'
@@ -366,7 +366,7 @@ describe('Vision', function () {
 
             var server = new Hapi.Server({ debug: false });
             server.handler('viewTest', Vision.handler);
-            server.views({
+            server._views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
                 layout: 'invalidLayout'
@@ -385,7 +385,7 @@ describe('Vision', function () {
 
             var server = new Hapi.Server();
             server.handler('viewTest', Vision.handler);
-            server.views({
+            server._views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
                 layout: true
@@ -406,7 +406,7 @@ describe('Vision', function () {
 
             var server = new Hapi.Server({ debug: false });
             server.handler('viewTest', Vision.handler);
-            server.views({
+            server._views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates/valid',
                 layout: true
@@ -426,7 +426,7 @@ describe('Vision', function () {
 
             var server = new Hapi.Server({ debug: false });
             server.handler('viewTest', Vision.handler);
-            server.views({
+            server._views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates/valid',
                 layout: true
@@ -445,38 +445,11 @@ describe('Vision', function () {
 
     describe('Multiple', function () {
 
-        it('should render jade template', function (done) {
+        it('renders handlebars template', function (done) {
 
             var server = new Hapi.Server();
             server.handler('viewTest', Vision.handler);
-            server.views({
-                path: __dirname + '/templates/valid',
-                engines: {
-                    'html': require('handlebars'),
-                    'jade': require('jade'),
-                    'hbar': {
-                        module: {
-                            compile: function (engine) { return engine.compile; }
-                        }
-                    }
-                }
-            });
-
-            server.route({ method: 'GET', path: '/', handler: { viewTest: { template: 'testMulti.jade', context: { message: 'Hello World!' } } } });
-
-            server.inject('/', function (res) {
-
-                expect(res.result).to.exist;
-                expect(res.statusCode).to.equal(200);
-                done();
-            });
-        });
-
-        it('should render handlebars template', function (done) {
-
-            var server = new Hapi.Server();
-            server.handler('viewTest', Vision.handler);
-            server.views({
+            server._views = new Vision.Manager({
                 path: __dirname + '/templates/valid',
                 engines: {
                     'html': require('handlebars'),
@@ -499,11 +472,38 @@ describe('Vision', function () {
             });
         });
 
-        it('should return 500 on unknown extension', function (done) {
+        it('renders jade template', function (done) {
+
+            var server = new Hapi.Server();
+            server.handler('viewTest', Vision.handler);
+            server._views = new Vision.Manager({
+                path: __dirname + '/templates/valid',
+                engines: {
+                    'html': require('handlebars'),
+                    'jade': require('jade'),
+                    'hbar': {
+                        module: {
+                            compile: function (engine) { return engine.compile; }
+                        }
+                    }
+                }
+            });
+
+            server.route({ method: 'GET', path: '/', handler: { viewTest: { template: 'testMulti.jade', context: { message: 'Hello World!' } } } });
+
+            server.inject('/', function (res) {
+
+                expect(res.result).to.exist;
+                expect(res.statusCode).to.equal(200);
+                done();
+            });
+        });
+
+        it('returns 500 on unknown extension', function (done) {
 
             var server = new Hapi.Server({ debug: false });
             server.handler('viewTest', Vision.handler);
-            server.views({
+            server._views = new Vision.Manager({
                 path: __dirname + '/templates/valid',
                 engines: {
                     'html': require('handlebars'),
@@ -525,11 +525,11 @@ describe('Vision', function () {
             });
         });
 
-        it('should return 500 on missing extension engine', function (done) {
+        it('returns 500 on missing extension engine', function (done) {
 
             var server = new Hapi.Server({ debug: false });
             server.handler('viewTest', Vision.handler);
-            server.views({
+            server._views = new Vision.Manager({
                 path: __dirname + '/templates/valid',
                 engines: {
                     'html': require('handlebars'),
@@ -1070,7 +1070,7 @@ describe('Vision', function () {
 
             var server = new Hapi.Server();
             server.handler('viewTest', Vision.handler);
-            server.views({
+            server._views = new Vision.Manager({
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates'
             });
@@ -1090,7 +1090,7 @@ describe('Vision', function () {
 
             var server = new Hapi.Server();
             server.handler('viewTest', Vision.handler);
-            server.views({
+            server._views = new Vision.Manager({
                 engines: { jade: Jade },
                 path: __dirname + '/templates'
             });
@@ -1107,7 +1107,7 @@ describe('Vision', function () {
 
             var server = new Hapi.Server();
             server.handler('viewTest', Vision.handler);
-            server.views({
+            server._views = new Vision.Manager({
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates',
                 layoutPath: __dirname + '/templates/layout'
@@ -1130,7 +1130,7 @@ describe('Vision', function () {
 
             var server = new Hapi.Server();
             server.handler('viewTest', Vision.handler);
-            server.views({
+            server._views = new Vision.Manager({
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates'
             });
@@ -1158,6 +1158,29 @@ describe('Vision', function () {
 
     describe('response()', function () {
 
+        it('sets Content-Type', function (done) {
+
+            var server = new Hapi.Server();
+
+            var handler = function (request, reply) {
+
+                var views = new Vision.Manager({
+                    engines: { html: require('handlebars') },
+                    path: __dirname + '/templates/valid'
+                });
+
+                var response = Vision.response(views, 'test.html', { message: 'hi' }, {}, request);
+                return reply(response);
+            };
+
+            server.route({ method: 'GET', path: '/', handler: handler });
+            server.inject('/', function (res) {
+
+                expect(res.headers['content-type']).to.contain('text/html');
+                done();
+            });
+        });
+
         it('does not override Content-Type', function (done) {
 
             var server = new Hapi.Server();
@@ -1173,11 +1196,33 @@ describe('Vision', function () {
                 return reply(response).type('text/plain');
             };
 
-            server.on('internalError', function () { console.log(arguments[1].stack) });
             server.route({ method: 'GET', path: '/', handler: handler });
             server.inject('/', function (res) {
 
                 expect(res.headers['content-type']).to.contain('text/plain');
+                done();
+            });
+        });
+
+        it('errors on invalid template', function (done) {
+
+            var server = new Hapi.Server({ debug: false });
+
+            var handler = function (request, reply) {
+
+                var views = new Vision.Manager({
+                    engines: { html: require('handlebars') },
+                    path: __dirname + '/templates/invalid'
+                });
+
+                var response = Vision.response(views, 'test.html', { message: 'hi' }, {}, request);
+                return reply(response);
+            };
+
+            server.route({ method: 'GET', path: '/', handler: handler });
+            server.inject('/', function (res) {
+
+                expect(res.statusCode).to.equal(500);
                 done();
             });
         });

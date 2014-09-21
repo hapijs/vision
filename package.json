@@ -1,7 +1,7 @@
 {
   "name": "vision",
   "description": "Templates rendering support for hapi.js",
-  "version": "1.0.0",
+  "version": "0.9.0",
   "repository": "git://github.com/hapijs/vision",
   "main": "index",
   "keywords": [
