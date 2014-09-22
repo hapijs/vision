@@ -1169,7 +1169,7 @@ describe('Vision', function () {
                     path: __dirname + '/templates/valid'
                 });
 
-                var response = Vision.response(views, 'test.html', { message: 'hi' }, {}, request);
+                var response = views.response('test.html', { message: 'hi' }, {}, request);
                 return reply(response);
             };
 
@@ -1192,7 +1192,7 @@ describe('Vision', function () {
                     path: __dirname + '/templates/valid'
                 });
 
-                var response = Vision.response(views, 'test.html', { message: 'hi' }, {}, request);
+                var response = views.response('test.html', { message: 'hi' }, {}, request);
                 return reply(response).type('text/plain');
             };
 
