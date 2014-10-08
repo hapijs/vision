@@ -20,37 +20,7 @@ var it = lab.it;
 var expect = Lab.expect;
 
 
-describe('Vision', function () {
-
-    it('should not fail if rendered template returns undefined', function (done) {
-
-        var server = new Hapi.Server();
-        server.handler('viewTest', Vision.handler);
-        server._views = new Vision.Manager({
-            engines: {
-                html: {
-                    module: {
-                        compile: function (template, options) {
-
-                            return function (context, options) {
-
-                                return undefined;
-                            }
-                        }
-                    },
-                    path: __dirname + '/templates/valid'
-                }
-            }
-        });
-
-        server.route({ method: 'GET', path: '/', handler: { viewTest: { template: 'test.html' } } });
-
-        server.inject('/', function (res) {
-
-            expect(res.statusCode).to.equal(200);
-            done();
-        });
-    });
+describe('Manager', function () {
 
     it('renders handlebars template', function (done) {
 
@@ -233,7 +203,37 @@ describe('Vision', function () {
         });
     });
 
-    describe('Layout', function (done) {
+    it('should not fail if rendered template returns undefined', function (done) {
+
+        var server = new Hapi.Server();
+        server.handler('viewTest', Vision.handler);
+        server._views = new Vision.Manager({
+            engines: {
+                html: {
+                    module: {
+                        compile: function (template, options) {
+
+                            return function (context, options) {
+
+                                return undefined;
+                            }
+                        }
+                    },
+                    path: __dirname + '/templates/valid'
+                }
+            }
+        });
+
+        server.route({ method: 'GET', path: '/', handler: { viewTest: { template: 'test.html' } } });
+
+        server.inject('/', function (res) {
+
+            expect(res.statusCode).to.equal(200);
+            done();
+        });
+    });
+
+    describe('with layout', function (done) {
 
         it('returns response', function (done) {
 
@@ -443,7 +443,7 @@ describe('Vision', function () {
         });
     });
 
-    describe('Multiple', function () {
+    describe('with multiple engines', function () {
 
         it('renders handlebars template', function (done) {
 
