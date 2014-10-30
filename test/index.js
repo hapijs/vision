@@ -1292,6 +1292,84 @@ describe('Manager', function () {
                 done();
             });
         });
+
+        it('handles a global context', function (done) {
+
+            var server = new Hapi.Server();
+            server.handler('viewTest', Vision.handler);
+            server._views = new Vision.Manager({
+                engines: { html: require('handlebars') },
+                path: __dirname + '/templates',
+
+                context: {
+                    message: 'default message',
+
+                    query: {
+                        test: 'global'
+                    }
+                }
+            });
+
+            server.route({ method: 'GET', path: '/', handler: { viewTest: { template: 'valid/testContext' } } });
+            server.inject('/', function (res) {
+
+                expect(res.result).to.contain('<h1>global</h1>');
+                expect(res.result).to.contain('<h1>default message</h1>');
+                done();
+            });
+        });
+
+        it('overrides the global context with the default handler context', function (done) {
+
+            var server = new Hapi.Server();
+            server.handler('viewTest', Vision.handler);
+            server._views = new Vision.Manager({
+                engines: { html: require('handlebars') },
+                path: __dirname + '/templates',
+
+                context: {
+                    message: 'default message',
+
+                    query: {
+                        test: 'global'
+                    }
+                }
+            });
+
+            server.route({ method: 'GET', path: '/', handler: { viewTest: { template: 'valid/testContext' } } });
+            server.inject('/?test=yes', function (res) {
+
+                expect(res.result).to.contain('<h1>yes</h1>');
+                expect(res.result).to.contain('<h1>default message</h1>');
+                done();
+            });
+        });
+
+        it('overrides the global and default contexts with a custom handler context', function (done) {
+
+            var server = new Hapi.Server();
+            server.handler('viewTest', Vision.handler);
+            server._views = new Vision.Manager({
+                engines: { html: require('handlebars') },
+                path: __dirname + '/templates',
+
+                context: {
+                    message: 'default message',
+
+                    query: {
+                        test: 'global'
+                    }
+                }
+            });
+
+            server.route({ method: 'GET', path: '/', handler: { viewTest: { template: 'valid/testContext', context: { message: 'override', query: { test: 'no' } } } } });
+            server.inject('/?test=yes', function (res) {
+
+                expect(res.result).to.contain('<h1>no</h1>');
+                expect(res.result).to.contain('<h1>override</h1>');
+                done();
+            });
+        });
     });
 
     describe('response()', function () {
