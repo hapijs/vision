@@ -641,6 +641,54 @@ describe('Manager', function () {
             });
         });
 
+        it('renders with a global context', function (done) {
+
+            var testView = new Vision.Manager({
+                engines: { html: require('handlebars') },
+                path: __dirname + '/templates',
+
+                context: {
+                    message: 'default message',
+
+                    query: {
+                        test: 'global'
+                    }
+                }
+            });
+
+            testView.render('valid/testContext', null, null, function (err, rendered, config) {
+
+                expect(rendered).to.exist;
+                expect(rendered).to.contain('<h1>global</h1>');
+                expect(rendered).to.contain('<h1>default message</h1>');
+                done();
+            });
+        });
+
+        it('overrides the global context with local values', function (done) {
+
+            var testView = new Vision.Manager({
+                engines: { html: require('handlebars') },
+                path: __dirname + '/templates',
+
+                context: {
+                    message: 'default message',
+
+                    query: {
+                        test: 'global'
+                    }
+                }
+            });
+
+            testView.render('valid/testContext', { message : 'override' }, null, function (err, rendered, config) {
+
+                expect(rendered).to.exist;
+                expect(rendered).to.contain('<h1>global</h1>');
+                expect(rendered).to.contain('<h1>override</h1>');
+                done();
+            });
+        });
+
         it('uses specified default ext', function (done) {
 
             var testView = new Vision.Manager({
