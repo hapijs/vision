@@ -1327,8 +1327,9 @@ describe('Manager', function () {
         it('handles a global context', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates',
 
@@ -1353,8 +1354,9 @@ describe('Manager', function () {
         it('overrides the global context with the default handler context', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates',
 
@@ -1379,8 +1381,9 @@ describe('Manager', function () {
         it('overrides the global and default contexts with a custom handler context', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates',
 
