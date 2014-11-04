@@ -27,7 +27,7 @@ describe('Manager', function () {
 
         var server = new Hapi.Server();
         server.handler('viewTest', Vision.handler);
-        server._views = new Vision.Manager({
+        server.pack._env.views = new Vision.Manager({
             engines: {
                 html: {
                     module: require('handlebars'),
@@ -51,7 +51,7 @@ describe('Manager', function () {
         var server = new Hapi.Server();
 
         server.handler('viewTest', Vision.handler);
-        server._views = new Vision.Manager({
+        server.pack._env.views = new Vision.Manager({
             engines: {
                 html: {
                     module: require('handlebars'),
@@ -75,7 +75,7 @@ describe('Manager', function () {
 
         var server = new Hapi.Server({ debug: false });
         server.handler('viewTest', Vision.handler);
-        server._views = new Vision.Manager({
+        server.pack._env.views = new Vision.Manager({
             engines: { 'html': require('handlebars') },
             path: __dirname + '/templates/invalid'
         });
@@ -92,7 +92,7 @@ describe('Manager', function () {
 
         var server = new Hapi.Server();
         server.handler('viewTest', Vision.handler);
-        server._views = new Vision.Manager({
+        server.pack._env.views = new Vision.Manager({
             engines: { 'html': require('handlebars') },
             path: __dirname + '/templates/valid'
         });
@@ -112,7 +112,7 @@ describe('Manager', function () {
 
         var server = new Hapi.Server({ debug: false });
         server.handler('viewTest', Vision.handler);
-        server._views = new Vision.Manager({
+        server.pack._env.views = new Vision.Manager({
             engines: { 'html': require('handlebars') },
             path: __dirname + '/templates/valid'
         });
@@ -131,7 +131,7 @@ describe('Manager', function () {
 
         var server = new Hapi.Server({ debug: false });
         server.handler('viewTest', Vision.handler);
-        server._views = new Vision.Manager({
+        server.pack._env.views = new Vision.Manager({
             engines: { 'html': require('handlebars') },
             path: __dirname + '/templates/valid'
         });
@@ -150,7 +150,7 @@ describe('Manager', function () {
 
         var server = new Hapi.Server();
         server.handler('viewTest', Vision.handler);
-        server._views = new Vision.Manager({
+        server.pack._env.views = new Vision.Manager({
             engines: { 'html': require('handlebars') },
             allowInsecureAccess: true,
             path: __dirname + '/templates/valid/helpers'
@@ -171,7 +171,7 @@ describe('Manager', function () {
 
         var server = new Hapi.Server({ debug: false });
         server.handler('viewTest', Vision.handler);
-        server._views = new Vision.Manager({
+        server.pack._env.views = new Vision.Manager({
             engines: { 'html': require('handlebars') },
             path: __dirname + '/templates/valid'
         });
@@ -190,7 +190,7 @@ describe('Manager', function () {
 
         var server = new Hapi.Server({ debug: false });
         server.handler('viewTest', Vision.handler);
-        server._views = new Vision.Manager({
+        server.pack._env.views = new Vision.Manager({
             engines: { 'html': require('handlebars') },
             path: __dirname + '/templates/valid'
         });
@@ -209,7 +209,7 @@ describe('Manager', function () {
 
         var server = new Hapi.Server();
         server.handler('viewTest', Vision.handler);
-        server._views = new Vision.Manager({
+        server.pack._env.views = new Vision.Manager({
             engines: {
                 html: {
                     module: {
@@ -241,7 +241,7 @@ describe('Manager', function () {
 
             var server = new Hapi.Server();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server.pack._env.views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
                 layout: true
@@ -262,7 +262,7 @@ describe('Manager', function () {
 
             var server = new Hapi.Server();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server.pack._env.views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 basePath: '/none/shall/pass',
                 path: __dirname + '/templates',
@@ -284,7 +284,7 @@ describe('Manager', function () {
 
             var server = new Hapi.Server();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server.pack._env.views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
                 layout: true
@@ -305,7 +305,7 @@ describe('Manager', function () {
 
             var server = new Hapi.Server();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server.pack._env.views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
                 layout: 'otherLayout'
@@ -326,7 +326,7 @@ describe('Manager', function () {
 
             var server = new Hapi.Server();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server.pack._env.views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 basePath: __dirname,
                 path: 'templates',
@@ -349,7 +349,7 @@ describe('Manager', function () {
 
             var server = new Hapi.Server({ debug: false });
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server.pack._env.views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
                 layout: 'missingLayout'
@@ -368,7 +368,7 @@ describe('Manager', function () {
 
             var server = new Hapi.Server({ debug: false });
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server.pack._env.views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
                 layout: 'invalidLayout'
@@ -387,7 +387,7 @@ describe('Manager', function () {
 
             var server = new Hapi.Server();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server.pack._env.views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
                 layout: true
@@ -408,7 +408,7 @@ describe('Manager', function () {
 
             var server = new Hapi.Server({ debug: false });
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server.pack._env.views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates/valid',
                 layout: true
@@ -428,7 +428,7 @@ describe('Manager', function () {
 
             var server = new Hapi.Server({ debug: false });
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server.pack._env.views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates/valid',
                 layout: true
@@ -451,7 +451,7 @@ describe('Manager', function () {
 
             var server = new Hapi.Server();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server.pack._env.views = new Vision.Manager({
                 path: __dirname + '/templates/valid',
                 engines: {
                     'html': require('handlebars'),
@@ -478,7 +478,7 @@ describe('Manager', function () {
 
             var server = new Hapi.Server();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server.pack._env.views = new Vision.Manager({
                 path: __dirname + '/templates/valid',
                 engines: {
                     'html': require('handlebars'),
@@ -505,7 +505,7 @@ describe('Manager', function () {
 
             var server = new Hapi.Server({ debug: false });
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server.pack._env.views = new Vision.Manager({
                 path: __dirname + '/templates/valid',
                 engines: {
                     'html': require('handlebars'),
@@ -531,7 +531,7 @@ describe('Manager', function () {
 
             var server = new Hapi.Server({ debug: false });
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server.pack._env.views = new Vision.Manager({
                 path: __dirname + '/templates/valid',
                 engines: {
                     'html': require('handlebars'),
@@ -1174,7 +1174,7 @@ describe('Manager', function () {
 
             var server = new Hapi.Server();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server.pack._env.views = new Vision.Manager({
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates'
             });
@@ -1194,7 +1194,7 @@ describe('Manager', function () {
 
             var server = new Hapi.Server();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server.pack._env.views = new Vision.Manager({
                 engines: { jade: Jade },
                 path: __dirname + '/templates'
             });
@@ -1211,7 +1211,7 @@ describe('Manager', function () {
 
             var server = new Hapi.Server();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server.pack._env.views = new Vision.Manager({
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates',
                 layoutPath: __dirname + '/templates/layout'
@@ -1234,7 +1234,7 @@ describe('Manager', function () {
 
             var server = new Hapi.Server();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server.pack._env.views = new Vision.Manager({
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates'
             });
@@ -1263,7 +1263,7 @@ describe('Manager', function () {
 
             var server = new Hapi.Server();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server.pack._env.views = new Vision.Manager({
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates'
             });
@@ -1281,7 +1281,7 @@ describe('Manager', function () {
 
             var server = new Hapi.Server();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server.pack._env.views = new Vision.Manager({
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates'
             });
@@ -1299,7 +1299,7 @@ describe('Manager', function () {
 
             var server = new Hapi.Server();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server.pack._env.views = new Vision.Manager({
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates',
 
@@ -1325,7 +1325,7 @@ describe('Manager', function () {
 
             var server = new Hapi.Server();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server.pack._env.views = new Vision.Manager({
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates',
 
@@ -1351,7 +1351,7 @@ describe('Manager', function () {
 
             var server = new Hapi.Server();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server.pack._env.views = new Vision.Manager({
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates',
 
