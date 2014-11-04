@@ -26,8 +26,9 @@ describe('Manager', function () {
     it('renders handlebars template', function (done) {
 
         var server = new Hapi.Server();
+        server.connection();
         server.handler('viewTest', Vision.handler);
-        server._views = new Vision.Manager({
+        server._env.views = new Vision.Manager({
             engines: {
                 html: {
                     module: require('handlebars'),
@@ -49,9 +50,9 @@ describe('Manager', function () {
     it('sets content type', function (done) {
 
         var server = new Hapi.Server();
-
+        server.connection();
         server.handler('viewTest', Vision.handler);
-        server._views = new Vision.Manager({
+        server._env.views = new Vision.Manager({
             engines: {
                 html: {
                     module: require('handlebars'),
@@ -74,8 +75,9 @@ describe('Manager', function () {
     it('errors on invalid template path', function (done) {
 
         var server = new Hapi.Server({ debug: false });
+        server.connection();
         server.handler('viewTest', Vision.handler);
-        server._views = new Vision.Manager({
+        server._env.views = new Vision.Manager({
             engines: { 'html': require('handlebars') },
             path: __dirname + '/templates/invalid'
         });
@@ -91,8 +93,9 @@ describe('Manager', function () {
     it('returns a compiled Handlebars template reply', function (done) {
 
         var server = new Hapi.Server();
+        server.connection();
         server.handler('viewTest', Vision.handler);
-        server._views = new Vision.Manager({
+        server._env.views = new Vision.Manager({
             engines: { 'html': require('handlebars') },
             path: __dirname + '/templates/valid'
         });
@@ -111,8 +114,9 @@ describe('Manager', function () {
     it('errors absolute path given and allowAbsolutePath is false (by default)', function (done) {
 
         var server = new Hapi.Server({ debug: false });
+        server.connection();
         server.handler('viewTest', Vision.handler);
-        server._views = new Vision.Manager({
+        server._env.views = new Vision.Manager({
             engines: { 'html': require('handlebars') },
             path: __dirname + '/templates/valid'
         });
@@ -130,8 +134,9 @@ describe('Manager', function () {
     it('errors if path given includes ../ and allowInsecureAccess is false (by default)', function (done) {
 
         var server = new Hapi.Server({ debug: false });
+        server.connection();
         server.handler('viewTest', Vision.handler);
-        server._views = new Vision.Manager({
+        server._env.views = new Vision.Manager({
             engines: { 'html': require('handlebars') },
             path: __dirname + '/templates/valid'
         });
@@ -149,8 +154,9 @@ describe('Manager', function () {
     it('allows if path given includes ../ and allowInsecureAccess is true', function (done) {
 
         var server = new Hapi.Server();
+        server.connection();
         server.handler('viewTest', Vision.handler);
-        server._views = new Vision.Manager({
+        server._env.views = new Vision.Manager({
             engines: { 'html': require('handlebars') },
             allowInsecureAccess: true,
             path: __dirname + '/templates/valid/helpers'
@@ -170,8 +176,9 @@ describe('Manager', function () {
     it('errors if template does not exist()', function (done) {
 
         var server = new Hapi.Server({ debug: false });
+        server.connection();
         server.handler('viewTest', Vision.handler);
-        server._views = new Vision.Manager({
+        server._env.views = new Vision.Manager({
             engines: { 'html': require('handlebars') },
             path: __dirname + '/templates/valid'
         });
@@ -189,8 +196,9 @@ describe('Manager', function () {
     it('errors if engine.compile throws', function (done) {
 
         var server = new Hapi.Server({ debug: false });
+        server.connection();
         server.handler('viewTest', Vision.handler);
-        server._views = new Vision.Manager({
+        server._env.views = new Vision.Manager({
             engines: { 'html': require('handlebars') },
             path: __dirname + '/templates/valid'
         });
@@ -208,8 +216,9 @@ describe('Manager', function () {
     it('should not fail if rendered template returns undefined', function (done) {
 
         var server = new Hapi.Server();
+        server.connection();
         server.handler('viewTest', Vision.handler);
-        server._views = new Vision.Manager({
+        server._env.views = new Vision.Manager({
             engines: {
                 html: {
                     module: {
@@ -240,8 +249,9 @@ describe('Manager', function () {
         it('returns response', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
                 layout: true
@@ -261,8 +271,9 @@ describe('Manager', function () {
         it('returns response with basePath and absolute path', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 basePath: '/none/shall/pass',
                 path: __dirname + '/templates',
@@ -283,8 +294,9 @@ describe('Manager', function () {
         it('returns response with layout override', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
                 layout: true
@@ -304,8 +316,9 @@ describe('Manager', function () {
         it('returns response with custom server layout', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
                 layout: 'otherLayout'
@@ -325,8 +338,9 @@ describe('Manager', function () {
         it('returns response with custom server layout and path', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 basePath: __dirname,
                 path: 'templates',
@@ -348,8 +362,9 @@ describe('Manager', function () {
         it('errors on missing layout', function (done) {
 
             var server = new Hapi.Server({ debug: false });
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
                 layout: 'missingLayout'
@@ -367,8 +382,9 @@ describe('Manager', function () {
         it('errors on invalid layout', function (done) {
 
             var server = new Hapi.Server({ debug: false });
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
                 layout: 'invalidLayout'
@@ -386,8 +402,9 @@ describe('Manager', function () {
         it('returns response without layout', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
                 layout: true
@@ -407,8 +424,9 @@ describe('Manager', function () {
         it('errors on layoutKeyword conflict', function (done) {
 
             var server = new Hapi.Server({ debug: false });
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates/valid',
                 layout: true
@@ -427,8 +445,9 @@ describe('Manager', function () {
         it('errors absolute path given and allowAbsolutePath is false (by default)', function (done) {
 
             var server = new Hapi.Server({ debug: false });
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates/valid',
                 layout: true
@@ -450,8 +469,9 @@ describe('Manager', function () {
         it('renders handlebars template', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 path: __dirname + '/templates/valid',
                 engines: {
                     'html': require('handlebars'),
@@ -477,8 +497,9 @@ describe('Manager', function () {
         it('renders jade template', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 path: __dirname + '/templates/valid',
                 engines: {
                     'html': require('handlebars'),
@@ -504,8 +525,9 @@ describe('Manager', function () {
         it('returns 500 on unknown extension', function (done) {
 
             var server = new Hapi.Server({ debug: false });
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 path: __dirname + '/templates/valid',
                 engines: {
                     'html': require('handlebars'),
@@ -530,8 +552,9 @@ describe('Manager', function () {
         it('returns 500 on missing extension engine', function (done) {
 
             var server = new Hapi.Server({ debug: false });
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 path: __dirname + '/templates/valid',
                 engines: {
                     'html': require('handlebars'),
@@ -1173,8 +1196,9 @@ describe('Manager', function () {
         it('handles routes to views', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates'
             });
@@ -1193,8 +1217,9 @@ describe('Manager', function () {
         it('handles custom context', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { jade: Jade },
                 path: __dirname + '/templates'
             });
@@ -1210,8 +1235,9 @@ describe('Manager', function () {
         it('handles custom options', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates',
                 layoutPath: __dirname + '/templates/layout'
@@ -1233,8 +1259,9 @@ describe('Manager', function () {
             };
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates'
             });
@@ -1262,8 +1289,9 @@ describe('Manager', function () {
         it('handles both custom and default contexts', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates'
             });
@@ -1280,8 +1308,9 @@ describe('Manager', function () {
         it('overrides default contexts when provided with context of same name', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates'
             });
@@ -1298,8 +1327,9 @@ describe('Manager', function () {
         it('handles a global context', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates',
 
@@ -1324,8 +1354,9 @@ describe('Manager', function () {
         it('overrides the global context with the default handler context', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates',
 
@@ -1350,8 +1381,9 @@ describe('Manager', function () {
         it('overrides the global and default contexts with a custom handler context', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates',
 
@@ -1379,6 +1411,7 @@ describe('Manager', function () {
         it('sets Content-Type', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
 
             var handler = function (request, reply) {
 
@@ -1402,6 +1435,7 @@ describe('Manager', function () {
         it('does not override Content-Type', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
 
             var handler = function (request, reply) {
 
@@ -1425,6 +1459,7 @@ describe('Manager', function () {
         it('errors on invalid template', function (done) {
 
             var server = new Hapi.Server({ debug: false });
+            server.connection();
 
             var handler = function (request, reply) {
 
