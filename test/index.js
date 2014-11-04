@@ -2,8 +2,9 @@
 
 var Handlebars = require('handlebars');
 var Jade = require('jade');
-var Lab = require('lab');
+var Code = require('code')
 var Hapi = require('hapi');
+var Lab = require('lab');
 var Vision = require('..');
 
 
@@ -17,7 +18,7 @@ var internals = {};
 var lab = exports.lab = Lab.script();
 var describe = lab.describe;
 var it = lab.it;
-var expect = Lab.expect;
+var expect = Code.expect;
 
 
 describe('Manager', function () {
@@ -25,8 +26,9 @@ describe('Manager', function () {
     it('renders handlebars template', function (done) {
 
         var server = new Hapi.Server();
+        server.connection();
         server.handler('viewTest', Vision.handler);
-        server._views = new Vision.Manager({
+        server._env.views = new Vision.Manager({
             engines: {
                 html: {
                     module: require('handlebars'),
@@ -39,7 +41,7 @@ describe('Manager', function () {
 
         server.inject('/handlebars', function (res) {
 
-            expect(res.result).to.exist;
+            expect(res.result).to.exist();
             expect(res.statusCode).to.equal(200);
             done();
         });
@@ -48,8 +50,9 @@ describe('Manager', function () {
     it('sets content type', function (done) {
 
         var server = new Hapi.Server();
+        server.connection();
         server.handler('viewTest', Vision.handler);
-        server._views = new Vision.Manager({
+        server._env.views = new Vision.Manager({
             engines: {
                 html: {
                     module: require('handlebars'),
@@ -63,7 +66,7 @@ describe('Manager', function () {
         server.inject('/', function (res) {
 
             expect(res.headers['content-type']).to.equal('something/else');
-            expect(res.result).to.exist;
+            expect(res.result).to.exist();
             expect(res.statusCode).to.equal(200);
             done();
         });
@@ -72,8 +75,9 @@ describe('Manager', function () {
     it('errors on invalid template path', function (done) {
 
         var server = new Hapi.Server({ debug: false });
+        server.connection();
         server.handler('viewTest', Vision.handler);
-        server._views = new Vision.Manager({
+        server._env.views = new Vision.Manager({
             engines: { 'html': require('handlebars') },
             path: __dirname + '/templates/invalid'
         });
@@ -89,8 +93,9 @@ describe('Manager', function () {
     it('returns a compiled Handlebars template reply', function (done) {
 
         var server = new Hapi.Server();
+        server.connection();
         server.handler('viewTest', Vision.handler);
-        server._views = new Vision.Manager({
+        server._env.views = new Vision.Manager({
             engines: { 'html': require('handlebars') },
             path: __dirname + '/templates/valid'
         });
@@ -99,7 +104,7 @@ describe('Manager', function () {
 
         server.inject('/', function (res) {
 
-            expect(res.result).to.exist;
+            expect(res.result).to.exist();
             expect(res.result).to.have.string('Hello, World!');
             expect(res.statusCode).to.equal(200);
             done();
@@ -109,8 +114,9 @@ describe('Manager', function () {
     it('errors absolute path given and allowAbsolutePath is false (by default)', function (done) {
 
         var server = new Hapi.Server({ debug: false });
+        server.connection();
         server.handler('viewTest', Vision.handler);
-        server._views = new Vision.Manager({
+        server._env.views = new Vision.Manager({
             engines: { 'html': require('handlebars') },
             path: __dirname + '/templates/valid'
         });
@@ -119,7 +125,7 @@ describe('Manager', function () {
 
         server.inject('/', function (res) {
 
-            expect(res.result).to.exist;
+            expect(res.result).to.exist();
             expect(res.statusCode).to.equal(500);
             done();
         });
@@ -128,8 +134,9 @@ describe('Manager', function () {
     it('errors if path given includes ../ and allowInsecureAccess is false (by default)', function (done) {
 
         var server = new Hapi.Server({ debug: false });
+        server.connection();
         server.handler('viewTest', Vision.handler);
-        server._views = new Vision.Manager({
+        server._env.views = new Vision.Manager({
             engines: { 'html': require('handlebars') },
             path: __dirname + '/templates/valid'
         });
@@ -138,7 +145,7 @@ describe('Manager', function () {
 
         server.inject('/', function (res) {
 
-            expect(res.result).to.exist;
+            expect(res.result).to.exist();
             expect(res.statusCode).to.equal(500);
             done();
         });
@@ -147,8 +154,9 @@ describe('Manager', function () {
     it('allows if path given includes ../ and allowInsecureAccess is true', function (done) {
 
         var server = new Hapi.Server();
+        server.connection();
         server.handler('viewTest', Vision.handler);
-        server._views = new Vision.Manager({
+        server._env.views = new Vision.Manager({
             engines: { 'html': require('handlebars') },
             allowInsecureAccess: true,
             path: __dirname + '/templates/valid/helpers'
@@ -158,18 +166,19 @@ describe('Manager', function () {
 
         server.inject('/', function (res) {
 
-            expect(res.result).to.exist;
+            expect(res.result).to.exist();
             expect(res.result).to.have.string('Hello, World!');
             expect(res.statusCode).to.equal(200);
             done();
         });
     });
 
-    it('errors if template does not exist', function (done) {
+    it('errors if template does not exist()', function (done) {
 
         var server = new Hapi.Server({ debug: false });
+        server.connection();
         server.handler('viewTest', Vision.handler);
-        server._views = new Vision.Manager({
+        server._env.views = new Vision.Manager({
             engines: { 'html': require('handlebars') },
             path: __dirname + '/templates/valid'
         });
@@ -178,7 +187,7 @@ describe('Manager', function () {
 
         server.inject('/', function (res) {
 
-            expect(res.result).to.exist;
+            expect(res.result).to.exist();
             expect(res.statusCode).to.equal(500);
             done();
         });
@@ -187,8 +196,9 @@ describe('Manager', function () {
     it('errors if engine.compile throws', function (done) {
 
         var server = new Hapi.Server({ debug: false });
+        server.connection();
         server.handler('viewTest', Vision.handler);
-        server._views = new Vision.Manager({
+        server._env.views = new Vision.Manager({
             engines: { 'html': require('handlebars') },
             path: __dirname + '/templates/valid'
         });
@@ -197,7 +207,7 @@ describe('Manager', function () {
 
         server.inject('/', function (res) {
 
-            expect(res.result).to.exist;
+            expect(res.result).to.exist();
             expect(res.statusCode).to.equal(500);
             done();
         });
@@ -206,8 +216,9 @@ describe('Manager', function () {
     it('should not fail if rendered template returns undefined', function (done) {
 
         var server = new Hapi.Server();
+        server.connection();
         server.handler('viewTest', Vision.handler);
-        server._views = new Vision.Manager({
+        server._env.views = new Vision.Manager({
             engines: {
                 html: {
                     module: {
@@ -238,8 +249,9 @@ describe('Manager', function () {
         it('returns response', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
                 layout: true
@@ -249,7 +261,7 @@ describe('Manager', function () {
 
             server.inject('/', function (res) {
 
-                expect(res.result).to.exist;
+                expect(res.result).to.exist();
                 expect(res.statusCode).to.equal(200);
                 expect(res.result).to.equal('<!DOCTYPE html>\n<html>\n    <head>\n        <title>test</title>\n    </head>\n    <body>\n        <div>\n    <h1>Hapi</h1>\n</div>\n\n    </body>\n</html>\n');
                 done();
@@ -259,8 +271,9 @@ describe('Manager', function () {
         it('returns response with basePath and absolute path', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 basePath: '/none/shall/pass',
                 path: __dirname + '/templates',
@@ -271,7 +284,7 @@ describe('Manager', function () {
 
             server.inject('/', function (res) {
 
-                expect(res.result).to.exist;
+                expect(res.result).to.exist();
                 expect(res.statusCode).to.equal(200);
                 expect(res.result).to.equal('<!DOCTYPE html>\n<html>\n    <head>\n        <title>test</title>\n    </head>\n    <body>\n        <div>\n    <h1>Hapi</h1>\n</div>\n\n    </body>\n</html>\n');
                 done();
@@ -281,8 +294,9 @@ describe('Manager', function () {
         it('returns response with layout override', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
                 layout: true
@@ -292,7 +306,7 @@ describe('Manager', function () {
 
             server.inject('/', function (res) {
 
-                expect(res.result).to.exist;
+                expect(res.result).to.exist();
                 expect(res.statusCode).to.equal(200);
                 expect(res.result).to.equal('test:<div>\n    <h1>Hapi</h1>\n</div>\n');
                 done();
@@ -302,8 +316,9 @@ describe('Manager', function () {
         it('returns response with custom server layout', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
                 layout: 'otherLayout'
@@ -313,7 +328,7 @@ describe('Manager', function () {
 
             server.inject('/', function (res) {
 
-                expect(res.result).to.exist;
+                expect(res.result).to.exist();
                 expect(res.statusCode).to.equal(200);
                 expect(res.result).to.equal('test:<div>\n    <h1>Hapi</h1>\n</div>\n');
                 done();
@@ -323,8 +338,9 @@ describe('Manager', function () {
         it('returns response with custom server layout and path', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 basePath: __dirname,
                 path: 'templates',
@@ -336,7 +352,7 @@ describe('Manager', function () {
 
             server.inject('/', function (res) {
 
-                expect(res.result).to.exist;
+                expect(res.result).to.exist();
                 expect(res.statusCode).to.equal(200);
                 expect(res.result).to.equal('test+<div>\n    <h1>Hapi</h1>\n</div>\n');
                 done();
@@ -346,8 +362,9 @@ describe('Manager', function () {
         it('errors on missing layout', function (done) {
 
             var server = new Hapi.Server({ debug: false });
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
                 layout: 'missingLayout'
@@ -365,8 +382,9 @@ describe('Manager', function () {
         it('errors on invalid layout', function (done) {
 
             var server = new Hapi.Server({ debug: false });
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
                 layout: 'invalidLayout'
@@ -384,8 +402,9 @@ describe('Manager', function () {
         it('returns response without layout', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
                 layout: true
@@ -395,7 +414,7 @@ describe('Manager', function () {
 
             server.inject('/', function (res) {
 
-                expect(res.result).to.exist;
+                expect(res.result).to.exist();
                 expect(res.statusCode).to.equal(200);
                 expect(res.result).to.equal('<div>\n    <h1>Hapi</h1>\n</div>\n');
                 done();
@@ -405,8 +424,9 @@ describe('Manager', function () {
         it('errors on layoutKeyword conflict', function (done) {
 
             var server = new Hapi.Server({ debug: false });
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates/valid',
                 layout: true
@@ -416,7 +436,7 @@ describe('Manager', function () {
 
             server.inject('/', function (res) {
 
-                expect(res.result).to.exist;
+                expect(res.result).to.exist();
                 expect(res.statusCode).to.equal(500);
                 done();
             });
@@ -425,8 +445,9 @@ describe('Manager', function () {
         it('errors absolute path given and allowAbsolutePath is false (by default)', function (done) {
 
             var server = new Hapi.Server({ debug: false });
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates/valid',
                 layout: true
@@ -436,7 +457,7 @@ describe('Manager', function () {
 
             server.inject('/', function (res) {
 
-                expect(res.result).to.exist;
+                expect(res.result).to.exist();
                 expect(res.statusCode).to.equal(500);
                 done();
             });
@@ -448,8 +469,9 @@ describe('Manager', function () {
         it('renders handlebars template', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 path: __dirname + '/templates/valid',
                 engines: {
                     'html': require('handlebars'),
@@ -466,7 +488,7 @@ describe('Manager', function () {
 
             server.inject('/', function (res) {
 
-                expect(res.result).to.exist;
+                expect(res.result).to.exist();
                 expect(res.statusCode).to.equal(200);
                 done();
             });
@@ -475,8 +497,9 @@ describe('Manager', function () {
         it('renders jade template', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 path: __dirname + '/templates/valid',
                 engines: {
                     'html': require('handlebars'),
@@ -493,7 +516,7 @@ describe('Manager', function () {
 
             server.inject('/', function (res) {
 
-                expect(res.result).to.exist;
+                expect(res.result).to.exist();
                 expect(res.statusCode).to.equal(200);
                 done();
             });
@@ -502,8 +525,9 @@ describe('Manager', function () {
         it('returns 500 on unknown extension', function (done) {
 
             var server = new Hapi.Server({ debug: false });
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 path: __dirname + '/templates/valid',
                 engines: {
                     'html': require('handlebars'),
@@ -528,8 +552,9 @@ describe('Manager', function () {
         it('returns 500 on missing extension engine', function (done) {
 
             var server = new Hapi.Server({ debug: false });
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 path: __dirname + '/templates/valid',
                 engines: {
                     'html': require('handlebars'),
@@ -579,7 +604,7 @@ describe('Manager', function () {
 
             views.render('valid/test', { title: 'test', message: 'Hapi' }, null, function (err, rendered, config) {
 
-                expect(rendered).to.exist;
+                expect(rendered).to.exist();
                 expect(rendered).to.contain('Hapi');
                 done();
             });
@@ -604,7 +629,7 @@ describe('Manager', function () {
 
             views.render('valid/test', { title: 'test', message: 'Hapi' }, null, function (err, rendered, config) {
 
-                expect(err).to.exist;
+                expect(err).to.exist();
                 expect(err.message).to.equal('Bad bad view');
                 done();
             });
@@ -620,7 +645,7 @@ describe('Manager', function () {
 
             testView.render('valid/test', { title: 'test', message: 'Hapi' }, null, function (err, rendered, config) {
 
-                expect(rendered).to.exist;
+                expect(rendered).to.exist();
                 expect(rendered).to.contain('Hapi');
                 done();
             });
@@ -635,7 +660,7 @@ describe('Manager', function () {
 
             testView.render('valid/test', null, null, function (err, rendered, config) {
 
-                expect(rendered).to.exist;
+                expect(rendered).to.exist();
                 expect(rendered).to.equal('<div>\n    <h1></h1>\n</div>\n');
                 done();
             });
@@ -651,7 +676,7 @@ describe('Manager', function () {
 
             testView.render('valid/test', null, null, function (err, rendered, config) {
 
-                expect(rendered).to.exist;
+                expect(rendered).to.exist();
                 expect(rendered).to.equal('<div>\n    <h1></h1>\n</div>\n');
                 done();
             });
@@ -667,7 +692,7 @@ describe('Manager', function () {
 
             testView.render('valid/test', { title: 'test', message: 'Hapi' }, null, function (err, rendered, config) {
 
-                expect(rendered).to.exist;
+                expect(rendered).to.exist();
                 expect(rendered).to.equal('<div>\n    <h1>Hapi</h1>\n</div>\n');
                 done();
             });
@@ -683,7 +708,7 @@ describe('Manager', function () {
 
             testViewWithLayouts.render('valid/test', { title: 'test', message: 'Hapi' }, null, function (err, rendered, config) {
 
-                expect(rendered).to.exist;
+                expect(rendered).to.exist();
                 expect(rendered).to.contain('Hapi');
                 done();
             });
@@ -700,7 +725,7 @@ describe('Manager', function () {
 
             testViewWithLayouts.render('valid/test', { title: 'test', message: 'Hapi' }, null, function (err, rendered, config) {
 
-                expect(rendered).to.exist;
+                expect(rendered).to.exist();
                 expect(rendered).to.contain('Hapi');
                 done();
             });
@@ -716,7 +741,7 @@ describe('Manager', function () {
 
             views.render('valid/test', { title: 'test', message: 'Hapi' }, null, function (err, rendered, config) {
 
-                expect(err).to.exist;
+                expect(err).to.exist();
                 expect(err.message).to.equal('Parse error on line 1:\n{{}\n--^\nExpecting \'ID\', \'DATA\', got \'INVALID\': Parse error on line 1:\n{{}\n--^\nExpecting \'ID\', \'DATA\', got \'INVALID\'');
                 done();
             });
@@ -732,7 +757,7 @@ describe('Manager', function () {
 
             views.render('valid/test', { title: 'test', message: 'Hapi' }, null, function (err, rendered, config) {
 
-                expect(err).to.exist;
+                expect(err).to.exist();
                 expect(err.message).to.equal('Absolute paths are not allowed in views');
                 done();
             });
@@ -773,7 +798,7 @@ describe('Manager', function () {
             var views = new Vision.Manager({ engines: { html: require('handlebars') } });
             views.render('test', { title: 'test', message: 'Hapi' }, { basePath: __dirname + '/templates/valid' }, function (err, rendered, config) {
 
-                expect(rendered).to.exist;
+                expect(rendered).to.exist();
                 expect(rendered).to.contain('Hapi');
                 done();
             });
@@ -789,7 +814,7 @@ describe('Manager', function () {
 
             testViewWithLayouts.render('invalid/test', { title: 'test', message: 'Hapi' }, null, function (err, rendered, config) {
 
-                expect(err).to.exist;
+                expect(err).to.exist();
                 done();
             });
         });
@@ -804,7 +829,7 @@ describe('Manager', function () {
 
             testView.render('invalid/test', { title: 'test', message: 'Hapi' }, null, function (err, rendered, config) {
 
-                expect(err).to.exist;
+                expect(err).to.exist();
                 done();
             });
 
@@ -821,7 +846,7 @@ describe('Manager', function () {
             var opts = { title: 'test', message: 'Hapi', content: 1 };
             testViewWithLayouts.render('valid/test', opts, null, function (err, rendered, config) {
 
-                expect(err).to.exist;
+                expect(err).to.exist();
                 done();
             });
         });
@@ -896,7 +921,7 @@ describe('Manager', function () {
 
             tempView.render('testPartials', {}, null, function (err, rendered, config) {
 
-                expect(rendered).to.exist;
+                expect(rendered).to.exist();
                 expect(rendered.length).above(1);
                 done();
             });
@@ -1007,12 +1032,12 @@ describe('Manager', function () {
 
             views.render('valid/test', { title: 'test', message: 'Hapi' }, null, function (err, rendered, config) {
 
-                expect(rendered).to.exist;
+                expect(rendered).to.exist();
                 expect(rendered).to.contain('Hapi');
 
                 views.render('valid/test', { title: 'test', message: 'Hapi' }, null, function (err, rendered, config) {
 
-                    expect(rendered).to.exist;
+                    expect(rendered).to.exist();
                     expect(rendered).to.contain('Hapi');
 
                     expect(gen).to.equal(1);
@@ -1049,12 +1074,12 @@ describe('Manager', function () {
 
             views.render('valid/test', { title: 'test', message: 'Hapi' }, null, function (err, rendered, config) {
 
-                expect(rendered).to.exist;
+                expect(rendered).to.exist();
                 expect(rendered).to.contain('Hapi');
 
                 views.render('valid/test', { title: 'test', message: 'Hapi' }, null, function (err, rendered, config) {
 
-                    expect(rendered).to.exist;
+                    expect(rendered).to.exist();
                     expect(rendered).to.contain('Hapi');
 
                     expect(gen).to.equal(2);
@@ -1069,8 +1094,9 @@ describe('Manager', function () {
         it('handles routes to views', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates'
             });
@@ -1089,8 +1115,9 @@ describe('Manager', function () {
         it('handles custom context', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { jade: Jade },
                 path: __dirname + '/templates'
             });
@@ -1106,8 +1133,9 @@ describe('Manager', function () {
         it('handles custom options', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates',
                 layoutPath: __dirname + '/templates/layout'
@@ -1129,8 +1157,9 @@ describe('Manager', function () {
             };
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates'
             });
@@ -1158,8 +1187,9 @@ describe('Manager', function () {
         it('handles both custom and default contexts', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates'
             });
@@ -1176,8 +1206,9 @@ describe('Manager', function () {
         it('overrides default contexts when provided with context of same name', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
             server.handler('viewTest', Vision.handler);
-            server._views = new Vision.Manager({
+            server._env.views = new Vision.Manager({
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates'
             });
@@ -1197,6 +1228,7 @@ describe('Manager', function () {
         it('sets Content-Type', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
 
             var handler = function (request, reply) {
 
@@ -1220,6 +1252,7 @@ describe('Manager', function () {
         it('does not override Content-Type', function (done) {
 
             var server = new Hapi.Server();
+            server.connection();
 
             var handler = function (request, reply) {
 
@@ -1243,6 +1276,7 @@ describe('Manager', function () {
         it('errors on invalid template', function (done) {
 
             var server = new Hapi.Server({ debug: false });
+            server.connection();
 
             var handler = function (request, reply) {
 
