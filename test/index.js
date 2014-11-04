@@ -268,14 +268,14 @@ describe('Manager', function () {
             });
         });
 
-        it('returns response with basePath and absolute path', function (done) {
+        it('returns response with relativeTo and absolute path', function (done) {
 
             var server = new Hapi.Server();
             server.connection();
             server.handler('viewTest', Vision.handler);
             server._env.views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
-                basePath: '/none/shall/pass',
+                relativeTo: '/none/shall/pass',
                 path: __dirname + '/templates',
                 layout: true
             });
@@ -342,7 +342,7 @@ describe('Manager', function () {
             server.handler('viewTest', Vision.handler);
             server._env.views = new Vision.Manager({
                 engines: { 'html': require('handlebars') },
-                basePath: __dirname,
+                relativeTo: __dirname,
                 path: 'templates',
                 layoutPath: 'templates/layout',
                 layout: 'elsewhere'
@@ -895,10 +895,10 @@ describe('Manager', function () {
             });
         });
 
-        it('allows basePath, template name, and no path', function (done) {
+        it('allows relativeTo, template name, and no path', function (done) {
 
             var views = new Vision.Manager({ engines: { html: require('handlebars') } });
-            views.render('test', { title: 'test', message: 'Hapi' }, { basePath: __dirname + '/templates/valid' }, function (err, rendered, config) {
+            views.render('test', { title: 'test', message: 'Hapi' }, { relativeTo: __dirname + '/templates/valid' }, function (err, rendered, config) {
 
                 expect(rendered).to.exist();
                 expect(rendered).to.contain('Hapi');
@@ -1079,7 +1079,7 @@ describe('Manager', function () {
 
             var tempView = new Vision.Manager({
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
-                basePath: './test/templates',
+                relativeTo: './test/templates',
                 path: './valid',
                 helpersPath: './valid/helpers'
             });
@@ -1095,7 +1095,7 @@ describe('Manager', function () {
 
             var tempView = new Vision.Manager({
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
-                basePath: 'test/templates',
+                relativeTo: 'test/templates',
                 path: 'valid',
                 helpersPath: 'valid/helpers'
             });
