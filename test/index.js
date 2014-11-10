@@ -1301,6 +1301,37 @@ describe('Manager', function () {
             });
         });
 
+        it('loads helpers from multiple paths without a base', function (done) {
+
+            var tempView = new Vision.Manager({
+                engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
+                path: './test/templates/valid',
+                helpersPath: ['./test/templates/valid/helpers/tools', './test/templates/valid/helpers']
+            });
+
+            tempView.render('testHelpers', { something: 'uppercase' }, null, function (err, rendered, config) {
+
+                expect(rendered).to.equal('<p>This is all UPPERCASE and this is how we like it!</p>');
+                done();
+            });
+        });
+
+        it('loads helpers from multiple paths with a base', function (done) {
+
+            var tempView = new Vision.Manager({
+                engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
+                basePath: './test/templates',
+                path: './valid',
+                helpersPath: ['./valid/helpers/tools', './valid/helpers']
+            });
+
+            tempView.render('testHelpers', { something: 'uppercase' }, null, function (err, rendered, config) {
+
+                expect(rendered).to.equal('<p>This is all UPPERCASE and this is how we like it!</p>');
+                done();
+            });
+        });
+
         it('loads helpers using relative paths (without dots)', function (done) {
 
             var tempView = new Vision.Manager({
