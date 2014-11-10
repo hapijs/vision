@@ -1,5 +1,6 @@
 // Load modules
 
+var Fs = require('fs');
 var Handlebars = require('handlebars');
 var Jade = require('jade');
 var Code = require('code')
@@ -836,6 +837,72 @@ describe('Manager', function () {
             });
         });
 
+        it('allows multiple relative paths with no base', function (done) {
+
+            var testView = new Vision.Manager({
+                engines: { html: require('handlebars') },
+                path: ['./test/templates/layout', './test/templates/valid'],
+                layout: false
+            });
+
+            testView.render('test', { message: 'Hapi' }, null, function (err, rendered, config) {
+
+                expect(rendered).to.exist();
+                expect(rendered).to.contain('<h1>Hapi</h1>');
+                done();
+            });
+        });
+
+        it('allows multiple relative paths with a base', function (done) {
+
+            var testView = new Vision.Manager({
+                engines: { html: require('handlebars') },
+                basePath: __dirname + '/templates',
+                path: ['layout', 'valid'],
+                layout: false
+            });
+
+            testView.render('test', { message: 'Hapi' }, null, function (err, rendered, config) {
+
+                expect(rendered).to.exist();
+                expect(rendered).to.contain('<h1>Hapi</h1>');
+                done();
+            });
+        });
+
+        it('uses the first matching template', function (done) {
+
+            var testView = new Vision.Manager({
+                engines: { html: require('handlebars') },
+                basePath: __dirname + '/templates',
+                path: ['valid', 'invalid'],
+                layout: false
+            });
+
+            testView.render('test', { message: 'Hapi' }, null, function (err, rendered, config) {
+
+                expect(rendered).to.exist();
+                expect(rendered).to.contain('<h1>Hapi</h1>');
+                done();
+            });
+        });
+
+        it('allows multiple absolute paths', function (done) {
+
+            var testView = new Vision.Manager({
+                engines: { html: require('handlebars') },
+                path: [__dirname + '/templates/layout', __dirname + '/templates/valid'],
+                layout: false
+            });
+
+            testView.render('test', { message: 'Hapi' }, null, function (err, rendered, config) {
+
+                expect(rendered).to.exist();
+                expect(rendered).to.contain('<h1>Hapi</h1>');
+                done();
+            });
+        });
+
         it('allows valid (with layouts)', function (done) {
 
             var testViewWithLayouts = new Vision.Manager({
@@ -881,6 +948,31 @@ describe('Manager', function () {
 
                 expect(err).to.exist();
                 expect(err.message).to.equal('Parse error on line 1:\n{{}\n--^\nExpecting \'ID\', \'DATA\', got \'INVALID\': Parse error on line 1:\n{{}\n--^\nExpecting \'ID\', \'DATA\', got \'INVALID\'');
+                done();
+            });
+        });
+
+        it('errors on layout compile error', function (done) {
+
+            var views = new Vision.Manager({
+                engines: { html: require('handlebars') },
+                path: __dirname + '/templates',
+                layout: 'layout'
+            });
+
+            var layout = __dirname + '/templates/layout.html';
+            var mode = Fs.statSync(layout).mode;
+
+            Fs.chmodSync(layout, 0300);
+            views.render('valid/test', { title: 'test', message: 'Hapi' }, null, function (err, rendered, config) {
+
+                try {
+                    expect(err).to.exist();
+                    expect(err.message).to.contain('Failed to read view file');
+                }
+                finally {
+                    Fs.chmodSync(layout, mode);
+                }
                 done();
             });
         });
