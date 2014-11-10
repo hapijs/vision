@@ -1,7 +1,7 @@
 {
   "name": "vision",
   "description": "Templates rendering support for hapi.js",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "repository": "git://github.com/hapijs/vision",
   "main": "index",
   "keywords": [
@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "boom": "2.x.x",
-    "hoek": "2.x.x",
+    "hoek": "^2.9.x",
     "joi": "^4.7.x"
   },
   "devDependencies": {
