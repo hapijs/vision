@@ -1162,6 +1162,52 @@ describe('Manager', function () {
             });
         });
 
+        it('loads partals from multiple relative paths without base', function (done) {
+
+            var tempView = new Vision.Manager({
+                engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
+                path: __dirname + '/templates/valid',
+                partialsPath: ['./test/templates/invalid', './test/templates/valid/partials']
+            });
+
+            tempView.render('testPartials', {}, null, function (err, rendered, config) {
+
+                expect(rendered).to.equal(' Nav:<nav>Nav</nav>|<nav>Nested</nav>');
+                done();
+            });
+        });
+
+        it('loads partals from multiple relative paths with base', function (done) {
+
+            var tempView = new Vision.Manager({
+                engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
+                basePath: __dirname + '/templates',
+                path: 'valid',
+                partialsPath: ['invalid', 'valid/partials']
+            });
+
+            tempView.render('testPartials', {}, null, function (err, rendered, config) {
+
+                expect(rendered).to.equal(' Nav:<nav>Nav</nav>|<nav>Nested</nav>');
+                done();
+            });
+        });
+
+        it('loads partials from multiple absolute paths', function (done) {
+
+            var tempView = new Vision.Manager({
+                engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
+                path: __dirname + '/templates/valid',
+                partialsPath: [__dirname + '/templates/invalid', __dirname + '/templates/valid/partials']
+            });
+
+            tempView.render('testPartials', {}, null, function (err, rendered, config) {
+
+                expect(rendered).to.equal(' Nav:<nav>Nav</nav>|<nav>Nested</nav>');
+                done();
+            });
+        });
+
         it('loads partials from relative path without base (no dot)', function (done) {
 
             var tempView = new Vision.Manager({
