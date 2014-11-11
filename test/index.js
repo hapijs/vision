@@ -993,6 +993,42 @@ describe('Manager', function () {
             });
         });
 
+        it('allows multiple layout paths', function (done) {
+
+            var views = new Vision.Manager({
+                engines: { html: require('handlebars') },
+                basePath: __dirname + '/templates',
+                path: 'valid',
+                layoutPath: ['invalid', 'layout'],
+                layout: 'elsewhere'
+            });
+
+            views.render('test', { title: 'test', message: 'Hapi' }, null, function (err, rendered, config) {
+
+                expect(err).not.to.exist();
+                expect(rendered).to.contain('Hapi');
+                done();
+            });
+        });
+
+        it('uses the first matching layout', function (done) {
+
+            var views = new Vision.Manager({
+                engines: { html: require('handlebars') },
+                basePath: __dirname,
+                path: 'templates/valid',
+                layoutPath: ['templates', 'templates/invalid'],
+                layout: true
+            });
+
+            views.render('test', { title: 'test', message: 'Hapi' }, null, function (err, rendered, config) {
+
+                expect(err).not.to.exist();
+                expect(rendered).to.contain('Hapi');
+                done();
+            });
+        });
+
         it('allows valid jade layouts', function (done) {
 
             var testViewWithJadeLayouts = new Vision.Manager({
