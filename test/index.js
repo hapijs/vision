@@ -663,6 +663,22 @@ describe('Manager', function () {
             });
         });
 
+        it('renders without handler/global-context (with layout)', function (done) {
+
+            var testView = new Vision.Manager({
+                engines: { html: require('handlebars') },
+                path: __dirname + '/templates',
+                layout: true
+            });
+
+            testView.render('valid/test', null, null, function (err, rendered, config) {
+
+                expect(rendered).to.exist();
+                expect(rendered).to.contain('<div>\n    <h1></h1>\n</div>\n');
+                done();
+            });
+        });
+
         it('renders with a global context object', function (done) {
 
             var testView = new Vision.Manager({
