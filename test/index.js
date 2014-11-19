@@ -857,7 +857,7 @@ describe('Manager', function () {
 
             var testView = new Vision.Manager({
                 engines: { html: require('handlebars') },
-                basePath: __dirname + '/templates',
+                relativeTo: __dirname + '/templates',
                 path: ['layout', 'valid'],
                 layout: false
             });
@@ -874,7 +874,7 @@ describe('Manager', function () {
 
             var testView = new Vision.Manager({
                 engines: { html: require('handlebars') },
-                basePath: __dirname + '/templates',
+                relativeTo: __dirname + '/templates',
                 path: ['valid', 'invalid'],
                 layout: false
             });
@@ -997,7 +997,7 @@ describe('Manager', function () {
 
             var views = new Vision.Manager({
                 engines: { html: require('handlebars') },
-                basePath: __dirname + '/templates',
+                relativeTo: __dirname + '/templates',
                 path: 'valid',
                 layoutPath: ['invalid', 'layout'],
                 layout: 'elsewhere'
@@ -1015,7 +1015,7 @@ describe('Manager', function () {
 
             var views = new Vision.Manager({
                 engines: { html: require('handlebars') },
-                basePath: __dirname,
+                relativeTo: __dirname,
                 path: 'templates/valid',
                 layoutPath: ['templates', 'templates/invalid'],
                 layout: true
@@ -1181,7 +1181,7 @@ describe('Manager', function () {
 
             var tempView = new Vision.Manager({
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
-                basePath: __dirname + '/templates',
+                relativeTo: __dirname + '/templates',
                 path: 'valid',
                 partialsPath: ['invalid', 'valid/partials']
             });
@@ -1320,7 +1320,7 @@ describe('Manager', function () {
 
             var tempView = new Vision.Manager({
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
-                basePath: './test/templates',
+                relativeTo: './test/templates',
                 path: './valid',
                 helpersPath: ['./valid/helpers/tools', './valid/helpers']
             });
