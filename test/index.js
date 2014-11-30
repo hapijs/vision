@@ -1,10 +1,10 @@
 // Load modules
 
 var Fs = require('fs');
+var Code = require('code');
 var Handlebars = require('handlebars');
-var Jade = require('jade');
-var Code = require('code')
 var Hapi = require('hapi');
+var Jade = require('jade');
 var Lab = require('lab');
 var Vision = require('..');
 
@@ -248,7 +248,7 @@ describe('Manager', function () {
                             return function (context, options) {
 
                                 return undefined;
-                            }
+                            };
                         }
                     },
                     path: __dirname + '/templates/valid'
@@ -720,7 +720,7 @@ describe('Manager', function () {
 
             testView.render('valid/testContext', null, null, function (err, rendered, config) {
 
-                expect(rendered).to.exist;
+                expect(rendered).to.exist();
                 expect(rendered).to.contain('<h1>global</h1>');
                 expect(rendered).to.contain('<h1>default message</h1>');
                 done();
@@ -744,7 +744,7 @@ describe('Manager', function () {
 
             testView.render('valid/testContext', { message: 'override' }, null, function (err, rendered, config) {
 
-                expect(rendered).to.exist;
+                expect(rendered).to.exist();
                 expect(rendered).to.contain('<h1>global</h1>');
                 expect(rendered).to.contain('<h1>override</h1>');
                 done();
@@ -771,7 +771,7 @@ describe('Manager', function () {
 
             testView.render('valid/testContext', null, null, function (err, rendered, config) {
 
-                expect(rendered).to.exist;
+                expect(rendered).to.exist();
                 expect(rendered).to.contain('<h1>global</h1>');
                 expect(rendered).to.contain('<h1>default message</h1>');
                 done();
@@ -798,7 +798,7 @@ describe('Manager', function () {
 
             testView.render('valid/testContext', { message: 'override' }, null, function (err, rendered, config) {
 
-                expect(rendered).to.exist;
+                expect(rendered).to.exist();
                 expect(rendered).to.contain('<h1>global</h1>');
                 expect(rendered).to.contain('<h1>override</h1>');
                 done();
@@ -963,7 +963,7 @@ describe('Manager', function () {
             var layout = __dirname + '/templates/layout.html';
             var mode = Fs.statSync(layout).mode;
 
-            Fs.chmodSync(layout, 0300);
+            Fs.chmodSync(layout, '0300');
             views.render('valid/test', { title: 'test', message: 'Hapi' }, null, function (err, rendered, config) {
 
                 try {

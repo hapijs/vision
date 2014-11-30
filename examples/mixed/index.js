@@ -10,7 +10,8 @@ var internals = {};
 var ctx = {
     title: 'examples/views/mixed | Hapi ' + Hapi.version,
     message: 'Hello World!'
-}
+};
+
 
 var oneHandler = function (request, reply) {
 
@@ -25,17 +26,17 @@ var twoHandler = function (request, reply) {
 
 internals.main = function () {
 
-    var options = {
-        views: {
-            engines: {
-                'html': require('handlebars'),
-                'jade': require('jade')
-            },
-            path: __dirname + '/templates',
-        }
-    };
+    var server = new Hapi.Server();
+    server.connection({ port: 8000 });
 
-    var server = new Hapi.Server(8000, options);
+    server.views({
+        engines: {
+            'html': require('handlebars'),
+            'jade': require('jade')
+        },
+        path: __dirname + '/templates'
+    });
+
     server.route({ method: 'GET', path: '/one', handler: oneHandler });
     server.route({ method: 'GET', path: '/two', handler: twoHandler });
     server.start();

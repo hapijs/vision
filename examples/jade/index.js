@@ -27,17 +27,17 @@ var aboutHandler = function (request, reply) {
 
 internals.main = function () {
 
-    var options = {
-        views: {
-            engines: { jade: require('jade') },
-            path: __dirname + '/templates',
-            compileOptions: {
-                pretty: true
-            }
-        }
-    };
+    var server = new Hapi.Server();
+    server.connection({ port: 8000 });
 
-    var server = new Hapi.Server(8000, options);
+    server.views({
+        engines: { jade: require('jade') },
+        path: __dirname + '/templates',
+        compileOptions: {
+            pretty: true
+        }
+    });
+
     server.route({ method: 'GET', path: '/', handler: rootHandler });
     server.route({ method: 'GET', path: '/about', handler: aboutHandler });
     server.start();
