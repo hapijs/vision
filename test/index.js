@@ -1019,6 +1019,21 @@ describe('Manager', function () {
             });
         });
 
+        it('normalizes full partial name (windows)', function (done) {
+
+            var tempView = new Vision.Manager({
+                engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
+                path: __dirname + '/templates/valid',
+                partialsPath: __dirname + '/templates/valid/partials'
+            });
+
+            tempView.render('testPartialsName', {}, null, function (err, rendered, config) {
+
+                expect(rendered).to.equal(' Nav:<nav>Nav</nav>|<nav>Nested</nav>');
+                done();
+            });
+        });
+
         it('loads partials from relative path without base', function (done) {
 
             var tempView = new Vision.Manager({
