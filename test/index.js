@@ -1,5 +1,6 @@
 // Load modules
 
+var Fs = require('fs');
 var Handlebars = require('handlebars');
 var Jade = require('jade');
 var Code = require('code')
@@ -836,6 +837,72 @@ describe('Manager', function () {
             });
         });
 
+        it('allows multiple relative paths with no base', function (done) {
+
+            var testView = new Vision.Manager({
+                engines: { html: require('handlebars') },
+                path: ['./test/templates/layout', './test/templates/valid'],
+                layout: false
+            });
+
+            testView.render('test', { message: 'Hapi' }, null, function (err, rendered, config) {
+
+                expect(rendered).to.exist();
+                expect(rendered).to.contain('<h1>Hapi</h1>');
+                done();
+            });
+        });
+
+        it('allows multiple relative paths with a base', function (done) {
+
+            var testView = new Vision.Manager({
+                engines: { html: require('handlebars') },
+                relativeTo: __dirname + '/templates',
+                path: ['layout', 'valid'],
+                layout: false
+            });
+
+            testView.render('test', { message: 'Hapi' }, null, function (err, rendered, config) {
+
+                expect(rendered).to.exist();
+                expect(rendered).to.contain('<h1>Hapi</h1>');
+                done();
+            });
+        });
+
+        it('uses the first matching template', function (done) {
+
+            var testView = new Vision.Manager({
+                engines: { html: require('handlebars') },
+                relativeTo: __dirname + '/templates',
+                path: ['valid', 'invalid'],
+                layout: false
+            });
+
+            testView.render('test', { message: 'Hapi' }, null, function (err, rendered, config) {
+
+                expect(rendered).to.exist();
+                expect(rendered).to.contain('<h1>Hapi</h1>');
+                done();
+            });
+        });
+
+        it('allows multiple absolute paths', function (done) {
+
+            var testView = new Vision.Manager({
+                engines: { html: require('handlebars') },
+                path: [__dirname + '/templates/layout', __dirname + '/templates/valid'],
+                layout: false
+            });
+
+            testView.render('test', { message: 'Hapi' }, null, function (err, rendered, config) {
+
+                expect(rendered).to.exist();
+                expect(rendered).to.contain('<h1>Hapi</h1>');
+                done();
+            });
+        });
+
         it('allows valid (with layouts)', function (done) {
 
             var testViewWithLayouts = new Vision.Manager({
@@ -885,6 +952,31 @@ describe('Manager', function () {
             });
         });
 
+        it('errors on layout compile error', function (done) {
+
+            var views = new Vision.Manager({
+                engines: { html: require('handlebars') },
+                path: __dirname + '/templates',
+                layout: 'layout'
+            });
+
+            var layout = __dirname + '/templates/layout.html';
+            var mode = Fs.statSync(layout).mode;
+
+            Fs.chmodSync(layout, 0300);
+            views.render('valid/test', { title: 'test', message: 'Hapi' }, null, function (err, rendered, config) {
+
+                try {
+                    expect(err).to.exist();
+                    expect(err.message).to.contain('Failed to read view file');
+                }
+                finally {
+                    Fs.chmodSync(layout, mode);
+                }
+                done();
+            });
+        });
+
         it('errors on invalid layout path', function (done) {
 
             var views = new Vision.Manager({
@@ -897,6 +989,42 @@ describe('Manager', function () {
 
                 expect(err).to.exist();
                 expect(err.message).to.equal('Absolute paths are not allowed in views');
+                done();
+            });
+        });
+
+        it('allows multiple layout paths', function (done) {
+
+            var views = new Vision.Manager({
+                engines: { html: require('handlebars') },
+                relativeTo: __dirname + '/templates',
+                path: 'valid',
+                layoutPath: ['invalid', 'layout'],
+                layout: 'elsewhere'
+            });
+
+            views.render('test', { title: 'test', message: 'Hapi' }, null, function (err, rendered, config) {
+
+                expect(err).not.to.exist();
+                expect(rendered).to.contain('Hapi');
+                done();
+            });
+        });
+
+        it('uses the first matching layout', function (done) {
+
+            var views = new Vision.Manager({
+                engines: { html: require('handlebars') },
+                relativeTo: __dirname,
+                path: 'templates/valid',
+                layoutPath: ['templates', 'templates/invalid'],
+                layout: true
+            });
+
+            views.render('test', { title: 'test', message: 'Hapi' }, null, function (err, rendered, config) {
+
+                expect(err).not.to.exist();
+                expect(rendered).to.contain('Hapi');
                 done();
             });
         });
@@ -1049,6 +1177,52 @@ describe('Manager', function () {
             });
         });
 
+        it('loads partals from multiple relative paths without base', function (done) {
+
+            var tempView = new Vision.Manager({
+                engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
+                path: __dirname + '/templates/valid',
+                partialsPath: ['./test/templates/invalid', './test/templates/valid/partials']
+            });
+
+            tempView.render('testPartials', {}, null, function (err, rendered, config) {
+
+                expect(rendered).to.equal(' Nav:<nav>Nav</nav>|<nav>Nested</nav>');
+                done();
+            });
+        });
+
+        it('loads partals from multiple relative paths with base', function (done) {
+
+            var tempView = new Vision.Manager({
+                engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
+                relativeTo: __dirname + '/templates',
+                path: 'valid',
+                partialsPath: ['invalid', 'valid/partials']
+            });
+
+            tempView.render('testPartials', {}, null, function (err, rendered, config) {
+
+                expect(rendered).to.equal(' Nav:<nav>Nav</nav>|<nav>Nested</nav>');
+                done();
+            });
+        });
+
+        it('loads partials from multiple absolute paths', function (done) {
+
+            var tempView = new Vision.Manager({
+                engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
+                path: __dirname + '/templates/valid',
+                partialsPath: [__dirname + '/templates/invalid', __dirname + '/templates/valid/partials']
+            });
+
+            tempView.render('testPartials', {}, null, function (err, rendered, config) {
+
+                expect(rendered).to.equal(' Nav:<nav>Nav</nav>|<nav>Nested</nav>');
+                done();
+            });
+        });
+
         it('loads partials from relative path without base (no dot)', function (done) {
 
             var tempView = new Vision.Manager({
@@ -1133,6 +1307,37 @@ describe('Manager', function () {
                 relativeTo: './test/templates',
                 path: './valid',
                 helpersPath: './valid/helpers'
+            });
+
+            tempView.render('testHelpers', { something: 'uppercase' }, null, function (err, rendered, config) {
+
+                expect(rendered).to.equal('<p>This is all UPPERCASE and this is how we like it!</p>');
+                done();
+            });
+        });
+
+        it('loads helpers from multiple paths without a base', function (done) {
+
+            var tempView = new Vision.Manager({
+                engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
+                path: './test/templates/valid',
+                helpersPath: ['./test/templates/valid/helpers/tools', './test/templates/valid/helpers']
+            });
+
+            tempView.render('testHelpers', { something: 'uppercase' }, null, function (err, rendered, config) {
+
+                expect(rendered).to.equal('<p>This is all UPPERCASE and this is how we like it!</p>');
+                done();
+            });
+        });
+
+        it('loads helpers from multiple paths with a base', function (done) {
+
+            var tempView = new Vision.Manager({
+                engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
+                relativeTo: './test/templates',
+                path: './valid',
+                helpersPath: ['./valid/helpers/tools', './valid/helpers']
             });
 
             tempView.render('testHelpers', { something: 'uppercase' }, null, function (err, rendered, config) {
