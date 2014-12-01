@@ -1,6 +1,6 @@
 #vision
 
-Templates rendering support for hapi.js.
+Templates rendering plugin support for hapi.js.
 
 [![Build Status](https://secure.travis-ci.org/hapijs/vision.png)](http://travis-ci.org/hapijs/vision)
 
