@@ -501,7 +501,10 @@ describe('Manager', function () {
                     'jade': require('jade'),
                     'hbar': {
                         module: {
-                            compile: function (engine) { return engine.compile; }
+                            compile: function (engine) {
+
+                                return engine.compile;
+                            }
                         }
                     }
                 }
@@ -529,7 +532,10 @@ describe('Manager', function () {
                     'jade': require('jade'),
                     'hbar': {
                         module: {
-                            compile: function (engine) { return engine.compile; }
+                            compile: function (engine) {
+
+                                return engine.compile;
+                            }
                         }
                     }
                 }
@@ -557,7 +563,10 @@ describe('Manager', function () {
                     'jade': require('jade'),
                     'hbar': {
                         module: {
-                            compile: function (engine) { return engine.compile; }
+                            compile: function (engine) {
+
+                                return engine.compile;
+                            }
                         }
                     }
                 }
@@ -584,7 +593,10 @@ describe('Manager', function () {
                     'jade': require('jade'),
                     'hbar': {
                         module: {
-                            compile: function (engine) { return engine.compile; }
+                            compile: function (engine) {
+
+                                return engine.compile;
+                            }
                         }
                     }
                 }
