@@ -236,7 +236,14 @@ describe('handler()', function () {
         var server = new Hapi.Server({ minimal: true, debug: false });
         server.register(Vision, Hoek.ignore);
         server.connection();
-        server.route({ path: '/', method: 'GET', handler: function (request, reply) { return reply.view('test', { message: 'steve' }); } });
+        server.route({
+            path: '/',
+            method: 'GET',
+            handler: function (request, reply) {
+
+                return reply.view('test', { message: 'steve' });
+            }
+        });
 
         server.inject('/', function (res) {
 
