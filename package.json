@@ -21,10 +21,13 @@
   },
   "devDependencies": {
     "code": "1.x.x",
-    "hapi": "8.x.x",
-    "lab": "5.x.x",
+    "ejs": "2.x.x",
     "handlebars": "3.x.x",
-    "jade": "1.x.x"
+    "hapi": "8.x.x",
+    "jade": "1.x.x",
+    "lab": "5.x.x",
+    "mustache": "2.x.x",
+    "nunjucks": "1.x.x"
   },
   "scripts": {
     "test": "make test-cov"

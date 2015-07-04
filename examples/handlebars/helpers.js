@@ -10,9 +10,9 @@ var internals = {};
 
 var handler = function (request, reply) {
 
-    reply.view('withLayout/index', {
-        title: 'examples/views/handlebars/layout.js | Hapi ' + request.server.version,
-        message: 'Hello World!\n'
+    reply.view('index', {
+        title: 'examples/views/handlebars/helpers.js | Hapi ' + request.server.version,
+        message: 'Hello World!'
     });
 };
 
@@ -24,8 +24,9 @@ internals.main = function () {
 
     server.views({
         engines: { html: require('handlebars') },
-        path: __dirname + '/templates',
-        layout: true
+        relativeTo: __dirname,
+        path: 'templates/withHelpers',
+        helpersPath: 'templates/withHelpers/helpers'
     });
 
     server.route({ method: 'GET', path: '/', handler: handler });

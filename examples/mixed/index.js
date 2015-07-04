@@ -7,20 +7,15 @@ var Hapi = require('hapi');
 
 var internals = {};
 
-var ctx = {
-    title: 'examples/views/mixed | Hapi ' + Hapi.version,
-    message: 'Hello World!'
-};
-
 
 var oneHandler = function (request, reply) {
 
-    reply.view('index.jade', ctx);
+    reply.view('index.jade');
 };
 
 var twoHandler = function (request, reply) {
 
-    reply.view('handlebars.html', ctx);
+    reply.view('handlebars.html');
 };
 
 
@@ -34,7 +29,11 @@ internals.main = function () {
             'html': require('handlebars'),
             'jade': require('jade')
         },
-        path: __dirname + '/templates'
+        path: __dirname + '/templates',
+        context: {
+            title: 'examples/views/mixed | Hapi ' + server.version,
+            message: 'Hello World!'
+        }
     });
 
     server.route({ method: 'GET', path: '/one', handler: oneHandler });
