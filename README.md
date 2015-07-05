@@ -12,6 +12,21 @@ methods for managing view engines that can be used to render templated responses
 provides a built-in [handler](https://github.com/hapijs/hapi/blob/master/API.md#serverhandlername-method)
 implementation for creating templated responses.
 
+```js
+var server = new Hapi.Server();
+server.connection({ port: 8080 });
+
+server.register({
+    register: require('vision')
+}, function (err) {
+
+    if (err) {
+        console.log("Failed to load vision.");
+    }
+});
+```
+**NOTE:** Vision is included with and loaded by default in Hapi < 9.0.
+
 - [Examples](#examples)
     - [EJS](#ejs)
     - [Handlebars](#handlebars)
