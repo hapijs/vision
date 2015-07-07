@@ -245,9 +245,9 @@ describe('Manager', function () {
             engines: {
                 html: {
                     module: {
-                        compile: function (template, options) {
+                        compile: function (template, compileOptions) {
 
-                            return function (context, options) {
+                            return function (context, renderOptions) {
 
                                 return undefined;
                             };
@@ -1402,15 +1402,15 @@ describe('Manager', function () {
                 }
             });
 
-            views.render('valid/test', { title: 'test', message: 'Hapi' }, null, function (err, rendered, config) {
+            views.render('valid/test', { title: 'test', message: 'Hapi' }, null, function (err, original, originalConfig) {
 
-                expect(rendered).to.exist();
-                expect(rendered).to.contain('Hapi');
+                expect(original).to.exist();
+                expect(original).to.contain('Hapi');
 
-                views.render('valid/test', { title: 'test', message: 'Hapi' }, null, function (err, rendered, config) {
+                views.render('valid/test', { title: 'test', message: 'Hapi' }, null, function (err, cached, cachedConfig) {
 
-                    expect(rendered).to.exist();
-                    expect(rendered).to.contain('Hapi');
+                    expect(cached).to.exist();
+                    expect(cached).to.contain('Hapi');
 
                     expect(gen).to.equal(1);
                     done();
@@ -1444,15 +1444,15 @@ describe('Manager', function () {
                 isCached: false
             });
 
-            views.render('valid/test', { title: 'test', message: 'Hapi' }, null, function (err, rendered, config) {
+            views.render('valid/test', { title: 'test', message: 'Hapi' }, null, function (err, original, originalConfig) {
 
-                expect(rendered).to.exist();
-                expect(rendered).to.contain('Hapi');
+                expect(original).to.exist();
+                expect(original).to.contain('Hapi');
 
-                views.render('valid/test', { title: 'test', message: 'Hapi' }, null, function (err, rendered, config) {
+                views.render('valid/test', { title: 'test', message: 'Hapi' }, null, function (err, cached, cachedConfig) {
 
-                    expect(rendered).to.exist();
-                    expect(rendered).to.contain('Hapi');
+                    expect(cached).to.exist();
+                    expect(cached).to.contain('Hapi');
 
                     expect(gen).to.equal(2);
                     done();

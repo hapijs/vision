@@ -482,13 +482,13 @@ describe('views()', function () {
         server.register({ register: test, options: { message: 'viewing it' } }, function (err) {
 
             expect(err).to.not.exist();
-            server.inject('/view', function (res) {
+            server.inject('/view', function (viewResponse) {
 
-                expect(res.result).to.equal('<h1>viewing it</h1>');
+                expect(viewResponse.result).to.equal('<h1>viewing it</h1>');
 
-                server.inject('/ext', function (res) {
+                server.inject('/ext', function (extResponse) {
 
-                    expect(res.result).to.equal('<h1>grabbed</h1>');
+                    expect(extResponse.result).to.equal('<h1>grabbed</h1>');
                     done();
                 });
             });
