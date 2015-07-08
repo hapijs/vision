@@ -105,10 +105,24 @@ describe('Manager', function () {
             path: __dirname + '/templates/invalid'
         });
 
+        // All rendering errors should be available via 'onPostHandler'.
+
+        var error;
+        server.ext('onPostHandler', function (request, reply) {
+
+            var response = request.response;
+            if (response.isBoom) {
+                error = response;
+            }
+
+            reply.continue();
+        });
+
         server.route({ method: 'GET', path: '/', handler: { view: { template: 'test', context: { message: 'Hello, World!' } } } });
         server.inject('/', function (res) {
 
             expect(res.statusCode).to.equal(500);
+            expect(error).to.be.an.instanceof(Error);
             done();
         });
     });
@@ -144,12 +158,26 @@ describe('Manager', function () {
             path: __dirname + '/templates/valid'
         });
 
+        // All rendering errors should be available via 'onPostHandler'.
+
+        var error;
+        server.ext('onPostHandler', function (request, reply) {
+
+            var response = request.response;
+            if (response.isBoom) {
+                error = response;
+            }
+
+            reply.continue();
+        });
+
         server.route({ method: 'GET', path: '/', handler: { view: { template: __dirname + '/templates/valid/test', context: { message: 'Hello, World!' } } } });
 
         server.inject('/', function (res) {
 
             expect(res.result).to.exist();
             expect(res.statusCode).to.equal(500);
+            expect(error).to.be.an.instanceof(Error);
             done();
         });
     });
@@ -164,12 +192,26 @@ describe('Manager', function () {
             path: __dirname + '/templates/valid'
         });
 
+        // All rendering errors should be available via 'onPostHandler'.
+
+        var error;
+        server.ext('onPostHandler', function (request, reply) {
+
+            var response = request.response;
+            if (response.isBoom) {
+                error = response;
+            }
+
+            reply.continue();
+        });
+
         server.route({ method: 'GET', path: '/', handler: { view: { template: '../test', context: { message: 'Hello, World!' } } } });
 
         server.inject('/', function (res) {
 
             expect(res.result).to.exist();
             expect(res.statusCode).to.equal(500);
+            expect(error).to.be.an.instanceof(Error);
             done();
         });
     });
@@ -206,12 +248,26 @@ describe('Manager', function () {
             path: __dirname + '/templates/valid'
         });
 
+        // All rendering errors should be available via 'onPostHandler'.
+
+        var error;
+        server.ext('onPostHandler', function (request, reply) {
+
+            var response = request.response;
+            if (response.isBoom) {
+                error = response;
+            }
+
+            reply.continue();
+        });
+
         server.route({ method: 'GET', path: '/', handler: { view: { template: 'testNope', context: { message: 'Hello, World!' } } } });
 
         server.inject('/', function (res) {
 
             expect(res.result).to.exist();
             expect(res.statusCode).to.equal(500);
+            expect(error).to.be.an.instanceof(Error);
             done();
         });
     });
@@ -226,12 +282,26 @@ describe('Manager', function () {
             path: __dirname + '/templates/valid'
         });
 
+        // All rendering errors should be available via 'onPostHandler'.
+
+        var error;
+        server.ext('onPostHandler', function (request, reply) {
+
+            var response = request.response;
+            if (response.isBoom) {
+                error = response;
+            }
+
+            reply.continue();
+        });
+
         server.route({ method: 'GET', path: '/', handler: { view: { template: 'badmustache', context: { message: 'Hello, World!' }, options: { path: __dirname + '/templates/valid/invalid' } } } });
 
         server.inject('/', function (res) {
 
             expect(res.result).to.exist();
             expect(res.statusCode).to.equal(500);
+            expect(error).to.be.an.instanceof(Error);
             done();
         });
     });
@@ -393,11 +463,25 @@ describe('Manager', function () {
                 layout: 'missingLayout'
             });
 
+            // All rendering errors should be available via 'onPostHandler'.
+
+            var error;
+            server.ext('onPostHandler', function (request, reply) {
+
+                var response = request.response;
+                if (response.isBoom) {
+                    error = response;
+                }
+
+                reply.continue();
+            });
+
             server.route({ method: 'GET', path: '/', handler: { view: { template: 'valid/test', context: { title: 'test', message: 'Hapi' } } } });
 
             server.inject('/', function (res) {
 
                 expect(res.statusCode).to.equal(500);
+                expect(error).to.be.an.instanceof(Error);
                 done();
             });
         });
@@ -413,11 +497,25 @@ describe('Manager', function () {
                 layout: 'invalidLayout'
             });
 
+            // All rendering errors should be available via 'onPostHandler'.
+
+            var error;
+            server.ext('onPostHandler', function (request, reply) {
+
+                var response = request.response;
+                if (response.isBoom) {
+                    error = response;
+                }
+
+                reply.continue();
+            });
+
             server.route({ method: 'GET', path: '/', handler: { view: { template: 'valid/test', context: { title: 'test', message: 'Hapi' } } } });
 
             server.inject('/', function (res) {
 
                 expect(res.statusCode).to.equal(500);
+                expect(error).to.be.an.instanceof(Error);
                 done();
             });
         });
@@ -455,12 +553,26 @@ describe('Manager', function () {
                 layout: true
             });
 
+            // All rendering errors should be available via 'onPostHandler'.
+
+            var error;
+            server.ext('onPostHandler', function (request, reply) {
+
+                var response = request.response;
+                if (response.isBoom) {
+                    error = response;
+                }
+
+                reply.continue();
+            });
+
             server.route({ method: 'GET', path: '/', handler: { view: { template: 'test', context: { message: 'Hello, World!', content: 'fail' } } } });
 
             server.inject('/', function (res) {
 
                 expect(res.result).to.exist();
                 expect(res.statusCode).to.equal(500);
+                expect(error).to.be.an.instanceof(Error);
                 done();
             });
         });
@@ -476,12 +588,26 @@ describe('Manager', function () {
                 layout: true
             });
 
+            // All rendering errors should be available via 'onPostHandler'.
+
+            var error;
+            server.ext('onPostHandler', function (request, reply) {
+
+                var response = request.response;
+                if (response.isBoom) {
+                    error = response;
+                }
+
+                reply.continue();
+            });
+
             server.route({ method: 'GET', path: '/', handler: { view: { template: 'test', context: { title: 'test', message: 'Hapi' }, options: { path: __dirname + '/templates/valid/invalid' } } } });
 
             server.inject('/', function (res) {
 
                 expect(res.result).to.exist();
                 expect(res.statusCode).to.equal(500);
+                expect(error).to.be.an.instanceof(Error);
                 done();
             });
         });
@@ -1525,10 +1651,24 @@ describe('Manager', function () {
                 return reply.view('test.html', { message: 'hi' });
             };
 
+            // All rendering errors should be available via 'onPostHandler'.
+
+            var error;
+            server.ext('onPostHandler', function (request, reply) {
+
+                var response = request.response;
+                if (response.isBoom) {
+                    error = response;
+                }
+
+                reply.continue();
+            });
+
             server.route({ method: 'GET', path: '/', handler: handler });
             server.inject('/', function (res) {
 
                 expect(res.statusCode).to.equal(500);
+                expect(error).to.be.an.instanceof(Error);
                 done();
             });
         });
