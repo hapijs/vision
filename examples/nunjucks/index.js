@@ -30,24 +30,27 @@ internals.main = function () {
             throw err;
         }
 
-        var viewPath = Path.join(__dirname, 'templates');
-        var environment = Nunjucks.configure(viewPath, { watch: false });
-
         server.views({
             engines: {
                 html: {
                     compile: function (src, options) {
 
-                        var template = Nunjucks.compile(src, environment);
+                        var template = Nunjucks.compile(src, options.environment);
 
                         return function (context) {
 
                             return template.render(context);
                         };
+                    },
+
+                    prepare: function (options, next) {
+
+                        options.compileOptions.environment = Nunjucks.configure(options.path, { watch: false });
+                        return next();
                     }
                 }
             },
-            path: viewPath
+            path: Path.join(__dirname, 'templates')
         });
 
         server.route({ method: 'GET', path: '/', handler: rootHandler });

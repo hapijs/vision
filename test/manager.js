@@ -355,6 +355,212 @@ describe('Manager', function () {
         });
     });
 
+    describe('with engine initialization', function () {
+
+        it('modifies the engine options', function (done) {
+
+            var compileOptions;
+            var runtimeOptions;
+
+            var manager = new Manager({
+                path: __dirname + '/templates',
+                engines: {
+                    html: {
+                        compile: function (string, options1) {
+
+                            compileOptions = options1;
+
+                            return function (context, options2) {
+
+                                runtimeOptions = options2;
+                                return string;
+                            };
+                        },
+
+                        prepare: function (options, next) {
+
+                            options.compileOptions = { stage: 'compile' };
+                            options.runtimeOptions = { stage: 'render' };
+                            return next();
+                        }
+                    }
+                }
+            });
+
+            manager.render('valid/test', null, null, function (err, rendered) {
+
+                expect(err).to.not.exist();
+                expect(compileOptions).to.include({ stage: 'compile' });
+                expect(runtimeOptions).to.include({ stage: 'render' });
+                done();
+            });
+        });
+
+        it('errors if initialization fails', function (done) {
+
+            var manager = new Manager({
+                path: __dirname + '/templates',
+                engines: {
+                    html: {
+                        compile: function (string, options1) {
+
+                            return function (context, options2) {
+
+                                return string;
+                            };
+                        },
+
+                        prepare: function (options, next) {
+
+                            return next(new Error('Initialization failed'));
+                        }
+                    }
+                }
+            });
+
+            manager.render('valid/test', null, null, function (err, rendered) {
+
+                expect(err).to.be.an.instanceOf(Error);
+                expect(err.message).to.equal('Initialization failed');
+                expect(rendered).to.not.exist();
+                done();
+            });
+        });
+
+        it('errors if initialization throws', function (done) {
+
+            var manager = new Manager({
+                path: __dirname + '/templates',
+                engines: {
+                    html: {
+                        compile: function (string, options1) {
+
+                            return function (context, options2) {
+
+                                return string;
+                            };
+                        },
+
+                        prepare: function (options, next) {
+
+                            throw new Error('Initialization error');
+                        }
+                    }
+                }
+            });
+
+            manager.render('valid/test', null, null, function (err, rendered) {
+
+                expect(err).to.be.an.instanceOf(Error);
+                expect(err.message).to.equal('Initialization error');
+                expect(rendered).to.not.exist();
+                done();
+            });
+        });
+
+        it('only initializes once before rendering', function (done) {
+
+            var initialized = 0;
+
+            var manager = new Manager({
+                path: __dirname + '/templates',
+                engines: {
+                    html: {
+                        compile: function (string, options1) {
+
+                            return function (context, options2) {
+
+                                return string;
+                            };
+                        },
+
+                        prepare: function (options, next) {
+
+                            ++initialized;
+                            return next();
+                        }
+                    }
+                }
+            });
+
+            expect(initialized).to.equal(0);
+            manager.render('valid/test', null, null, function (err, rendered1) {
+
+                expect(err).to.not.exist();
+                expect(rendered1).to.exist();
+                expect(initialized).to.equal(1);
+                manager.render('valid/test', null, null, function (err, rendered2) {
+
+                    expect(err).to.not.exist();
+                    expect(rendered2).to.exist();
+                    expect(initialized).to.equal(1);
+                    done();
+                });
+            });
+        });
+
+        it('initializes multiple engines independently', function (done) {
+
+            var htmlOptions;
+            var jadeOptions;
+
+            var manager = new Manager({
+                path: __dirname + '/templates',
+                engines: {
+                    html: {
+                        compile: function (string, options1) {
+
+                            htmlOptions = options1;
+                            return function (context, options2) {
+
+                                return string;
+                            };
+                        },
+
+                        prepare: function (options, next) {
+
+                            options.compileOptions = { engine: 'handlebars' };
+                            return next();
+                        }
+                    },
+
+                    jade: {
+                        compile: function (string, options1) {
+
+                            jadeOptions = options1;
+                            return function (context, options2) {
+
+                                return string;
+                            };
+                        },
+
+                        prepare: function (options, next) {
+
+                            options.compileOptions = { engine: 'jade' };
+                            return next();
+                        }
+                    }
+                }
+            });
+
+            manager.render('valid/test.html', null, null, function (err, rendered1) {
+
+                expect(err).to.not.exist();
+                expect(rendered1).to.exist();
+                expect(htmlOptions).to.include({ engine: 'handlebars' });
+                expect(jadeOptions).to.not.exist();
+
+                manager.render('valid/test.jade', null, null, function (err, rendered2) {
+
+                    expect(err).to.not.exist();
+                    expect(rendered2).to.exist();
+                    expect(jadeOptions).to.include({ engine: 'jade' });
+                    done();
+                });
+            });
+        });
+    });
+
     describe('with layout', function (done) {
 
         it('returns response', function (done) {
