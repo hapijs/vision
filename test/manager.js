@@ -105,6 +105,8 @@ describe('Manager', function () {
             path: __dirname + '/templates/invalid'
         });
 
+        // Rendering errors are not available to extensions.
+
         server.route({ method: 'GET', path: '/', handler: { view: { template: 'test', context: { message: 'Hello, World!' } } } });
         server.inject('/', function (res) {
 
@@ -144,12 +146,26 @@ describe('Manager', function () {
             path: __dirname + '/templates/valid'
         });
 
+        // Compilation errors sould be available for extensions.
+
+        var error = null;
+        server.ext('onPostHandler', function (request, reply) {
+
+            var response = request.response;
+            if (response.isBoom) {
+                error = response;
+            }
+
+            reply.continue();
+        });
+
         server.route({ method: 'GET', path: '/', handler: { view: { template: __dirname + '/templates/valid/test', context: { message: 'Hello, World!' } } } });
 
         server.inject('/', function (res) {
 
             expect(res.result).to.exist();
             expect(res.statusCode).to.equal(500);
+            expect(error).to.be.an.instanceof(Error);
             done();
         });
     });
@@ -164,12 +180,26 @@ describe('Manager', function () {
             path: __dirname + '/templates/valid'
         });
 
+        // Compilation errors sould be available for extensions.
+
+        var error = null;
+        server.ext('onPostHandler', function (request, reply) {
+
+            var response = request.response;
+            if (response.isBoom) {
+                error = response;
+            }
+
+            reply.continue();
+        });
+
         server.route({ method: 'GET', path: '/', handler: { view: { template: '../test', context: { message: 'Hello, World!' } } } });
 
         server.inject('/', function (res) {
 
             expect(res.result).to.exist();
             expect(res.statusCode).to.equal(500);
+            expect(error).to.be.an.instanceof(Error);
             done();
         });
     });
@@ -206,12 +236,26 @@ describe('Manager', function () {
             path: __dirname + '/templates/valid'
         });
 
+        // Compilation errors sould be available for extensions.
+
+        var error = null;
+        server.ext('onPostHandler', function (request, reply) {
+
+            var response = request.response;
+            if (response.isBoom) {
+                error = response;
+            }
+
+            reply.continue();
+        });
+
         server.route({ method: 'GET', path: '/', handler: { view: { template: 'testNope', context: { message: 'Hello, World!' } } } });
 
         server.inject('/', function (res) {
 
             expect(res.result).to.exist();
             expect(res.statusCode).to.equal(500);
+            expect(error).to.be.an.instanceof(Error);
             done();
         });
     });
@@ -226,12 +270,26 @@ describe('Manager', function () {
             path: __dirname + '/templates/valid'
         });
 
+        // Compilation errors sould be available for extensions.
+
+        var error = null;
+        server.ext('onPostHandler', function (request, reply) {
+
+            var response = request.response;
+            if (response.isBoom) {
+                error = response;
+            }
+
+            reply.continue();
+        });
+
         server.route({ method: 'GET', path: '/', handler: { view: { template: 'badmustache', context: { message: 'Hello, World!' }, options: { path: __dirname + '/templates/valid/invalid' } } } });
 
         server.inject('/', function (res) {
 
             expect(res.result).to.exist();
             expect(res.statusCode).to.equal(500);
+            expect(error).to.be.an.instanceof(Error);
             done();
         });
     });
@@ -262,6 +320,36 @@ describe('Manager', function () {
 
         server.inject('/', function (res) {
 
+            expect(res.statusCode).to.equal(200);
+            done();
+        });
+    });
+
+    it('allows the context to be modified by extensions', function (done) {
+
+        var server = new Hapi.Server({ minimal: true });
+        server.connection();
+        server.register(Vision, Hoek.ignore);
+        server.views({
+            engines: { html: require('handlebars') },
+            path: __dirname + '/templates/valid'
+        });
+
+        server.ext('onPreResponse', function (request, reply) {
+
+            var response = request.response;
+            response.source.context.message = 'goodbye';
+
+            reply.continue();
+        });
+
+        server.route({ method: 'GET', path: '/', handler: { view: { template: 'test.html', context: { message: 'hello' } } } });
+
+        server.inject('/', function (res) {
+
+            expect(res.result).to.exist();
+            expect(res.result).not.to.contain('hello');
+            expect(res.result).to.contain('goodbye');
             expect(res.statusCode).to.equal(200);
             done();
         });
@@ -393,11 +481,25 @@ describe('Manager', function () {
                 layout: 'missingLayout'
             });
 
+            // Compilation errors sould be available for extensions.
+
+            var error = null;
+            server.ext('onPostHandler', function (request, reply) {
+
+                var response = request.response;
+                if (response.isBoom) {
+                    error = response;
+                }
+
+                reply.continue();
+            });
+
             server.route({ method: 'GET', path: '/', handler: { view: { template: 'valid/test', context: { title: 'test', message: 'Hapi' } } } });
 
             server.inject('/', function (res) {
 
                 expect(res.statusCode).to.equal(500);
+                expect(error).to.be.an.instanceof(Error);
                 done();
             });
         });
@@ -413,11 +515,25 @@ describe('Manager', function () {
                 layout: 'invalidLayout'
             });
 
+            // Compilation errors sould be available for extensions.
+
+            var error = null;
+            server.ext('onPostHandler', function (request, reply) {
+
+                var response = request.response;
+                if (response.isBoom) {
+                    error = response;
+                }
+
+                reply.continue();
+            });
+
             server.route({ method: 'GET', path: '/', handler: { view: { template: 'valid/test', context: { title: 'test', message: 'Hapi' } } } });
 
             server.inject('/', function (res) {
 
                 expect(res.statusCode).to.equal(500);
+                expect(error).to.be.an.instanceof(Error);
                 done();
             });
         });
@@ -455,6 +571,8 @@ describe('Manager', function () {
                 layout: true
             });
 
+            // Rendering errors are not available to extensions.
+
             server.route({ method: 'GET', path: '/', handler: { view: { template: 'test', context: { message: 'Hello, World!', content: 'fail' } } } });
 
             server.inject('/', function (res) {
@@ -476,12 +594,26 @@ describe('Manager', function () {
                 layout: true
             });
 
+            // Compilation errors sould be available for extensions.
+
+            var error = null;
+            server.ext('onPostHandler', function (request, reply) {
+
+                var response = request.response;
+                if (response.isBoom) {
+                    error = response;
+                }
+
+                reply.continue();
+            });
+
             server.route({ method: 'GET', path: '/', handler: { view: { template: 'test', context: { title: 'test', message: 'Hapi' }, options: { path: __dirname + '/templates/valid/invalid' } } } });
 
             server.inject('/', function (res) {
 
                 expect(res.result).to.exist();
                 expect(res.statusCode).to.equal(500);
+                expect(error).to.be.an.instanceof(Error);
                 done();
             });
         });
