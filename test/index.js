@@ -430,6 +430,49 @@ describe('render()', function () {
         }).to.throw('Missing views manager');
         done();
     });
+
+    it('renders view (plugin request)', function (done) {
+
+        var test = function (server, options, next) {
+
+            server.views({
+                engines: { 'html': Handlebars },
+                relativeTo: Path.join(__dirname, '/templates/plugin')
+            });
+
+            server.route({
+                method: 'GET',
+                path: '/view',
+                handler: function (request, reply) {
+
+                    request.render('test', { message: 'steve' }, function (err, rendered, config) {
+
+                        return reply(rendered);
+                    });
+                }
+            });
+
+            return next();
+        };
+
+        test.attributes = {
+            name: 'test'
+        };
+
+        var server = new Hapi.Server({ minimal: true });
+        server.connection();
+        server.register(Vision, Hoek.ignore);
+
+        server.register(test, function (err) {
+
+            expect(err).to.not.exist();
+            server.inject('/view', function (res) {
+
+                expect(res.result).to.equal('<h1>steve</h1>');
+                done();
+            });
+        });
+    });
 });
 
 describe('views()', function () {
