@@ -23,7 +23,7 @@
     "code": "1.x.x",
     "ejs": "2.x.x",
     "handlebars": "3.x.x",
-    "hapi": "8.x.x",
+    "hapi": "9.x.x",
     "jade": "1.x.x",
     "lab": "5.x.x",
     "mustache": "2.x.x",

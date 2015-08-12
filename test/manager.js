@@ -28,7 +28,7 @@ describe('Manager', function () {
 
     it('renders handlebars template', function (done) {
 
-        var server = new Hapi.Server({ minimal: true });
+        var server = new Hapi.Server();
         server.connection();
         server.register(Vision, Hoek.ignore);
         server.views({
@@ -72,7 +72,7 @@ describe('Manager', function () {
 
     it('sets content type', function (done) {
 
-        var server = new Hapi.Server({ minimal: true });
+        var server = new Hapi.Server();
         server.connection();
         server.register(Vision, Hoek.ignore);
         server.views({
@@ -97,7 +97,7 @@ describe('Manager', function () {
 
     it('errors on invalid template path', function (done) {
 
-        var server = new Hapi.Server({ minimal: true, debug: false });
+        var server = new Hapi.Server({ debug: false });
         server.connection();
         server.register(Vision, Hoek.ignore);
         server.views({
@@ -117,7 +117,7 @@ describe('Manager', function () {
 
     it('returns a compiled Handlebars template reply', function (done) {
 
-        var server = new Hapi.Server({ minimal: true });
+        var server = new Hapi.Server();
         server.connection();
         server.register(Vision, Hoek.ignore);
         server.views({
@@ -138,7 +138,7 @@ describe('Manager', function () {
 
     it('errors absolute path given and allowAbsolutePath is false (by default)', function (done) {
 
-        var server = new Hapi.Server({ minimal: true, debug: false });
+        var server = new Hapi.Server({ debug: false });
         server.connection();
         server.register(Vision, Hoek.ignore);
         server.views({
@@ -172,7 +172,7 @@ describe('Manager', function () {
 
     it('errors if path given includes ../ and allowInsecureAccess is false (by default)', function (done) {
 
-        var server = new Hapi.Server({ minimal: true, debug: false });
+        var server = new Hapi.Server({ debug: false });
         server.connection();
         server.register(Vision, Hoek.ignore);
         server.views({
@@ -206,7 +206,7 @@ describe('Manager', function () {
 
     it('allows if path given includes ../ and allowInsecureAccess is true', function (done) {
 
-        var server = new Hapi.Server({ minimal: true });
+        var server = new Hapi.Server();
         server.connection();
         server.register(Vision, Hoek.ignore);
         server.views({
@@ -228,7 +228,7 @@ describe('Manager', function () {
 
     it('errors if template does not exist()', function (done) {
 
-        var server = new Hapi.Server({ minimal: true, debug: false });
+        var server = new Hapi.Server({ debug: false });
         server.connection();
         server.register(Vision, Hoek.ignore);
         server.views({
@@ -262,7 +262,7 @@ describe('Manager', function () {
 
     it('errors if engine.compile throws', function (done) {
 
-        var server = new Hapi.Server({ minimal: true, debug: false });
+        var server = new Hapi.Server({ debug: false });
         server.connection();
         server.register(Vision, Hoek.ignore);
         server.views({
@@ -296,7 +296,7 @@ describe('Manager', function () {
 
     it('should not fail if rendered template returns undefined', function (done) {
 
-        var server = new Hapi.Server({ minimal: true });
+        var server = new Hapi.Server();
         server.connection();
         server.register(Vision, Hoek.ignore);
         server.views({
@@ -327,7 +327,7 @@ describe('Manager', function () {
 
     it('allows the context to be modified by extensions', function (done) {
 
-        var server = new Hapi.Server({ minimal: true });
+        var server = new Hapi.Server();
         server.connection();
         server.register(Vision, Hoek.ignore);
         server.views({
@@ -359,7 +359,7 @@ describe('Manager', function () {
 
         it('returns response', function (done) {
 
-            var server = new Hapi.Server({ minimal: true });
+            var server = new Hapi.Server();
             server.connection();
             server.register(Vision, Hoek.ignore);
             server.views({
@@ -381,7 +381,7 @@ describe('Manager', function () {
 
         it('returns response with relativeTo and absolute path', function (done) {
 
-            var server = new Hapi.Server({ minimal: true });
+            var server = new Hapi.Server();
             server.connection();
             server.register(Vision, Hoek.ignore);
             server.views({
@@ -404,7 +404,7 @@ describe('Manager', function () {
 
         it('returns response with layout override', function (done) {
 
-            var server = new Hapi.Server({ minimal: true });
+            var server = new Hapi.Server();
             server.connection();
             server.register(Vision, Hoek.ignore);
             server.views({
@@ -426,7 +426,7 @@ describe('Manager', function () {
 
         it('returns response with custom server layout', function (done) {
 
-            var server = new Hapi.Server({ minimal: true });
+            var server = new Hapi.Server();
             server.connection();
             server.register(Vision, Hoek.ignore);
             server.views({
@@ -448,7 +448,7 @@ describe('Manager', function () {
 
         it('returns response with custom server layout and path', function (done) {
 
-            var server = new Hapi.Server({ minimal: true });
+            var server = new Hapi.Server();
             server.connection();
             server.register(Vision, Hoek.ignore);
             server.views({
@@ -472,7 +472,7 @@ describe('Manager', function () {
 
         it('errors on missing layout', function (done) {
 
-            var server = new Hapi.Server({ minimal: true, debug: false });
+            var server = new Hapi.Server({ debug: false });
             server.connection();
             server.register(Vision, Hoek.ignore);
             server.views({
@@ -506,7 +506,7 @@ describe('Manager', function () {
 
         it('errors on invalid layout', function (done) {
 
-            var server = new Hapi.Server({ minimal: true, debug: false });
+            var server = new Hapi.Server({ debug: false });
             server.connection();
             server.register(Vision, Hoek.ignore);
             server.views({
@@ -540,7 +540,7 @@ describe('Manager', function () {
 
         it('returns response without layout', function (done) {
 
-            var server = new Hapi.Server({ minimal: true });
+            var server = new Hapi.Server();
             server.connection();
             server.register(Vision, Hoek.ignore);
             server.views({
@@ -562,7 +562,7 @@ describe('Manager', function () {
 
         it('errors on layoutKeyword conflict', function (done) {
 
-            var server = new Hapi.Server({ minimal: true, debug: false });
+            var server = new Hapi.Server({ debug: false });
             server.connection();
             server.register(Vision, Hoek.ignore);
             server.views({
@@ -585,7 +585,7 @@ describe('Manager', function () {
 
         it('errors absolute path given and allowAbsolutePath is false (by default)', function (done) {
 
-            var server = new Hapi.Server({ minimal: true, debug: false });
+            var server = new Hapi.Server({ debug: false });
             server.connection();
             server.register(Vision, Hoek.ignore);
             server.views({
@@ -623,7 +623,7 @@ describe('Manager', function () {
 
         it('renders handlebars template', function (done) {
 
-            var server = new Hapi.Server({ minimal: true });
+            var server = new Hapi.Server();
             server.connection();
             server.register(Vision, Hoek.ignore);
             server.views({
@@ -654,7 +654,7 @@ describe('Manager', function () {
 
         it('renders jade template', function (done) {
 
-            var server = new Hapi.Server({ minimal: true });
+            var server = new Hapi.Server();
             server.connection();
             server.register(Vision, Hoek.ignore);
             server.views({
@@ -685,7 +685,7 @@ describe('Manager', function () {
 
         it('returns 500 on unknown extension', function (done) {
 
-            var server = new Hapi.Server({ minimal: true, debug: false });
+            var server = new Hapi.Server({ debug: false });
             server.connection();
             server.register(Vision, Hoek.ignore);
             server.views({
@@ -715,7 +715,7 @@ describe('Manager', function () {
 
         it('returns 500 on missing extension engine', function (done) {
 
-            var server = new Hapi.Server({ minimal: true, debug: false });
+            var server = new Hapi.Server({ debug: false });
             server.connection();
             server.register(Vision, Hoek.ignore);
             server.views({
@@ -1597,7 +1597,7 @@ describe('Manager', function () {
 
         it('sets Content-Type', function (done) {
 
-            var server = new Hapi.Server({ minimal: true });
+            var server = new Hapi.Server();
             server.register(Vision, Hoek.ignore);
             server.connection();
             server.views({
@@ -1620,7 +1620,7 @@ describe('Manager', function () {
 
         it('does not override Content-Type', function (done) {
 
-            var server = new Hapi.Server({ minimal: true });
+            var server = new Hapi.Server();
             server.register(Vision, Hoek.ignore);
             server.connection();
 
@@ -1644,7 +1644,7 @@ describe('Manager', function () {
 
         it('errors on invalid template', function (done) {
 
-            var server = new Hapi.Server({ minimal: true, debug: false });
+            var server = new Hapi.Server({ debug: false });
             server.register(Vision, Hoek.ignore);
             server.connection();
             server.views({

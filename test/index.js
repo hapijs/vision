@@ -27,7 +27,7 @@ describe('handler()', function () {
 
     it('handles routes to views', function (done) {
 
-        var server = new Hapi.Server({ minimal: true });
+        var server = new Hapi.Server();
         server.connection();
         server.register(Vision, Hoek.ignore);
         server.views({
@@ -48,7 +48,7 @@ describe('handler()', function () {
 
     it('handles custom context', function (done) {
 
-        var server = new Hapi.Server({ minimal: true });
+        var server = new Hapi.Server();
         server.connection();
         server.register(Vision, Hoek.ignore);
         server.views({
@@ -66,7 +66,7 @@ describe('handler()', function () {
 
     it('handles custom options', function (done) {
 
-        var server = new Hapi.Server({ minimal: true });
+        var server = new Hapi.Server();
         server.connection();
         server.register(Vision, Hoek.ignore);
         server.views({
@@ -90,7 +90,7 @@ describe('handler()', function () {
             reply('PreHello');
         };
 
-        var server = new Hapi.Server({ minimal: true });
+        var server = new Hapi.Server();
         server.connection();
         server.register(Vision, Hoek.ignore);
         server.views({
@@ -120,7 +120,7 @@ describe('handler()', function () {
 
     it('handles both custom and default contexts', function (done) {
 
-        var server = new Hapi.Server({ minimal: true });
+        var server = new Hapi.Server();
         server.connection();
         server.register(Vision, Hoek.ignore);
         server.views({
@@ -139,7 +139,7 @@ describe('handler()', function () {
 
     it('overrides default contexts when provided with context of same name', function (done) {
 
-        var server = new Hapi.Server({ minimal: true });
+        var server = new Hapi.Server();
         server.connection();
         server.register(Vision, Hoek.ignore);
         server.views({
@@ -158,7 +158,7 @@ describe('handler()', function () {
 
     it('handles a global context', function (done) {
 
-        var server = new Hapi.Server({ minimal: true });
+        var server = new Hapi.Server();
         server.connection();
         server.register(Vision, Hoek.ignore);
         server.views({
@@ -180,7 +180,7 @@ describe('handler()', function () {
 
     it('overrides the global context with the default handler context', function (done) {
 
-        var server = new Hapi.Server({ minimal: true });
+        var server = new Hapi.Server();
         server.connection();
         server.register(Vision, Hoek.ignore);
         server.views({
@@ -206,7 +206,7 @@ describe('handler()', function () {
 
     it('overrides the global and default contexts with a custom handler context', function (done) {
 
-        var server = new Hapi.Server({ minimal: true });
+        var server = new Hapi.Server();
         server.connection();
         server.register(Vision, Hoek.ignore);
         server.views({
@@ -233,7 +233,7 @@ describe('handler()', function () {
 
     it('throws on missing views', function (done) {
 
-        var server = new Hapi.Server({ minimal: true, debug: false });
+        var server = new Hapi.Server({ debug: false });
         server.register(Vision, Hoek.ignore);
         server.connection();
         server.route({
@@ -257,7 +257,7 @@ describe('render()', function () {
 
     it('renders view (root)', function (done) {
 
-        var server = new Hapi.Server({ minimal: true });
+        var server = new Hapi.Server();
         server.connection();
         server.register(Vision, Hoek.ignore);
 
@@ -276,7 +276,7 @@ describe('render()', function () {
 
     it('renders view (root with options)', function (done) {
 
-        var server = new Hapi.Server({ minimal: true });
+        var server = new Hapi.Server();
         server.connection();
         server.register(Vision, Hoek.ignore);
 
@@ -320,7 +320,7 @@ describe('render()', function () {
             name: 'test'
         };
 
-        var server = new Hapi.Server({ minimal: true });
+        var server = new Hapi.Server();
         server.connection();
         server.register(Vision, Hoek.ignore);
 
@@ -358,7 +358,7 @@ describe('render()', function () {
             name: 'test'
         };
 
-        var server = new Hapi.Server({ minimal: true });
+        var server = new Hapi.Server();
         server.connection();
         server.register(Vision, Hoek.ignore);
 
@@ -405,7 +405,7 @@ describe('render()', function () {
             name: 'test'
         };
 
-        var server = new Hapi.Server({ minimal: true });
+        var server = new Hapi.Server();
         server.connection();
         server.register(Vision, Hoek.ignore);
 
@@ -422,7 +422,7 @@ describe('render()', function () {
 
     it('throws on missing views', function (done) {
 
-        var server = new Hapi.Server({ minimal: true });
+        var server = new Hapi.Server();
         server.register(Vision, Hoek.ignore);
         expect(function () {
 
@@ -459,7 +459,7 @@ describe('render()', function () {
             name: 'test'
         };
 
-        var server = new Hapi.Server({ minimal: true });
+        var server = new Hapi.Server();
         server.connection();
         server.register(Vision, Hoek.ignore);
 
@@ -518,7 +518,7 @@ describe('views()', function () {
             name: 'test'
         };
 
-        var server = new Hapi.Server({ minimal: true });
+        var server = new Hapi.Server();
         server.connection();
         server.register(Vision, Hoek.ignore);
 
@@ -563,7 +563,7 @@ describe('views()', function () {
             name: 'test'
         };
 
-        var server = new Hapi.Server({ minimal: true });
+        var server = new Hapi.Server();
         server.connection();
         server.register(Vision, Hoek.ignore);
 
@@ -598,7 +598,7 @@ describe('views()', function () {
             name: 'test'
         };
 
-        var server = new Hapi.Server({ minimal: true });
+        var server = new Hapi.Server();
         server.connection();
         server.register(Vision, Hoek.ignore);
 
@@ -624,7 +624,7 @@ describe('views()', function () {
 
     it('throws on multiple views', function (done) {
 
-        var server = new Hapi.Server({ minimal: true });
+        var server = new Hapi.Server();
         server.register(Vision, Hoek.ignore);
         server.views({ engines: { 'html': Handlebars } });
         expect(function () {
