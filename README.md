@@ -16,9 +16,7 @@ implementation for creating templated responses.
 var server = new Hapi.Server();
 server.connection({ port: 8080 });
 
-server.register({
-    register: require('vision')
-}, function (err) {
+server.register(require('vision'), function (err) {
 
     if (err) {
         console.log("Failed to load vision.");
@@ -59,13 +57,20 @@ var rootHandler = function (request, reply) {
     });
 };
 
-server.views({
-    engines: { ejs: require('ejs') },
-    relativeTo: __dirname,
-    path: 'templates'
-});
+server.register(require('vision'), function (err) {
 
-server.route({ method: 'GET', path: '/', handler: rootHandler });
+    if (err) {
+        throw err;
+    }
+
+    server.views({
+        engines: { ejs: require('ejs') },
+        relativeTo: __dirname,
+        path: 'templates'
+    });
+
+    server.route({ method: 'GET', path: '/', handler: rootHandler });
+});
 ```
 
 ### Handlebars
@@ -82,12 +87,19 @@ var handler = function (request, reply) {
     });
 };
 
-server.views({
-    engines: { html: require('handlebars') },
-    path: __dirname + '/templates'
-});
+server.register(require('vision'), function (err) {
 
-server.route({ method: 'GET', path: '/', handler: handler });
+    if (err) {
+        throw err;
+    }
+
+    server.views({
+        engines: { html: require('handlebars') },
+        path: __dirname + '/templates'
+    });
+
+    server.route({ method: 'GET', path: '/', handler: handler });
+});
 ```
 
 ### Jade
@@ -112,16 +124,23 @@ var aboutHandler = function (request, reply) {
     });
 };
 
-server.views({
-    engines: { jade: require('jade') },
-    path: __dirname + '/templates',
-    compileOptions: {
-        pretty: true
-    }
-});
+server.register(require('vision'), function (err) {
 
-server.route({ method: 'GET', path: '/', handler: rootHandler });
-server.route({ method: 'GET', path: '/about', handler: aboutHandler });
+    if (err) {
+        throw err;
+    }
+
+    server.views({
+        engines: { jade: require('jade') },
+        path: __dirname + '/templates',
+        compileOptions: {
+            pretty: true
+        }
+    });
+
+    server.route({ method: 'GET', path: '/', handler: rootHandler });
+    server.route({ method: 'GET', path: '/about', handler: aboutHandler });
+});
 ```
 
 ### Mustache
@@ -138,25 +157,32 @@ var rootHandler = function (request, reply) {
     });
 };
 
-server.views({
-    engines: {
-        html: {
-            compile: function (template) {
+server.register(require('vision'), function (err) {
 
-                Mustache.parse(template);
+    if (err) {
+        throw err;
+    }
 
-                return function (context) {
+    server.views({
+        engines: {
+            html: {
+                compile: function (template) {
 
-                    return Mustache.render(template, context);
-                };
+                    Mustache.parse(template);
+
+                    return function (context) {
+
+                        return Mustache.render(template, context);
+                    };
+                }
             }
-        }
-    },
-    relativeTo: __dirname,
-    path: 'templates'
-});
+        },
+        relativeTo: __dirname,
+        path: 'templates'
+    });
 
-server.route({ method: 'GET', path: '/', handler: rootHandler });
+    server.route({ method: 'GET', path: '/', handler: rootHandler });
+});
 ```
 
 ### Nunjucks
@@ -176,24 +202,31 @@ var rootHandler = function (request, reply) {
     });
 };
 
-server.views({
-    engines: {
-        html: {
-            compile: function (src, options) {
+server.register(require('vision'), function (err) {
 
-                var template = Nunjucks.compile(src, environment);
+    if (err) {
+        throw err;
+    }
 
-                return function (context) {
+    server.views({
+        engines: {
+            html: {
+                compile: function (src, options) {
 
-                    return template.render(context);
-                };
+                    var template = Nunjucks.compile(src, environment);
+
+                    return function (context) {
+
+                        return template.render(context);
+                    };
+                }
             }
-        }
-    },
-    path: viewPath
-});
+        },
+        path: viewPath
+    });
 
-server.route({ method: 'GET', path: '/', handler: rootHandler });
+    server.route({ method: 'GET', path: '/', handler: rootHandler });
+});
 ```
 
 ## Usage

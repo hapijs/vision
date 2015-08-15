@@ -3,6 +3,7 @@
 var Hapi = require('hapi');
 var Nunjucks = require('nunjucks');
 var Path = require('path');
+var Vision = require('../..');
 
 
 // Declare internals
@@ -23,29 +24,42 @@ internals.main = function () {
 
     var server = new Hapi.Server();
     server.connection({ port: 8000 });
+    server.register(Vision, function (err) {
 
-    var viewPath = Path.join(__dirname, 'templates');
-    var environment = Nunjucks.configure(viewPath, { watch: false });
+        if (err) {
+            throw err;
+        }
 
-    server.views({
-        engines: {
-            html: {
-                compile: function (src, options) {
+        var viewPath = Path.join(__dirname, 'templates');
+        var environment = Nunjucks.configure(viewPath, { watch: false });
 
-                    var template = Nunjucks.compile(src, environment);
+        server.views({
+            engines: {
+                html: {
+                    compile: function (src, options) {
 
-                    return function (context) {
+                        var template = Nunjucks.compile(src, environment);
 
-                        return template.render(context);
-                    };
+                        return function (context) {
+
+                            return template.render(context);
+                        };
+                    }
                 }
-            }
-        },
-        path: viewPath
-    });
+            },
+            path: viewPath
+        });
 
-    server.route({ method: 'GET', path: '/', handler: rootHandler });
-    server.start();
+        server.route({ method: 'GET', path: '/', handler: rootHandler });
+        server.start(function (err) {
+
+            if (err) {
+                throw err;
+            }
+
+            console.log('Server is listening at ' + server.info.uri);
+        });
+    });
 };
 
 

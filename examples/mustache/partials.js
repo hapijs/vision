@@ -2,6 +2,7 @@
 
 var Hapi = require('hapi');
 var Mustache = require('mustache');
+var Vision = require('../..');
 
 
 // Declare internals
@@ -22,35 +23,44 @@ internals.main = function () {
 
     var server = new Hapi.Server();
     server.connection({ port: 8000 });
+    server.register(Vision, function (err) {
 
-    var partials = {};
+        var partials = {};
 
-    server.views({
-        engines: {
-            html: {
-                compile: function (template) {
+        server.views({
+            engines: {
+                html: {
+                    compile: function (template) {
 
-                    Mustache.parse(template);
+                        Mustache.parse(template);
 
-                    return function (context) {
+                        return function (context) {
 
-                        return Mustache.render(template, context, partials);
-                    };
-                },
+                            return Mustache.render(template, context, partials);
+                        };
+                    },
 
-                registerPartial: function (name, src) {
+                    registerPartial: function (name, src) {
 
-                    partials[name] = src;
+                        partials[name] = src;
+                    }
                 }
-            }
-        },
-        relativeTo: __dirname,
-        path: 'templates/withPartials',
-        partialsPath: 'templates/withPartials/partials'
-    });
+            },
+            relativeTo: __dirname,
+            path: 'templates/withPartials',
+            partialsPath: 'templates/withPartials/partials'
+        });
 
-    server.route({ method: 'GET', path: '/', handler: rootHandler });
-    server.start();
+        server.route({ method: 'GET', path: '/', handler: rootHandler });
+        server.start(function (err) {
+
+            if (err) {
+                throw err;
+            }
+
+            console.log('Server is listening at ' + server.info.uri);
+        });
+    });
 };
 
 

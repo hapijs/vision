@@ -1,6 +1,7 @@
 // Load modules
 
 var Hapi = require('hapi');
+var Vision = require('../..');
 
 
 // Declare internals
@@ -29,18 +30,31 @@ internals.main = function () {
 
     var server = new Hapi.Server();
     server.connection({ port: 8000 });
+    server.register(Vision, function (err) {
 
-    server.views({
-        engines: { jade: require('jade') },
-        path: __dirname + '/templates',
-        compileOptions: {
-            pretty: true
+        if (err) {
+            throw err;
         }
-    });
 
-    server.route({ method: 'GET', path: '/', handler: rootHandler });
-    server.route({ method: 'GET', path: '/about', handler: aboutHandler });
-    server.start();
+        server.views({
+            engines: { jade: require('jade') },
+            path: __dirname + '/templates',
+            compileOptions: {
+                pretty: true
+            }
+        });
+
+        server.route({ method: 'GET', path: '/', handler: rootHandler });
+        server.route({ method: 'GET', path: '/about', handler: aboutHandler });
+        server.start(function (err) {
+
+            if (err) {
+                throw err;
+            }
+
+            console.log('Server is listening at ' + server.info.uri);
+        });
+    });
 };
 
 
