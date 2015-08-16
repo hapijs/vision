@@ -421,6 +421,7 @@ response where:
   initialization.
 
 Returns a [response object](https://github.com/hapijs/hapi/blob/master/API.md#response-object).
+The generated response will have the `variety` property set to `view`.
 
 The [response flow control rules](https://github.com/hapijs/hapi/blob/master/API.md#flow-control) apply.
 
