@@ -6,7 +6,8 @@ Templates rendering plugin support for hapi.js.
 
 Lead Maintainer - [Jeffrey Jagoda](https://github.com/jagoda)
 
-**vision** decorates the [server](https://github.com/hapijs/hapi/blob/master/API.md#server) and
+**vision** decorates the [server](https://github.com/hapijs/hapi/blob/master/API.md#server),
+[request](https://github.com/hapijs/hapi/blob/master/API.md#request-object), and
 [reply](https://github.com/hapijs/hapi/blob/master/API.md#reply-interface) interfaces with additional
 methods for managing view engines that can be used to render templated responses. **vision** also
 provides a built-in [handler](https://github.com/hapijs/hapi/blob/master/API.md#serverhandlername-method)
@@ -34,6 +35,7 @@ server.register(require('vision'), function (err) {
 - [Usage](#usage)
     - [`server.views(options)`](#serverviewsoptions)
     - [`server.render(template, context, [options], callback)`](#serverrendertemplate-context-options-callback)
+    - [`request.render(template, context, [options], callback)`](#requestrendertemplate-context-options-callback)
     - [`reply.view(template, [context, [options]])`](#replyviewtemplate-context-options)
     - [The `view` handler](#the-view-handler)
 
@@ -339,19 +341,69 @@ Utilizes the server views manager to render a template where:
 var Hapi = require('hapi');
 var server = new Hapi.Server();
 server.connection({ port: 80 });
-server.views({
-    engines: { html: require('handlebars') },
-    path: __dirname + '/templates'
+
+server.register(require('vision'), function (err) {
+
+    if (err) {
+        throw err;
+    }
+
+    server.views({
+        engines: { html: require('handlebars') },
+        path: __dirname + '/templates'
+    });
+
+    var context = {
+        title: 'Views Example',
+        message: 'Hello, World'
+    };
+
+    server.render('hello', context, function (err, rendered, config) {
+
+        console.log(rendered);
+    });
 });
+```
 
-var context = {
-    title: 'Views Example',
-    message: 'Hello, World'
-};
+### `request.render(template, context, [options], callback)`
 
-server.render('hello', context, function (err, rendered, config) {
+`request.render()` works the same way as [`server.render()`](#serverrendertemplate-context-options-callback)
+but is for use inside of request handlers. [`server.render()`](#serverrendertemplate-context-options-callback)
+does not work inside request handlers when called via `request.server.render()` if the view manager was created
+by a plugin. This is because the `request.server` object does not have access to the plugin realm where the
+view manager was configured. `request.render()` gets its realm from the route that the request was bound to.
 
-    console.log(rendered);
+Note that this will not work in `onRequest` extensions added by the plugin because the route isn't yet set at
+this point in the request lifecycle and the `request.render()` method will produce the same limited results
+[`server.render()`](#serverrendertemplate-context-options-callback) can.
+
+```js
+var Hapi = require('hapi');
+var server = new Hapi.Server();
+server.connection({ port: 80 });
+
+server.register(require('vision'), function (err) {
+
+    if (err) {
+        throw err;
+    }
+
+    server.views({
+        engines: { html: require('handlebars') },
+        path: __dirname + '/templates'
+    });
+
+    server.route({
+        method: 'GET',
+        path: '/view',
+        handler: function (request, reply) {
+
+            request.render('test', { message: 'hello' }, function (err, rendered, config) {
+
+                return reply(rendered);
+            });
+        }
+    });
 });
 ```
 
@@ -376,22 +428,30 @@ The [response flow control rules](https://github.com/hapijs/hapi/blob/master/API
 var Hapi = require('hapi');
 var server = new Hapi.Server();
 server.connection({ port: 80 });
-server.views({
-    engines: { html: require('handlebars') },
-    path: __dirname + '/templates'
-});
 
-var handler = function (request, reply) {
+server.register(require('vision'), function (err) {
 
-    var context = {
-        title: 'Views Example',
-        message: 'Hello, World'
+    if (err) {
+        throw err;
+    }
+
+    server.views({
+        engines: { html: require('handlebars') },
+        path: __dirname + '/templates'
+    });
+
+    var handler = function (request, reply) {
+
+        var context = {
+            title: 'Views Example',
+            message: 'Hello, World'
+        };
+
+        return reply.view('hello', context);
     };
 
-    return reply.view('hello', context);
-};
-
-server.route({ method: 'GET', path: '/', handler: handler });
+    server.route({ method: 'GET', path: '/', handler: handler });
+});
 ```
 
 **templates/hello.html**
@@ -434,22 +494,30 @@ can be overriden by values explicitly set via the `options`).
 var Hapi = require('hapi');
 var server = new Hapi.Server();
 server.connection({ port: 80 });
-server.views({
-    engines: { html: require('handlebars') },
-    path: __dirname + '/templates'
-});
 
-server.route({
-    method: 'GET',
-    path: '/',
-    handler: {
-        view: {
-            template: 'hello',
-            context: {
-                title: 'Views Example',
-                message: 'Hello, World'
+server.register(require('vision'), function (err) {
+
+    if (err) {
+        throw err;
+    }
+
+    server.views({
+        engines: { html: require('handlebars') },
+        path: __dirname + '/templates'
+    });
+
+    server.route({
+        method: 'GET',
+        path: '/',
+        handler: {
+            view: {
+                template: 'hello',
+                context: {
+                    title: 'Views Example',
+                    message: 'Hello, World'
+                }
             }
         }
-    }
+    });
 });
 ```
