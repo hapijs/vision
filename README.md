@@ -191,9 +191,6 @@ server.register(require('vision'), function (err) {
 var server = new Hapi.Server();
 server.connection({ port: 8000 });
 
-var viewPath = Path.join(__dirname, 'templates');
-var environment = Nunjucks.configure(viewPath, { watch: false });
-
 var rootHandler = function (request, reply) {
 
     reply.view('index', {
@@ -213,16 +210,22 @@ server.register(require('vision'), function (err) {
             html: {
                 compile: function (src, options) {
 
-                    var template = Nunjucks.compile(src, environment);
+                    var template = Nunjucks.compile(src, options.environment);
 
                     return function (context) {
 
                         return template.render(context);
                     };
+                },
+
+                prepare: function (options, next) {
+
+                    options.compileOptions.environment = Nunjucks.configure(options.path, { watch : false });
+                    return next();
                 }
             }
         },
-        path: viewPath
+        path: Path.join(__dirname, 'templates')
     });
 
     server.route({ method: 'GET', path: '/', handler: rootHandler });
@@ -253,6 +256,10 @@ Initializes the server views manager where:
               where `callback` has the signature `function(err, compiled)` where `compiled` is a
               function with signature `function(context, options, callback)` and `callback` has the
               signature `function(err, rendered)`.
+            - `prepare(config, next)` - initializes additional engine state.
+              The `config` object is the engine configuration object allowing updates to be made.
+              This is useful for engines like Nunjucks that rely on additional state for rendering.
+              `next` has the signature `function(err)`.
             - `registerPartial(name, src)` - registers a partial for use during template rendering.
               The `name` is the partial path that templates should use to reference the partial and
               `src` is the uncompiled template string for the partial.
