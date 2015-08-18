@@ -13,6 +13,8 @@ methods for managing view engines that can be used to render templated responses
 provides a built-in [handler](https://github.com/hapijs/hapi/blob/master/API.md#serverhandlername-method)
 implementation for creating templated responses.
 
+## Make sure to install vision: ```npm install --save vision```
+
 ```js
 var server = new Hapi.Server();
 server.connection({ port: 8080 });
