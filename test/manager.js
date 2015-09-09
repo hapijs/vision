@@ -1,6 +1,7 @@
 // Load modules
 
 var Fs = require('fs');
+var Os = require('os');
 var Code = require('code');
 var Handlebars = require('handlebars');
 var Hapi = require('hapi');
@@ -580,6 +581,9 @@ describe('Manager', function () {
 
                 expect(res.result).to.exist();
                 expect(res.statusCode).to.equal(200);
+                var EOL = Os.EOL;
+                var html = '<!DOCTYPE html>' + EOL + '<html>' + EOL + '    <head>' + EOL + '        <title>test</title>' + EOL + '    </head>' + EOL + '    <body>' + EOL + '        <div>' + EOL + '    <h1>Hapi</h1>' + EOL + '</div>' + EOL + EOL + '    </body>' + EOL + '</html>' + EOL;
+                expect(res.result).to.equal(html);
                 done();
             });
         });
@@ -602,6 +606,9 @@ describe('Manager', function () {
 
                 expect(res.result).to.exist();
                 expect(res.statusCode).to.equal(200);
+                var EOL = Os.EOL;
+                var html = '<!DOCTYPE html>' + EOL + '<html>' + EOL + '    <head>' + EOL + '        <title>test</title>' + EOL + '    </head>' + EOL + '    <body>' + EOL + '        <div>' + EOL + '    <h1>Hapi</h1>' + EOL + '</div>' + EOL + EOL + '    </body>' + EOL + '</html>' + EOL;
+                expect(res.result).to.equal(html);
                 done();
             });
         });
@@ -623,6 +630,9 @@ describe('Manager', function () {
 
                 expect(res.result).to.exist();
                 expect(res.statusCode).to.equal(200);
+                var EOL = Os.EOL;
+                var html = 'test:<div>' + EOL + '    <h1>Hapi</h1>' + EOL + '</div>' + EOL;
+                expect(res.result).to.equal(html);
                 done();
             });
         });
@@ -644,6 +654,9 @@ describe('Manager', function () {
 
                 expect(res.result).to.exist();
                 expect(res.statusCode).to.equal(200);
+                var EOL = Os.EOL;
+                var html = 'test:<div>' + EOL + '    <h1>Hapi</h1>' + EOL + '</div>' + EOL;
+                expect(res.result).to.equal(html);
                 done();
             });
         });
@@ -667,6 +680,9 @@ describe('Manager', function () {
 
                 expect(res.result).to.exist();
                 expect(res.statusCode).to.equal(200);
+                var EOL = Os.EOL;
+                var html = 'test+<div>' + EOL + '    <h1>Hapi</h1>' + EOL + '</div>' + EOL;
+                expect(res.result).to.equal(html);
                 done();
             });
         });
@@ -756,6 +772,9 @@ describe('Manager', function () {
 
                 expect(res.result).to.exist();
                 expect(res.statusCode).to.equal(200);
+                var EOL = Os.EOL;
+                var html = '<div>' + EOL + '    <h1>Hapi</h1>' + EOL + '</div>' + EOL;
+                expect(res.result).to.equal(html);
                 done();
             });
         });
@@ -1028,6 +1047,9 @@ describe('Manager', function () {
             testView.render('valid/test', null, null, function (err, rendered, config) {
 
                 expect(rendered).to.exist();
+                var EOL = Os.EOL;
+                var html = '<div>' + EOL + '    <h1></h1>' + EOL + '</div>' + EOL;
+                expect(rendered).to.equal(html);
                 done();
             });
         });
@@ -1160,6 +1182,9 @@ describe('Manager', function () {
             testView.render('valid/test', null, null, function (err, rendered, config) {
 
                 expect(rendered).to.exist();
+                var EOL = Os.EOL;
+                var html = '<div>' + EOL + '    <h1></h1>' + EOL + '</div>' + EOL;
+                expect(rendered).to.equal(html);
                 done();
             });
         });
@@ -1175,6 +1200,9 @@ describe('Manager', function () {
             testView.render('valid/test', { title: 'test', message: 'Hapi' }, null, function (err, rendered, config) {
 
                 expect(rendered).to.exist();
+                var EOL = Os.EOL;
+                var html = '<div>' + EOL + '    <h1>Hapi</h1>' + EOL + '</div>' + EOL;
+                expect(rendered).to.equal(html);
                 done();
             });
         });
