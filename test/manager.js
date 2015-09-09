@@ -1065,6 +1065,9 @@ describe('Manager', function () {
             testView.render('valid/test', null, null, function (err, rendered, config) {
 
                 expect(rendered).to.exist();
+                var EOL = Os.EOL;
+                var html = '<!DOCTYPE html>' + EOL + '<html>' + EOL + '    <head>' + EOL + '        <title></title>' + EOL + '    </head>' + EOL + '    <body>' + EOL + '        <div>' + EOL + '    <h1></h1>' + EOL + '</div>' + EOL + EOL + '    </body>' + EOL + '</html>' + EOL;
+                expect(rendered).to.equal(html);
                 done();
             });
         });
