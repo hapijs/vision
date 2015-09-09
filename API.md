@@ -48,13 +48,13 @@ Initializes the server views manager where:
     - `defaultExtension` - defines the default filename extension to append to template names when
       multiple engines are configured and not explicit extension is provided for a given template.
       No default value.
-    - `path` - the root file path used to resolve and load the templates identified when calling
+    - `path` - the root file path, or array of file paths, used to resolve and load the templates identified when calling
       [`reply.view()`](https://github.com/hapijs/hapi/blob/master/API.md#replyviewtemplate-context-options).
       Defaults to current working directory.
-    - `partialsPath` - the root file path where partials are located. Partials are small segments
+    - `partialsPath` - the root file path, or array of file paths, where partials are located. Partials are small segments
       of template code that can be nested and reused throughout other templates. Defaults to no
       partials support (empty path).
-    - `helpersPath` - the directory path where helpers are located. Helpers are functions used
+    - `helpersPath` - the directory path, or array of directory paths, where helpers are located. Helpers are functions used
       within templates to perform transformations and other data manipulations using the template
       context or other inputs. Each '.js' file in the helpers directory is loaded and the file name
       is used as the helper name. The files must export a single method with the signature
@@ -68,7 +68,7 @@ Initializes the server views manager where:
       extension. Otherwise, the provided filename is suffixed with the engine's extension and
       loaded. Disable `layout` when using Jade as it will handle including any layout files
       independently. Defaults to `false`.
-    - `layoutPath` - the root file path where layout templates are located (using the `relativeTo`
+    - `layoutPath` - the root file path, or array of file paths, where layout templates are located (using the `relativeTo`
       prefix if present). Defaults to `path`.
     - `layoutKeyword` - the key used by the template engine to denote where primary template
       content should go. Defaults to `'content'`.
