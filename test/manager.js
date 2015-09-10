@@ -580,7 +580,7 @@ describe('Manager', function () {
 
                 expect(res.result).to.exist();
                 expect(res.statusCode).to.equal(200);
-                expect(res.result).to.equal('<!DOCTYPE html>\n<html>\n    <head>\n        <title>test</title>\n    </head>\n    <body>\n        <div>\n    <h1>Hapi</h1>\n</div>\n\n    </body>\n</html>\n');
+                expect(res.result.replace(/\r/g, '')).to.equal('<!DOCTYPE html>\n<html>\n    <head>\n        <title>test</title>\n    </head>\n    <body>\n        <div>\n    <h1>Hapi</h1>\n</div>\n\n    </body>\n</html>\n');
                 done();
             });
         });
@@ -603,7 +603,7 @@ describe('Manager', function () {
 
                 expect(res.result).to.exist();
                 expect(res.statusCode).to.equal(200);
-                expect(res.result).to.equal('<!DOCTYPE html>\n<html>\n    <head>\n        <title>test</title>\n    </head>\n    <body>\n        <div>\n    <h1>Hapi</h1>\n</div>\n\n    </body>\n</html>\n');
+                expect(res.result.replace(/\r/g, '')).to.equal('<!DOCTYPE html>\n<html>\n    <head>\n        <title>test</title>\n    </head>\n    <body>\n        <div>\n    <h1>Hapi</h1>\n</div>\n\n    </body>\n</html>\n');
                 done();
             });
         });
@@ -625,7 +625,7 @@ describe('Manager', function () {
 
                 expect(res.result).to.exist();
                 expect(res.statusCode).to.equal(200);
-                expect(res.result).to.equal('test:<div>\n    <h1>Hapi</h1>\n</div>\n');
+                expect(res.result.replace(/\r/g, '')).to.equal('test:<div>\n    <h1>Hapi</h1>\n</div>\n');
                 done();
             });
         });
@@ -647,7 +647,7 @@ describe('Manager', function () {
 
                 expect(res.result).to.exist();
                 expect(res.statusCode).to.equal(200);
-                expect(res.result).to.equal('test:<div>\n    <h1>Hapi</h1>\n</div>\n');
+                expect(res.result.replace(/\r/g, '')).to.equal('test:<div>\n    <h1>Hapi</h1>\n</div>\n');
                 done();
             });
         });
@@ -671,7 +671,7 @@ describe('Manager', function () {
 
                 expect(res.result).to.exist();
                 expect(res.statusCode).to.equal(200);
-                expect(res.result).to.equal('test+<div>\n    <h1>Hapi</h1>\n</div>\n');
+                expect(res.result.replace(/\r/g, '')).to.equal('test+<div>\n    <h1>Hapi</h1>\n</div>\n');
                 done();
             });
         });
@@ -761,7 +761,7 @@ describe('Manager', function () {
 
                 expect(res.result).to.exist();
                 expect(res.statusCode).to.equal(200);
-                expect(res.result).to.equal('<div>\n    <h1>Hapi</h1>\n</div>\n');
+                expect(res.result.replace(/\r/g, '')).to.equal('<div>\n    <h1>Hapi</h1>\n</div>\n');
                 done();
             });
         });
@@ -1034,7 +1034,7 @@ describe('Manager', function () {
             testView.render('valid/test', null, null, function (err, rendered, config) {
 
                 expect(rendered).to.exist();
-                expect(rendered).to.equal('<div>\n    <h1></h1>\n</div>\n');
+                expect(rendered.replace(/\r/g, '')).to.equal('<div>\n    <h1></h1>\n</div>\n');
                 done();
             });
         });
@@ -1050,7 +1050,7 @@ describe('Manager', function () {
             testView.render('valid/test', null, null, function (err, rendered, config) {
 
                 expect(rendered).to.exist();
-                expect(rendered).to.contain('<div>\n    <h1></h1>\n</div>\n');
+                expect(rendered.replace(/\r/g, '')).to.contain('<div>\n    <h1></h1>\n</div>\n');
                 done();
             });
         });
@@ -1074,7 +1074,7 @@ describe('Manager', function () {
 
                 expect(rendered).to.exist();
                 expect(rendered).to.contain('<h1>global</h1>');
-                expect(rendered).to.contain('<h1>default message</h1>');
+                expect(rendered.replace(/\r/g, '')).to.contain('<h1>default message</h1>');
                 done();
             });
         });
@@ -1168,7 +1168,7 @@ describe('Manager', function () {
             testView.render('valid/test', null, null, function (err, rendered, config) {
 
                 expect(rendered).to.exist();
-                expect(rendered).to.equal('<div>\n    <h1></h1>\n</div>\n');
+                expect(rendered.replace(/\r/g, '')).to.equal('<div>\n    <h1></h1>\n</div>\n');
                 done();
             });
         });
@@ -1184,7 +1184,7 @@ describe('Manager', function () {
             testView.render('valid/test', { title: 'test', message: 'Hapi' }, null, function (err, rendered, config) {
 
                 expect(rendered).to.exist();
-                expect(rendered).to.equal('<div>\n    <h1>Hapi</h1>\n</div>\n');
+                expect(rendered.replace(/\r/g, '')).to.equal('<div>\n    <h1>Hapi</h1>\n</div>\n');
                 done();
             });
         });
@@ -1217,7 +1217,7 @@ describe('Manager', function () {
             testView.render('test', { message: 'Hapi' }, null, function (err, rendered, config) {
 
                 expect(rendered).to.exist();
-                expect(rendered).to.contain('<h1>Hapi</h1>');
+                expect(rendered.replace(/\r/g, '')).to.contain('<h1>Hapi</h1>');
                 done();
             });
         });
