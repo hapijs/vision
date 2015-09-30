@@ -301,7 +301,7 @@ describe('render()', function () {
                 relativeTo: Path.join(__dirname, '/templates/plugin')
             });
 
-            var view = server.render('test', { message: 'steve' }, function (err, rendered, config) {
+            server.render('test', { message: 'steve' }, function (err, rendered, config) {
 
                 server.route([
                     {
@@ -339,7 +339,7 @@ describe('render()', function () {
 
         var test = function (server, options, next) {
 
-            var view = server.render('test', { message: 'steve' }, function (err, rendered, config) {
+            server.render('test', { message: 'steve' }, function (err, rendered, config) {
 
                 server.route([
                     {
@@ -386,7 +386,7 @@ describe('render()', function () {
                 engines: { 'html': Handlebars }
             });
 
-            var view = server.render('test', { message: 'steve' }, { relativeTo: Path.join(__dirname, '/templates/plugin') }, function (err, rendered, config) {
+            server.render('test', { message: 'steve' }, { relativeTo: Path.join(__dirname, '/templates/plugin') }, function (err, rendered, config) {
 
                 server.route([
                     {
