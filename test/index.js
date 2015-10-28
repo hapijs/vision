@@ -635,3 +635,54 @@ describe('views()', () => {
         done();
     });
 });
+
+describe('Plugin', () => {
+
+    it('can be registered before connections', (done) => {
+
+        const plugin = function (server, options, next) {
+
+            server.dependency('vision');
+            server.connection();
+            next();
+        };
+
+        plugin.attributes = {
+            connections: false,
+            name: 'test'
+        };
+
+        const server = new Hapi.Server();
+        server.register([Vision, plugin], Hoek.ignore);
+
+        expect(server.views).to.be.a.function();
+        server.initialize((err) => {
+
+            expect(err).to.not.exist();
+            server.stop(done);
+        });
+    });
+
+    it('only registers once', (done) => {
+
+        const one = function (server, options, next) {
+
+            server.register(Vision, next);
+        };
+
+        const two = function (server, options, next) {
+
+            server.register(Vision, next);
+        };
+
+        one.attributes = { name: 'one' };
+        two.attributes = { name: 'two' };
+
+        const server = new Hapi.Server();
+        server.register([one, two], (err) => {
+
+            expect(err).to.not.exist();
+            done();
+        });
+    });
+});
