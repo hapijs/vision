@@ -1,4 +1,4 @@
-var React = require('react/addons');
+var React = require('react');
 var Head = require('./includes/head.jsx');
 var Foot = require('./includes/foot.jsx');
 
@@ -9,8 +9,8 @@ var Component = React.createClass({
         <Head />
         <body>
           {this.props.children}
+          <Foot />
         </body>
-        <Foot />
       </html>
     );
   }

@@ -1,4 +1,4 @@
-var React = require('react/addons');
+var React = require('react');
 var Layout = require('./layout.jsx');
 
 var Component = React.createClass({

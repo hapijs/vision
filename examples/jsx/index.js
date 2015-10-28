@@ -3,6 +3,8 @@
 var Hapi = require('hapi');
 var Vision = require('../..');
 
+require('babel/register');
+
 
 // Declare internals
 
