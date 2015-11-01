@@ -1,17 +1,18 @@
+'use strict';
 // Load modules
 
-var Hapi = require('hapi');
-var Vision = require('../..');
+const Hapi = require('hapi');
+const Vision = require('../..');
 
 require('babel/register');
 
 
 // Declare internals
 
-var internals = {};
+const internals = {};
 
 
-var rootHandler = function (request, reply) {
+const rootHandler = function (request, reply) {
 
     reply.view('index', {
         title: 'examples/views/jsx/index.js | Hapi ' + request.server.version,
@@ -19,7 +20,7 @@ var rootHandler = function (request, reply) {
     });
 };
 
-var aboutHandler = function (request, reply) {
+const aboutHandler = function (request, reply) {
 
     reply.view('about', {
         title: 'examples/views/jsx/index.js | Hapi ' + request.server.version,
@@ -30,9 +31,9 @@ var aboutHandler = function (request, reply) {
 
 internals.main = function () {
 
-    var server = new Hapi.Server();
+    const server = new Hapi.Server();
     server.connection({ port: 8000 });
-    server.register(Vision, function (err) {
+    server.register(Vision, (err) => {
 
         if (err) {
             throw err;
@@ -48,7 +49,7 @@ internals.main = function () {
 
         server.route({ method: 'GET', path: '/', handler: rootHandler });
         server.route({ method: 'GET', path: '/about', handler: aboutHandler });
-        server.start(function (err) {
+        server.start((err) => {
 
             if (err) {
                 throw err;

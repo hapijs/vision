@@ -1,15 +1,16 @@
+'use strict';
 // Load modules
 
-var Hapi = require('hapi');
-var Vision = require('../..');
+const Hapi = require('hapi');
+const Vision = require('../..');
 
 
 // Declare internals
 
-var internals = {};
+const internals = {};
 
 
-var handler = function (request, reply) {
+const handler = function (request, reply) {
 
     reply.view('basic/index', {
         title: 'examples/views/handlebars/basic.js | Hapi ' + request.server.version,
@@ -20,9 +21,9 @@ var handler = function (request, reply) {
 
 internals.main = function () {
 
-    var server = new Hapi.Server();
+    const server = new Hapi.Server();
     server.connection({ port: 8000 });
-    server.register(Vision, function (err) {
+    server.register(Vision, (err) => {
 
         if (err) {
             throw err;
@@ -34,7 +35,7 @@ internals.main = function () {
         });
 
         server.route({ method: 'GET', path: '/', handler: handler });
-        server.start(function (err) {
+        server.start((err) => {
 
             if (err) {
                 throw err;

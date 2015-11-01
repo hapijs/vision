@@ -1,17 +1,18 @@
+'use strict';
 // Load modules
 
-var Hapi = require('hapi');
-var Nunjucks = require('nunjucks');
-var Path = require('path');
-var Vision = require('../..');
+const Hapi = require('hapi');
+const Nunjucks = require('nunjucks');
+const Path = require('path');
+const Vision = require('../..');
 
 
 // Declare internals
 
-var internals = {};
+const internals = {};
 
 
-var rootHandler = function (request, reply) {
+const rootHandler = function (request, reply) {
 
     reply.view('index', {
         title: 'examples/views/nunjucks/index.js | Hapi ' + request.server.version,
@@ -22,9 +23,9 @@ var rootHandler = function (request, reply) {
 
 internals.main = function () {
 
-    var server = new Hapi.Server();
+    const server = new Hapi.Server();
     server.connection({ port: 8000 });
-    server.register(Vision, function (err) {
+    server.register(Vision, (err) => {
 
         if (err) {
             throw err;
@@ -35,7 +36,7 @@ internals.main = function () {
                 html: {
                     compile: function (src, options) {
 
-                        var template = Nunjucks.compile(src, options.environment);
+                        const template = Nunjucks.compile(src, options.environment);
 
                         return function (context) {
 
@@ -54,7 +55,7 @@ internals.main = function () {
         });
 
         server.route({ method: 'GET', path: '/', handler: rootHandler });
-        server.start(function (err) {
+        server.start((err) => {
 
             if (err) {
                 throw err;

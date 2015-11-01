@@ -11,7 +11,7 @@
     "hapi"
   ],
   "engines": {
-    "node": ">=0.10.32"
+    "node": ">=4.0.0"
   },
   "dependencies": {
     "boom": "2.x.x",

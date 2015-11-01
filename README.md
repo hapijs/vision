@@ -16,10 +16,10 @@ implementation for creating templated responses.
 **You will need to install `vision` using something like `npm install --save vision` before you can register it.**
 
 ```js
-var server = new Hapi.Server();
+const server = new Hapi.Server();
 server.connection({ port: 8080 });
 
-server.register(require('vision'), function (err) {
+server.register(require('vision'), (err) => {
 
     if (err) {
         console.log("Failed to load vision.");
@@ -46,10 +46,10 @@ the following examples can be found in the [examples directory](./examples).
 ### EJS
 
 ```js
-var server = new Hapi.Server();
+const server = new Hapi.Server();
 server.connection({ port: 8000 });
 
-var rootHandler = function (request, reply) {
+const rootHandler = function (request, reply) {
 
     reply.view('index', {
         title: 'examples/views/ejs/index.js | Hapi ' + request.server.version,
@@ -57,7 +57,7 @@ var rootHandler = function (request, reply) {
     });
 };
 
-server.register(require('vision'), function (err) {
+server.register(require('vision'), (err) => {
 
     if (err) {
         throw err;
@@ -76,10 +76,10 @@ server.register(require('vision'), function (err) {
 ### Handlebars
 
 ```js
-var server = new Hapi.Server();
+const server = new Hapi.Server();
 server.connection({ port: 8000 });
 
-var handler = function (request, reply) {
+const handler = function (request, reply) {
 
     reply.view('basic/index', {
         title: 'examples/views/handlebars/basic.js | Hapi ' + request.server.version,
@@ -87,7 +87,7 @@ var handler = function (request, reply) {
     });
 };
 
-server.register(require('vision'), function (err) {
+server.register(require('vision'), (err) => {
 
     if (err) {
         throw err;
@@ -105,10 +105,10 @@ server.register(require('vision'), function (err) {
 ### Jade
 
 ```js
-var server = new Hapi.Server();
+const server = new Hapi.Server();
 server.connection({ port: 8000 });
 
-var rootHandler = function (request, reply) {
+const rootHandler = function (request, reply) {
 
     reply.view('index', {
         title: 'examples/views/jade/index.js | Hapi ' + request.server.version,
@@ -116,7 +116,7 @@ var rootHandler = function (request, reply) {
     });
 };
 
-var aboutHandler = function (request, reply) {
+const aboutHandler = function (request, reply) {
 
     reply.view('about', {
         title: 'examples/views/jade/index.js | Hapi ' + request.server.version,
@@ -124,7 +124,7 @@ var aboutHandler = function (request, reply) {
     });
 };
 
-server.register(require('vision'), function (err) {
+server.register(require('vision'), (err) => {
 
     if (err) {
         throw err;
@@ -146,10 +146,10 @@ server.register(require('vision'), function (err) {
 ### Mustache
 
 ```js
-var server = new Hapi.Server();
+const server = new Hapi.Server();
 server.connection({ port: 8000 });
 
-var rootHandler = function (request, reply) {
+const rootHandler = function (request, reply) {
 
     reply.view('index', {
         title: 'examples/views/mustache/index.js | Hapi ' + request.server.version,
@@ -157,7 +157,7 @@ var rootHandler = function (request, reply) {
     });
 };
 
-server.register(require('vision'), function (err) {
+server.register(require('vision'), (err) => {
 
     if (err) {
         throw err;
@@ -188,10 +188,10 @@ server.register(require('vision'), function (err) {
 ### Nunjucks
 
 ```js
-var server = new Hapi.Server();
+const server = new Hapi.Server();
 server.connection({ port: 8000 });
 
-var rootHandler = function (request, reply) {
+const rootHandler = function (request, reply) {
 
     reply.view('index', {
         title: 'examples/views/nunjucks/index.js | Hapi ' + request.server.version,
@@ -199,7 +199,7 @@ var rootHandler = function (request, reply) {
     });
 };
 
-server.register(require('vision'), function (err) {
+server.register(require('vision'), (err) => {
 
     if (err) {
         throw err;
