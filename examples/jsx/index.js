@@ -4,7 +4,9 @@
 const Hapi = require('hapi');
 const Vision = require('../..');
 
-require('babel/register');
+require('babel-core/register')({
+    plugins: ['transform-react-jsx']
+});
 
 
 // Declare internals
