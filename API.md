@@ -113,11 +113,11 @@ Utilizes the server views manager to render a template where:
     - `config` - the configuration used to render the template.
 
 ```js
-var Hapi = require('hapi');
-var server = new Hapi.Server();
+const Hapi = require('hapi');
+const server = new Hapi.Server();
 server.connection({ port: 80 });
 
-server.register(require('vision'), function (err) {
+server.register(require('vision'), (err) => {
 
     if (err) {
         throw err;
@@ -128,12 +128,12 @@ server.register(require('vision'), function (err) {
         path: __dirname + '/templates'
     });
 
-    var context = {
+    const context = {
         title: 'Views Example',
         message: 'Hello, World'
     };
 
-    server.render('hello', context, function (err, rendered, config) {
+    server.render('hello', context, (err, rendered, config) => {
 
         console.log(rendered);
     });
@@ -155,11 +155,11 @@ this point in the request lifecycle and the `request.render()` method will produ
 [`server.render()`](#serverrendertemplate-context-options-callback) can.
 
 ```js
-var Hapi = require('hapi');
-var server = new Hapi.Server();
+const Hapi = require('hapi');
+const server = new Hapi.Server();
 server.connection({ port: 80 });
 
-server.register(require('vision'), function (err) {
+server.register(require('vision'), (err) => {
 
     if (err) {
         throw err;
@@ -175,7 +175,7 @@ server.register(require('vision'), function (err) {
         path: '/view',
         handler: function (request, reply) {
 
-            request.render('test', { message: 'hello' }, function (err, rendered, config) {
+            request.render('test', { message: 'hello' }, (err, rendered, config) => {
 
                 return reply(rendered);
             });
@@ -205,11 +205,11 @@ The rendering `context` contains the `params`, `payload`, `query`, and `pre` val
 can be overriden by values explicitly set via the `options`).
 
 ```js
-var Hapi = require('hapi');
-var server = new Hapi.Server();
+const Hapi = require('hapi');
+const server = new Hapi.Server();
 server.connection({ port: 80 });
 
-server.register(require('vision'), function (err) {
+server.register(require('vision'), (err) => {
 
     if (err) {
         throw err;
@@ -257,11 +257,11 @@ The generated response will have the `variety` property set to `view`.
 The [response flow control rules](https://github.com/hapijs/hapi/blob/master/API.md#flow-control) apply.
 
 ```js
-var Hapi = require('hapi');
-var server = new Hapi.Server();
+const Hapi = require('hapi');
+const server = new Hapi.Server();
 server.connection({ port: 80 });
 
-server.register(require('vision'), function (err) {
+server.register(require('vision'), (err) => {
 
     if (err) {
         throw err;
@@ -272,9 +272,9 @@ server.register(require('vision'), function (err) {
         path: __dirname + '/templates'
     });
 
-    var handler = function (request, reply) {
+    const handler = function (request, reply) {
 
-        var context = {
+        const context = {
             title: 'Views Example',
             message: 'Hello, World'
         };

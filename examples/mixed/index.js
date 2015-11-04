@@ -1,25 +1,26 @@
+'use strict';
 // Load modules
 
-var Hapi = require('hapi');
-var Vision = require('../..');
+const Hapi = require('hapi');
+const Vision = require('../..');
 
 
 // Declare internals
 
-var internals = {};
+const internals = {};
 
 
-var indexHandler = function (request, reply) {
+const indexHandler = function (request, reply) {
 
     reply.view('index.html');
 };
 
-var oneHandler = function (request, reply) {
+const oneHandler = function (request, reply) {
 
     reply.view('index.jade');
 };
 
-var twoHandler = function (request, reply) {
+const twoHandler = function (request, reply) {
 
     reply.view('handlebars.html');
 };
@@ -27,9 +28,9 @@ var twoHandler = function (request, reply) {
 
 internals.main = function () {
 
-    var server = new Hapi.Server();
+    const server = new Hapi.Server();
     server.connection({ port: 8000 });
-    server.register(Vision, function (err) {
+    server.register(Vision, (err) => {
 
         if (err) {
             throw err;
@@ -50,7 +51,7 @@ internals.main = function () {
         server.route({ method: 'GET', path: '/', handler: indexHandler });
         server.route({ method: 'GET', path: '/one', handler: oneHandler });
         server.route({ method: 'GET', path: '/two', handler: twoHandler });
-        server.start(function (err) {
+        server.start((err) => {
 
             if (err) {
                 throw err;

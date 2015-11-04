@@ -1,17 +1,18 @@
+'use strict';
 // Load modules
 
-var Path = require('path');
-var Hapi = require('hapi');
-var Pages = require('./pages');
-var Vision = require('../..');
+const Path = require('path');
+const Hapi = require('hapi');
+const Pages = require('./pages');
+const Vision = require('../..');
 
 
 // Declare internals
 
-var internals = {};
+const internals = {};
 
 
-var view = function (viewName) {
+const view = function (viewName) {
 
     return function (request, reply) {
 
@@ -20,32 +21,32 @@ var view = function (viewName) {
 };
 
 
-var getPages = function (request, reply) {
+const getPages = function (request, reply) {
 
     return reply.view('index', { pages: Object.keys(Pages.getAll()), title: 'All pages' });
 };
 
 
-var getPage = function (request, reply) {
+const getPage = function (request, reply) {
 
     return reply.view('page', { page: Pages.getPage(request.params.page), title: request.params.page });
 };
 
 
-var createPage = function (request, reply) {
+const createPage = function (request, reply) {
 
     Pages.savePage(request.payload.name, request.payload.contents);
     return reply.view('page', { page: Pages.getPage(request.payload.name), title: 'Create page' });
 };
 
 
-var showEditForm = function (request, reply) {
+const showEditForm = function (request, reply) {
 
     return reply.view('edit', { page: Pages.getPage(request.params.page), title: 'Edit: ' + request.params.page });
 };
 
 
-var updatePage = function (request, reply) {
+const updatePage = function (request, reply) {
 
     Pages.savePage(request.params.page, request.payload.contents);
     return reply.view('page', { page: Pages.getPage(request.params.page), title: request.params.page });
@@ -54,9 +55,9 @@ var updatePage = function (request, reply) {
 
 internals.main = function () {
 
-    var server = new Hapi.Server();
+    const server = new Hapi.Server();
     server.connection({ port: 8000, state: { ignoreErrors: true } });
-    server.register(Vision, function (err) {
+    server.register(Vision, (err) => {
 
         if (err) {
             throw err;
@@ -75,7 +76,7 @@ internals.main = function () {
         server.route({ method: 'POST', path: '/create', handler: createPage });
         server.route({ method: 'GET', path: '/pages/{page}/edit', handler: showEditForm });
         server.route({ method: 'POST', path: '/pages/{page}/edit', handler: updatePage });
-        server.start(function (err) {
+        server.start((err) => {
 
             if (err) {
                 throw err;

@@ -1,12 +1,13 @@
+'use strict';
 // Load modules
 
-var Fs = require('fs');
-var Path = require('path');
+const Fs = require('fs');
+const Path = require('path');
 
 
 // Declare internals
 
-var internals = {};
+const internals = {};
 
 
 internals.Pages = function (dirPath) {
@@ -19,8 +20,8 @@ internals.Pages = function (dirPath) {
 
 internals.Pages.prototype.loadPagesIntoCache = function () {
 
-    var self = this;
-    Fs.readdirSync(this._dirPath).forEach(function (file) {
+    const self = this;
+    Fs.readdirSync(this._dirPath).forEach((file) => {
 
         if (file[0] !== '.') {
             self._cache[file] = self.loadPageFile(file);
@@ -54,7 +55,7 @@ internals.Pages.prototype.savePage = function (name, contents) {
 
 internals.Pages.prototype.loadPageFile = function (file) {
 
-    var contents = Fs.readFileSync(Path.join(this._dirPath, file));
+    const contents = Fs.readFileSync(Path.join(this._dirPath, file));
 
     return {
         name: file,

@@ -1,16 +1,17 @@
+'use strict';
 // Load modules
 
-var Hapi = require('hapi');
-var Mustache = require('mustache');
-var Vision = require('../..');
+const Hapi = require('hapi');
+const Mustache = require('mustache');
+const Vision = require('../..');
 
 
 // Declare internals
 
-var internals = {};
+const internals = {};
 
 
-var rootHandler = function (request, reply) {
+const rootHandler = function (request, reply) {
 
     reply.view('index', {
         title: 'examples/views/mustache/basic.js | Hapi ' + request.server.version,
@@ -21,9 +22,9 @@ var rootHandler = function (request, reply) {
 
 internals.main = function () {
 
-    var server = new Hapi.Server();
+    const server = new Hapi.Server();
     server.connection({ port: 8000 });
-    server.register(Vision, function (err) {
+    server.register(Vision, (err) => {
 
         if (err) {
             throw err;
@@ -48,7 +49,7 @@ internals.main = function () {
         });
 
         server.route({ method: 'GET', path: '/', handler: rootHandler });
-        server.start(function (err) {
+        server.start((err) => {
 
             if (err) {
                 throw err;
