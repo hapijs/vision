@@ -562,6 +562,29 @@ describe('Manager', () => {
         });
     });
 
+    it('should not error on layoutKeyword conflict', (done) => {
+
+        const server = new Hapi.Server({ debug: false });
+        server.connection();
+        server.register(Vision, Hoek.ignore);
+        server.views({
+            engines: { 'html': require('handlebars') },
+            path: __dirname + '/templates/valid'
+        });
+
+        // Rendering errors are not available to extensions.
+
+        server.route({ method: 'GET', path: '/', handler: { view: { template: 'test', context: { message: 'Hello, World!', content: 'fail' } } } });
+
+        server.inject('/', (res) => {
+
+            expect(res.result).to.exist();
+            expect(res.statusCode).to.equal(200);
+            expect(res.payload).to.contain('Hello, World!');
+            done();
+        });
+    });
+
     describe('with layout', (done) => {
 
         it('returns response', (done) => {
