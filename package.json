@@ -17,7 +17,7 @@
     "boom": "3.x.x",
     "hoek": "3.x.x",
     "items": "2.x.x",
-    "joi": "6.x.x"
+    "joi": "7.x.x"
   },
   "devDependencies": {
     "babel-core": "6.x.x",
@@ -26,13 +26,14 @@
     "ejs": "2.x.x",
     "handlebars": "4.x.x",
     "hapi": "11.x.x",
-    "hapi-react-views": "4.x.x",
+    "hapi-react-views": "5.x.x",
     "jade": "1.x.x",
     "lab": "7.x.x",
     "marko": "2.x.x",
     "mustache": "2.x.x",
     "nunjucks": "2.x.0",
-    "react": "0.14.x"
+    "react": "0.14.x",
+    "react-dom": "0.14.x"
   },
   "scripts": {
     "test": "lab -a code -t 100 -L",
