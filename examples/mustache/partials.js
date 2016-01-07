@@ -26,6 +26,10 @@ internals.main = function () {
     server.connection({ port: 8000 });
     server.register(Vision, (err) => {
 
+        if (err) {
+            throw error;
+        }
+
         const partials = {};
 
         server.views({

@@ -1001,6 +1001,7 @@ describe('Manager', () => {
 
             views.render('valid/test', { title: 'test', message: 'Hapi' }, null, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.exist();
                 expect(rendered).to.contain('Hapi');
                 done();
@@ -1042,6 +1043,7 @@ describe('Manager', () => {
 
             testView.render('valid/test', { title: 'test', message: 'Hapi' }, null, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.exist();
                 expect(rendered).to.contain('Hapi');
                 done();
@@ -1057,6 +1059,7 @@ describe('Manager', () => {
 
             testView.render('valid/test', null, null, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.exist();
                 expect(rendered.replace(/\r/g, '')).to.equal('<div>\n    <h1></h1>\n</div>\n');
                 done();
@@ -1073,6 +1076,7 @@ describe('Manager', () => {
 
             testView.render('valid/test', null, null, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.exist();
                 expect(rendered.replace(/\r/g, '')).to.contain('<div>\n    <h1></h1>\n</div>\n');
                 done();
@@ -1096,6 +1100,7 @@ describe('Manager', () => {
 
             testView.render('valid/testContext', null, null, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.exist();
                 expect(rendered).to.contain('<h1>global</h1>');
                 expect(rendered.replace(/\r/g, '')).to.contain('<h1>default message</h1>');
@@ -1120,6 +1125,7 @@ describe('Manager', () => {
 
             testView.render('valid/testContext', { message: 'override' }, null, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.exist();
                 expect(rendered).to.contain('<h1>global</h1>');
                 expect(rendered).to.contain('<h1>override</h1>');
@@ -1147,6 +1153,7 @@ describe('Manager', () => {
 
             testView.render('valid/testContext', null, null, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.exist();
                 expect(rendered).to.contain('<h1>global</h1>');
                 expect(rendered).to.contain('<h1>default message</h1>');
@@ -1174,6 +1181,7 @@ describe('Manager', () => {
 
             testView.render('valid/testContext', { message: 'override' }, null, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.exist();
                 expect(rendered).to.contain('<h1>global</h1>');
                 expect(rendered).to.contain('<h1>override</h1>');
@@ -1191,6 +1199,7 @@ describe('Manager', () => {
 
             testView.render('valid/test', null, null, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.exist();
                 expect(rendered.replace(/\r/g, '')).to.equal('<div>\n    <h1></h1>\n</div>\n');
                 done();
@@ -1207,6 +1216,7 @@ describe('Manager', () => {
 
             testView.render('valid/test', { title: 'test', message: 'Hapi' }, null, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.exist();
                 expect(rendered.replace(/\r/g, '')).to.equal('<div>\n    <h1>Hapi</h1>\n</div>\n');
                 done();
@@ -1223,6 +1233,7 @@ describe('Manager', () => {
 
             testView.render('test', { message: 'Hapi' }, null, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.exist();
                 expect(rendered).to.contain('<h1>Hapi</h1>');
                 done();
@@ -1240,6 +1251,7 @@ describe('Manager', () => {
 
             testView.render('test', { message: 'Hapi' }, null, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.exist();
                 expect(rendered.replace(/\r/g, '')).to.contain('<h1>Hapi</h1>');
                 done();
@@ -1257,6 +1269,7 @@ describe('Manager', () => {
 
             testView.render('test', { message: 'Hapi' }, null, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.exist();
                 expect(rendered).to.contain('<h1>Hapi</h1>');
                 done();
@@ -1273,6 +1286,7 @@ describe('Manager', () => {
 
             testView.render('test', { message: 'Hapi' }, null, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.exist();
                 expect(rendered).to.contain('<h1>Hapi</h1>');
                 done();
@@ -1289,6 +1303,7 @@ describe('Manager', () => {
 
             testViewWithLayouts.render('valid/test', { title: 'test', message: 'Hapi' }, null, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.exist();
                 expect(rendered).to.contain('Hapi');
                 done();
@@ -1306,6 +1321,7 @@ describe('Manager', () => {
 
             testViewWithLayouts.render('valid/test', { title: 'test', message: 'Hapi' }, null, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.exist();
                 expect(rendered).to.contain('Hapi');
                 done();
@@ -1415,6 +1431,7 @@ describe('Manager', () => {
 
             testViewWithJadeLayouts.render('index', { title: 'test', message: 'Hapi' }, null, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.contain('Hapi');
                 done();
             });
@@ -1430,6 +1447,7 @@ describe('Manager', () => {
 
             testViewWithoutJadeLayouts.render('test', { title: 'test', message: 'Hapi Message' }, null, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.contain('Hapi Message');
                 done();
             });
@@ -1440,6 +1458,7 @@ describe('Manager', () => {
             const views = new Manager({ engines: { html: require('handlebars') } });
             views.render('test', { title: 'test', message: 'Hapi' }, { relativeTo: __dirname + '/templates/valid' }, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.exist();
                 expect(rendered).to.contain('Hapi');
                 done();
@@ -1518,6 +1537,7 @@ describe('Manager', () => {
 
             tempView.render('testPartials', {}, null, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.equal(' Nav:<nav>Nav</nav>|<nav>Nested</nav>');
                 done();
             });
@@ -1533,6 +1553,7 @@ describe('Manager', () => {
 
             tempView.render('testPartialsName', {}, null, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.equal(' Nav:<nav>Nav</nav>|<nav>Nested</nav>');
                 done();
             });
@@ -1548,6 +1569,7 @@ describe('Manager', () => {
 
             tempView.render('testPartials', {}, null, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.equal(' Nav:<nav>Nav</nav>|<nav>Nested</nav>');
                 done();
             });
@@ -1563,6 +1585,7 @@ describe('Manager', () => {
 
             tempView.render('testPartials', {}, null, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.equal(' Nav:<nav>Nav</nav>|<nav>Nested</nav>');
                 done();
             });
@@ -1579,6 +1602,7 @@ describe('Manager', () => {
 
             tempView.render('testPartials', {}, null, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.equal(' Nav:<nav>Nav</nav>|<nav>Nested</nav>');
                 done();
             });
@@ -1594,6 +1618,7 @@ describe('Manager', () => {
 
             tempView.render('testPartials', {}, null, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.equal(' Nav:<nav>Nav</nav>|<nav>Nested</nav>');
                 done();
             });
@@ -1609,6 +1634,7 @@ describe('Manager', () => {
 
             tempView.render('testPartials', {}, null, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.equal(' Nav:<nav>Nav</nav>|<nav>Nested</nav>');
                 done();
             });
@@ -1624,6 +1650,7 @@ describe('Manager', () => {
 
             tempView.render('testPartials', {}, null, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.exist();
                 expect(rendered.length).above(1);
                 done();
@@ -1641,6 +1668,7 @@ describe('Manager', () => {
 
             tempView.render('testPartials', {}, null, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.equal('Nav:{{> nav}}|{{> nested/nav}}');
                 done();
             });
@@ -1656,6 +1684,7 @@ describe('Manager', () => {
 
             tempView.render('testHelpers', { something: 'uppercase' }, null, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.equal('<p>This is all UPPERCASE and this is how we like it!</p>');
                 done();
             });
@@ -1671,6 +1700,7 @@ describe('Manager', () => {
 
             tempView.render('testHelpers', { something: 'uppercase' }, null, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.equal('<p>This is all UPPERCASE and this is how we like it!</p>');
                 done();
             });
@@ -1687,6 +1717,7 @@ describe('Manager', () => {
 
             tempView.render('testHelpers', { something: 'uppercase' }, null, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.equal('<p>This is all UPPERCASE and this is how we like it!</p>');
                 done();
             });
@@ -1702,6 +1733,7 @@ describe('Manager', () => {
 
             tempView.render('testHelpers', { something: 'uppercase' }, null, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.equal('<p>This is all UPPERCASE and this is how we like it!</p>');
                 done();
             });
@@ -1718,6 +1750,7 @@ describe('Manager', () => {
 
             tempView.render('testHelpers', { something: 'uppercase' }, null, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.equal('<p>This is all UPPERCASE and this is how we like it!</p>');
                 done();
             });
@@ -1734,6 +1767,7 @@ describe('Manager', () => {
 
             tempView.render('testHelpers', { something: 'uppercase' }, null, (err, rendered, config) => {
 
+                expect(err).not.to.exist();
                 expect(rendered).to.equal('<p>This is all UPPERCASE and this is how we like it!</p>');
                 done();
             });
@@ -1766,11 +1800,13 @@ describe('Manager', () => {
 
             views.render('valid/test', { title: 'test', message: 'Hapi' }, null, (err, original, originalConfig) => {
 
+                expect(err).not.to.exist();
                 expect(original).to.exist();
                 expect(original).to.contain('Hapi');
 
                 views.render('valid/test', { title: 'test', message: 'Hapi' }, null, (err, cached, cachedConfig) => {
 
+                    expect(err).not.to.exist();
                     expect(cached).to.exist();
                     expect(cached).to.contain('Hapi');
 
@@ -1808,11 +1844,13 @@ describe('Manager', () => {
 
             views.render('valid/test', { title: 'test', message: 'Hapi' }, null, (err, original, originalConfig) => {
 
+                expect(err).not.to.exist();
                 expect(original).to.exist();
                 expect(original).to.contain('Hapi');
 
                 views.render('valid/test', { title: 'test', message: 'Hapi' }, null, (err, cached, cachedConfig) => {
 
+                    expect(err).not.to.exist();
                     expect(cached).to.exist();
                     expect(cached).to.contain('Hapi');
 

@@ -269,6 +269,7 @@ describe('render()', () => {
 
         server.render('test', { title: 'test', message: 'Hapi' }, (err, rendered, config) => {
 
+            expect(err).not.to.exist();
             expect(rendered).to.exist();
             expect(rendered).to.contain('Hapi');
             done();
@@ -287,6 +288,7 @@ describe('render()', () => {
 
         server.render('test', { title: 'test', message: 'Hapi' }, { path: Path.join(__dirname, '/templates/valid') }, (err, rendered, config) => {
 
+            expect(err).not.to.exist();
             expect(rendered).to.exist();
             expect(rendered).to.contain('Hapi');
             done();
@@ -303,6 +305,8 @@ describe('render()', () => {
             });
 
             server.render('test', { message: 'steve' }, (err, rendered, config) => {
+
+                expect(err).not.to.exist();
 
                 server.route([
                     {
@@ -341,6 +345,8 @@ describe('render()', () => {
         const test = function (server, options, next) {
 
             server.render('test', { message: 'steve' }, (err, rendered, config) => {
+
+                expect(err).not.to.exist();
 
                 server.route([
                     {
@@ -388,6 +394,8 @@ describe('render()', () => {
             });
 
             server.render('test', { message: 'steve' }, { relativeTo: Path.join(__dirname, '/templates/plugin') }, (err, rendered, config) => {
+
+                expect(err).not.to.exist();
 
                 server.route([
                     {
@@ -448,6 +456,7 @@ describe('render()', () => {
 
                     request.render('test', { message: 'steve' }, (err, rendered, config) => {
 
+                        expect(err).not.to.exist();
                         return reply(rendered);
                     });
                 }
