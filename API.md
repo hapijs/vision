@@ -26,12 +26,12 @@ Initializes the server views manager where:
         - `module` - the npm module used for rendering the templates. The module object must
           contain the `compile()` function:
             - `compile()` - the rendering function. The required function signature depends on the
-              `compileMode` settings. If the `compileMode` is `'sync'`, the signature is
+              `compileMode` settings (see below). If `compileMode` is `'sync'`, the signature is
               `compile(template, options)`, the return value is a function with signature
-              `function(context, options)`, and the method is allowed to throw errors. If the
-              `compileMode` is `'async'`, the signature is `compile(template, options, callback)`
-              where `callback` has the signature `function(err, compiled)` where `compiled` is a
-              function with signature `function(context, options, callback)` and `callback` has the
+              `function(context, options)` (the compiled sync template), and the method is allowed to throw errors. If 
+              `compileMode` is `'async'`, the signature is `compile(template, options, next)`
+              where `next` has the signature `function(err, compiled)`, `compiled` is a
+              function with signature `function(context, options, callback)` (the compiled async template) and `callback` has the
               signature `function(err, rendered)`.
             - `prepare(config, next)` - initializes additional engine state.
               The `config` object is the engine configuration object allowing updates to be made.
