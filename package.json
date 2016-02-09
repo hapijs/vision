@@ -25,7 +25,7 @@
     "code": "2.x.x",
     "ejs": "2.x.x",
     "handlebars": "4.x.x",
-    "hapi": "12.x.x",
+    "hapi": "13.x.x",
     "hapi-react-views": "5.x.x",
     "jade": "1.x.x",
     "lab": "8.x.x",
