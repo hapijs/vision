@@ -157,7 +157,7 @@ describe('handler()', () => {
         });
     });
 
-    it('handles a global context', (done) => {
+    it('handles a global context object', (done) => {
 
         const server = new Hapi.Server();
         server.connection();
@@ -175,6 +175,32 @@ describe('handler()', () => {
 
             expect(res.result).to.contain('<h1></h1>');
             expect(res.result).to.contain('<h1>default message</h1>');
+            done();
+        });
+    });
+
+    it('passes the request to a global context function', (done) => {
+
+        const server = new Hapi.Server();
+        server.connection();
+        server.register(Vision, Hoek.ignore);
+        server.views({
+            engines: { html: require('handlebars') },
+            path: __dirname + '/templates',
+
+            context: (request) => {
+
+                return {
+                    message: request ? request.route.path : 'default'
+                };
+            }
+        });
+
+        server.route({ method: 'GET', path: '/', handler: { view: { template: 'valid/testContext' } } });
+        server.inject('/', (res) => {
+
+            expect(res.result).to.contain('<h1></h1>');
+            expect(res.result).to.contain('<h1>/</h1>');
             done();
         });
     });
@@ -484,12 +510,70 @@ describe('render()', () => {
         });
     });
 
+    it('does not pass the request to the global context function (server)', (done) => {
+
+        const server = new Hapi.Server();
+        server.connection();
+        server.register(Vision, Hoek.ignore);
+        server.views({
+            engines: { html: require('handlebars') },
+            path: __dirname + '/templates/valid',
+
+            context: (request) => {
+
+                return {
+                    message: request ? request.route.path : 'default'
+                };
+            }
+        });
+
+        server.render('testContext', null, null, (err, result) => {
+
+            expect(err).not.to.exist();
+            expect(result).to.contain('<h1>default</h1>');
+            done();
+        });
+    });
+
+    it('does not pass the request to the global context function (request)', (done) => {
+
+        const server = new Hapi.Server();
+        server.connection();
+        server.register(Vision, Hoek.ignore);
+        server.views({
+            engines: { html: require('handlebars') },
+            path: __dirname + '/templates/valid',
+
+            context: (request) => {
+
+                return {
+                    message: request ? request.route.path : 'default'
+                };
+            }
+        });
+
+        const handler = (request, reply) => {
+
+            request.render('testContext', null, null, (err, rendered) => {
+
+                expect(err).not.to.exist();
+                reply(rendered);
+            });
+        };
+
+        server.route({ method: 'GET', path: '/', handler: handler });
+        server.inject({ method: 'GET', url: '/' }, (response) => {
+
+            expect(response.result).to.contain('<h1>default</h1>');
+            done();
+        });
+    });
+
     it('returns a promise when no options or callback given (server)', () => {
 
         const server = new Hapi.Server();
         server.connection();
         server.register(Vision, Hoek.ignore);
-
         server.views({
             engines: { html: Handlebars },
             path: __dirname + '/templates/valid'
