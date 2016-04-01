@@ -7,9 +7,9 @@ are augmented as follows:
 
 - [Server](#server)
     - [`server.views(options)`](#serverviewsoptions)
-    - [`server.render(template, context, [options], callback)`](#serverrendertemplate-context-options-callback)
+    - [`server.render(template, context, [options], [callback])`](#serverrendertemplate-context-options-callback)
 - [Requests](#requests)
-    - [`request.render(template, context, [options], callback)`](#requestrendertemplate-context-options-callback)
+    - [`request.render(template, context, [options], [callback])`](#requestrendertemplate-context-options-callback)
     - [The `view` handler](#the-view-handler)
 - [Reply interface](#reply-interface)
     - [`reply.view(template, [context, [options]])`](#replyviewtemplate-context-options)
@@ -104,7 +104,7 @@ methods.
 
 `server.views()` returns a [view manager](#view-manager) that can be used to programmatically manipulate the engine configuration.
 
-### `server.render(template, context, [options], callback)`
+### `server.render(template, context, [options], [callback])`
 
 Utilizes the server views manager to render a template where:
 - `template` - the template filename and path, relative to the views manager templates path (`path`
@@ -116,6 +116,9 @@ Utilizes the server views manager to render a template where:
     - `err` - the rendering error if any.
     - `rendered` - the result view string.
     - `config` - the configuration used to render the template.
+
+If no `callback` is provided, a `Promise` object is returned. The returned promise is resolved with only the
+rendered content an not the configuration object.
 
 ```js
 const Hapi = require('hapi');
@@ -147,7 +150,7 @@ server.register(require('vision'), (err) => {
 
 ## [Requests](https://github.com/hapijs/hapi/blob/master/API.md#requests)
 
-### `request.render(template, context, [options], callback)`
+### `request.render(template, context, [options], [callback])`
 
 `request.render()` works the same way as [`server.render()`](#serverrendertemplate-context-options-callback)
 but is for use inside of request handlers. [`server.render()`](#serverrendertemplate-context-options-callback)
@@ -307,12 +310,12 @@ server.register(require('vision'), (err) => {
 </html>
 ```
 
-# View Manager
+## View Manager
 
 ## `manager.registerHelper(name, helper)`
 
 Registers a helper, on all configured engines that have a `registerHelper()` method, for use during template rendering. Engines without a `registerHelper()` method will be skipped. The `name` is the name that templates should use to reference the helper and `helper` is the function that will be invoked when the helper is called.
 
-## `manager.render(template, context, options, callback)`
+## `manager.render(template, context, options, [callback])`
 
 Renders a template. This is typically not needed and it is usually more convenient to use [`server.render()`](#serverrendertemplate-context-options-callback).

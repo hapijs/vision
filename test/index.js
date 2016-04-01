@@ -483,6 +483,88 @@ describe('render()', () => {
             });
         });
     });
+
+    it('returns a promise when no options or callback given (server)', () => {
+
+        const server = new Hapi.Server();
+        server.connection();
+        server.register(Vision, Hoek.ignore);
+
+        server.views({
+            engines: { html: Handlebars },
+            path: __dirname + '/templates/valid'
+        });
+
+        return server.render('test', { message: 'Hello!' })
+        .then((content) => expect(content).to.contain('<h1>Hello!</h1>'));
+    });
+
+    it('returns a promise when no callback given (server)', () => {
+
+        const server = new Hapi.Server();
+        server.connection();
+        server.register(Vision, Hoek.ignore);
+
+        server.views({
+            engines: { html: Handlebars },
+            path: __dirname + '/templates/valid'
+        });
+
+        return server.render('test', { message: 'Hello!' }, {})
+        .then((content) => expect(content).to.contain('<h1>Hello!</h1>'));
+    });
+
+    it('returns a promise when no options or callback given (request)', (done) => {
+
+        const server = new Hapi.Server();
+        server.connection();
+        server.register(Vision, Hoek.ignore);
+
+        server.views({
+            engines: { html: Handlebars },
+            path: __dirname + '/templates/valid'
+        });
+
+        const handler = (request, reply) => {
+
+            const promise = request.render('test', { message: 'Hello!' });
+            expect(promise).to.be.an.instanceof(Promise);
+            reply(promise);
+        };
+
+        server.route({ method: 'GET', path: '/', handler: handler });
+        server.inject({ method: 'GET', url: '/' }, (response) => {
+
+            expect(response.result).to.contain('<h1>Hello!</h1>');
+            done();
+        });
+    });
+
+    it('returns a promise when no callback given (request)', (done) => {
+
+        const server = new Hapi.Server();
+        server.connection();
+        server.register(Vision, Hoek.ignore);
+
+        server.views({
+            engines: { html: Handlebars },
+            path: __dirname + '/templates/valid'
+        });
+
+        const handler = (request, reply) => {
+
+            const promise = request.render('test', { message: 'Hello!' }, {});
+            expect(promise).to.be.an.instanceof(Promise);
+            reply(promise);
+        };
+
+        server.route({ method: 'GET', path: '/', handler: handler });
+        server.inject({ method: 'GET', url: '/' }, (response) => {
+
+            expect(response.result).to.contain('<h1>Hello!</h1>');
+            done();
+        });
+    });
 });
 
 describe('views()', () => {
