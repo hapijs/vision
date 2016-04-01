@@ -643,6 +643,47 @@ describe('views()', () => {
         }).to.throw('Cannot set views manager more than once');
         done();
     });
+
+    it('can register helpers via the view manager', (done) => {
+
+        const server = new Hapi.Server();
+        server.register(Vision, Hoek.ignore);
+
+        const manager = server.views({
+            engines: { 'html': Handlebars.create() },
+            relativeTo: 'test/templates',
+            path: 'valid'
+        });
+
+        manager.registerHelper('long', (string) => string);
+        manager.registerHelper('uppercase', (string) => string);
+
+        server.render('testHelpers', { something: 'uppercase' }, (err, result) => {
+
+            expect(err).not.to.exist();
+            expect(result).to.equal('<p>This is all uppercase and this is how we like it!</p>');
+            done();
+        });
+    });
+
+    it('can render templates via the view manager', (done) => {
+
+        const server = new Hapi.Server();
+        server.register(Vision, Hoek.ignore);
+
+        const manager = server.views({
+            engines: { 'html': Handlebars },
+            relativeTo: 'test/templates',
+            path: 'valid'
+        });
+
+        manager.render('test', { message: 'Hello!' }, null, (err, result) => {
+
+            expect(err).not.to.exist();
+            expect(result).to.contain('<h1>Hello!</h1>');
+            done();
+        });
+    });
 });
 
 describe('Plugin', () => {

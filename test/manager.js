@@ -10,6 +10,7 @@ const Jade = require('jade');
 const Lab = require('lab');
 const Vision = require('..');
 const Manager = require('../lib/manager');
+const Mustache = require('mustache');
 
 
 // Declare internals
@@ -1769,6 +1770,65 @@ describe('Manager', () => {
 
                 expect(err).not.to.exist();
                 expect(rendered).to.equal('<p>This is all UPPERCASE and this is how we like it!</p>');
+                done();
+            });
+        });
+
+        it('registers helpers programmatically', (done) => {
+
+            const tempView = new Manager({
+                engines: {
+                    html: { module: Handlebars.create() },
+                    txt: { module: Handlebars.create() }
+                },
+                relativeTo: 'test/templates',
+                path: 'valid'
+            });
+
+            tempView.registerHelper('long', (string) => string + string.substr(-1).repeat(2));
+            tempView.registerHelper('uppercase', (string) => string.toUpperCase());
+
+            tempView.render('testHelpers.html', { something: 'uppercase' }, null, (err, rendered1) => {
+
+                expect(err).not.to.exist();
+                expect(rendered1).to.equal('<p>This is all UPPERCASE and this is howww we like it!</p>');
+
+                tempView.render('testHelpers.txt', { something: 'uppercase' }, null, (err, rendered2) => {
+
+                    expect(err).not.to.exist();
+                    expect(rendered2).to.equal('This is all UPPERCASE and this is howww we like it!');
+                    done();
+                });
+            });
+        });
+
+        it('does not register helpers on engines that don\'t have helper support', (done) => {
+
+            const tempView = new Manager({
+                engines: {
+                    html: {
+                        compile: function (template) {
+
+                            Mustache.parse(template);
+
+                            return function (context) {
+
+                                return Mustache.render(template, context);
+                            };
+                        }
+                    }
+                },
+                relativeTo: 'test/templates',
+                path: 'valid'
+            });
+
+            tempView.registerHelper('long', (string) => string + string.substr(-1).repeat(2));
+            tempView.registerHelper('uppercase', (string) => string.toUpperCase());
+
+            tempView.render('testHelpers', { something: 'uppercase' }, null, (err, rendered, config) => {
+
+                expect(err).not.to.exist();
+                expect(rendered).to.equal('<p>This is all  and this is  we like it!</p>');
                 done();
             });
         });
