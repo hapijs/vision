@@ -13,6 +13,9 @@ are augmented as follows:
     - [The `view` handler](#the-view-handler)
 - [Reply interface](#reply-interface)
     - [`reply.view(template, [context, [options]])`](#replyviewtemplate-context-options)
+- [View Manager](#view-manager)
+    - [`manager.registerHelper(name, helper)`](#managerregisterhelpername-helper)
+    - [`manager.render(template, context, options, callback)`](#managerrendertemplate-context-options-callback)
 
 ## [Server](https://github.com/hapijs/hapi/blob/master/API.md#server)
 
@@ -28,7 +31,7 @@ Initializes the server views manager where:
             - `compile()` - the rendering function. The required function signature depends on the
               `compileMode` settings (see below). If `compileMode` is `'sync'`, the signature is
               `compile(template, options)`, the return value is a function with signature
-              `function(context, options)` (the compiled sync template), and the method is allowed to throw errors. If 
+              `function(context, options)` (the compiled sync template), and the method is allowed to throw errors. If
               `compileMode` is `'async'`, the signature is `compile(template, options, next)`
               where `next` has the signature `function(err, compiled)`, `compiled` is a
               function with signature `function(context, options, callback)` (the compiled async template) and `callback` has the
@@ -98,6 +101,8 @@ Initializes the server views manager where:
 When [`server.views()`](https://github.com/hapijs/hapi/blob/master/API.md#serverviewsoptions) is called within a
 plugin, the views manager is only available to [plugins](https://github.com/hapijs/hapi/blob/master/API.md#plugins)
 methods.
+
+`server.views()` returns a [view manager](#view-manager) that can be used to programmatically manipulate the engine configuration.
 
 ### `server.render(template, context, [options], callback)`
 
@@ -301,3 +306,13 @@ server.register(require('vision'), (err) => {
     </body>
 </html>
 ```
+
+# View Manager
+
+## `manager.registerHelper(name, helper)`
+
+Registers a helper, on all configured engines that have a `registerHelper()` method, for use during template rendering. Engines without a `registerHelper()` method will be skipped. The `name` is the name that templates should use to reference the helper and `helper` is the function that will be invoked when the helper is called.
+
+## `manager.render(template, context, options, callback)`
+
+Renders a template. This is typically not needed and it is usually more convenient to use [`server.render()`](#serverrendertemplate-context-options-callback).
