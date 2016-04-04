@@ -1919,6 +1919,41 @@ describe('Manager', () => {
                 });
             });
         });
+
+        it('returns a promise that is resolved with the content if no callback is provided', () => {
+
+            const views = new Manager({
+                engines: { html: { module: Handlebars } },
+                path: __dirname + '/templates/valid'
+            });
+
+            return views.render('test', { message: 'Hello!' }, null)
+            .then((content) => {
+
+                expect(content).to.contain('<h1>Hello!</h1>');
+            });
+        });
+
+        it('returns a promise that is rejected on error if no callback is provided', () => {
+
+            const views = new Manager({
+                engines: { html: { module: Handlebars } },
+                path: __dirname + '/templates/valid'
+            });
+
+            return views.render('missing', null, null)
+            .then(
+                () => {
+
+                    throw new Error('should not resolve');
+                },
+                (err) => {
+
+                    expect(err).to.exist();
+                    expect(err.message).to.contain('missing.html');
+                }
+            );
+        });
     });
 
     describe('_response()', () => {
