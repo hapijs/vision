@@ -93,10 +93,16 @@ Initializes the server views manager where:
     - `compileMode` - specify whether the engine `compile()` method is `'sync'` or `'async'`.
       Defaults to `'sync'`.
     - `context` - a global context used with all templates. The global context option can be either
-      an object or a function that takes no arguments and returns a context object. When rendering
-      views, the global context will be merged with any context object specified on the handler or
-      using [`reply.view()`](https://github.com/hapijs/hapi/blob/master/API.md#replyviewtemplate-context-options).
-      When multiple context objects are used, values from the global context always have lowest precedence.
+      an object or a function that takes the [`request`](https://github.com/hapijs/hapi/blob/master/API.md#request-properties)
+      as its only argument and returns a context object. The
+      [`request`](https://github.com/hapijs/hapi/blob/master/API.md#request-properties) object is only provided when using
+      the [view handler](#the-view-handler) or [`reply.view()`](#replyviewtemplate-context-options). When using
+      [`server.render()`](#serverrendertemplate-context-options-callback) or
+      [`request.render()`](#requestrendertemplate-context-options-callback), the
+      [`request`](https://github.com/hapijs/hapi/blob/master/API.md#request-properties) argument will be `null`. When rendering
+      views, the global context will be merged with any context object specified on the handler or using
+      [`reply.view()`](#replyviewtemplate-context-options). When multiple context objects are used, values from the global
+      context always have lowest precedence.
 
 When [`server.views()`](https://github.com/hapijs/hapi/blob/master/API.md#serverviewsoptions) is called within a
 plugin, the views manager is only available to [plugins](https://github.com/hapijs/hapi/blob/master/API.md#plugins)

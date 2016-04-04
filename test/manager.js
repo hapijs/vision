@@ -1134,16 +1134,16 @@ describe('Manager', () => {
             });
         });
 
-        it('renders with a global context function', (done) => {
+        it('renders with a global context function (no request)', (done) => {
 
             const testView = new Manager({
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates',
 
-                context: function () {
+                context: function (request) {
 
                     return {
-                        message: 'default message',
+                        message: request ? request.route.path : 'default message',
 
                         query: {
                             test: 'global'
@@ -2024,6 +2024,41 @@ describe('Manager', () => {
             server.inject('/', (res) => {
 
                 expect(res.statusCode).to.equal(500);
+                done();
+            });
+        });
+
+        it('passes the response object to the global context function', (done) => {
+
+            const server = new Hapi.Server();
+            server.register(Vision, Hoek.ignore);
+            server.connection();
+            server.views({
+                engines: { html: Handlebars },
+                path: __dirname + '/templates/valid',
+
+                context: function (request) {
+
+                    return {
+                        message: request ? request.route.path : 'default message',
+
+                        query: {
+                            test: 'global'
+                        }
+                    };
+                }
+            });
+
+            const handler = function (request, reply) {
+
+                return reply.view('testContext');
+            };
+
+            server.route({ method: 'GET', path: '/', handler: handler });
+            server.inject('/', (res) => {
+
+                expect(res.payload).to.contain('<h1>/</h1>');
+                expect(res.payload).to.contain('<h1>global</h1>');
                 done();
             });
         });
