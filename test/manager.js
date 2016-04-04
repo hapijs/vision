@@ -11,6 +11,7 @@ const Lab = require('lab');
 const Vision = require('..');
 const Manager = require('../lib/manager');
 const Mustache = require('mustache');
+const Util = require('util');
 
 
 // Declare internals
@@ -1831,6 +1832,39 @@ describe('Manager', () => {
                 expect(rendered).to.equal('<p>This is all  and this is  we like it!</p>');
                 done();
             });
+        });
+
+        it('prints a warning message when helpers fail to load', (done) => {
+
+            const buffer = [];
+            const oldWarn = console.warn;
+
+            console.warn = function () {
+
+                const message = Util.format.apply(Util, arguments);
+
+                buffer.push(message);
+            };
+
+            try {
+                new Manager({
+                    engines: { html: { module: Handlebars.create() } },
+                    relativeTo: 'test/templates',
+                    path: 'valid',
+                    helpersPath: 'invalid/helpers'
+                });
+            }
+            finally {
+                console.warn = oldWarn;
+            }
+
+            const output = buffer.join('\n');
+
+            expect(output).to.match(/^WARNING:/);
+            expect(output).to.contain('vision failed to load helper');
+            expect(output).to.contain('invalid/helpers/bad1.module');
+            expect(output).to.contain('invalid/helpers/bad2.module');
+            done();
         });
 
         it('reuses cached compilation', (done) => {
