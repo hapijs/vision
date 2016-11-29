@@ -1,4 +1,5 @@
 'use strict';
+
 // Load modules
 
 const Hapi = require('hapi');
@@ -13,7 +14,7 @@ const internals = {};
 const rootHandler = function (request, reply) {
 
     reply.view('index', {
-        title: 'examples/views/jade/index.js | Hapi ' + request.server.version,
+        title: 'examples/views/pug/index.js | Hapi ' + request.server.version,
         message: 'Index - Hello World!'
     });
 };
@@ -21,7 +22,7 @@ const rootHandler = function (request, reply) {
 const aboutHandler = function (request, reply) {
 
     reply.view('about', {
-        title: 'examples/views/jade/index.js | Hapi ' + request.server.version,
+        title: 'examples/views/pug/index.js | Hapi ' + request.server.version,
         message: 'About - Hello World!'
     });
 };
@@ -38,7 +39,7 @@ internals.main = function () {
         }
 
         server.views({
-            engines: { jade: require('jade') },
+            engines: { pug: require('pug') },
             path: __dirname + '/templates',
             compileOptions: {
                 pretty: true

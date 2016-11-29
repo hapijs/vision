@@ -6,7 +6,7 @@ const Code = require('code');
 const Handlebars = require('handlebars');
 const Hapi = require('hapi');
 const Hoek = require('hoek');
-const Jade = require('jade');
+const Pug = require('pug');
 const Lab = require('lab');
 const Vision = require('..');
 
@@ -53,7 +53,7 @@ describe('handler()', () => {
         server.connection();
         server.register(Vision, Hoek.ignore);
         server.views({
-            engines: { jade: Jade },
+            engines: { pug: Pug },
             path: __dirname + '/templates'
         });
 
@@ -561,7 +561,7 @@ describe('render()', () => {
             });
         };
 
-        server.route({ method: 'GET', path: '/', handler: handler });
+        server.route({ method: 'GET', path: '/', handler });
         server.inject({ method: 'GET', url: '/' }, (response) => {
 
             expect(response.result).to.contain('<h1>default</h1>');
@@ -616,7 +616,7 @@ describe('render()', () => {
             reply(promise);
         };
 
-        server.route({ method: 'GET', path: '/', handler: handler });
+        server.route({ method: 'GET', path: '/', handler });
         server.inject({ method: 'GET', url: '/' }, (response) => {
 
             expect(response.result).to.contain('<h1>Hello!</h1>');
@@ -642,7 +642,7 @@ describe('render()', () => {
             reply(promise);
         };
 
-        server.route({ method: 'GET', path: '/', handler: handler });
+        server.route({ method: 'GET', path: '/', handler });
         server.inject({ method: 'GET', url: '/' }, (response) => {
 
             expect(response.result).to.contain('<h1>Hello!</h1>');

@@ -36,7 +36,7 @@ internals.main = function () {
             helpersPath: 'templates/withHelpers/helpers'
         });
 
-        server.route({ method: 'GET', path: '/', handler: handler });
+        server.route({ method: 'GET', path: '/', handler });
         server.start((err) => {
 
             if (err) {

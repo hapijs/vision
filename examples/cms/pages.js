@@ -46,10 +46,7 @@ internals.Pages.prototype.savePage = function (name, contents) {
 
     name = Path.normalize(name);
     Fs.writeFileSync(Path.join(this._dirPath, name), contents);
-    this._cache[name] = {
-        name: name,
-        contents: contents
-    };
+    this._cache[name] = { name, contents };
 };
 
 

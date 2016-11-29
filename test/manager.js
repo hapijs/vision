@@ -6,7 +6,7 @@ const Code = require('code');
 const Handlebars = require('handlebars');
 const Hapi = require('hapi');
 const Hoek = require('hoek');
-const Jade = require('jade');
+const Pug = require('pug');
 const Lab = require('lab');
 const Vision = require('..');
 const Manager = require('../lib/manager');
@@ -527,7 +527,7 @@ describe('Manager', () => {
                         }
                     },
 
-                    jade: {
+                    pug: {
                         compile: function (string, options1) {
 
                             jadeOptions = options1;
@@ -539,7 +539,7 @@ describe('Manager', () => {
 
                         prepare: function (options, next) {
 
-                            options.compileOptions = { engine: 'jade' };
+                            options.compileOptions = { engine: 'pug' };
                             return next();
                         }
                     }
@@ -553,11 +553,11 @@ describe('Manager', () => {
                 expect(htmlOptions).to.include({ engine: 'handlebars' });
                 expect(jadeOptions).to.not.exist();
 
-                manager.render('valid/test.jade', null, null, (err, rendered2) => {
+                manager.render('valid/test.pug', null, null, (err, rendered2) => {
 
                     expect(err).to.not.exist();
                     expect(rendered2).to.exist();
-                    expect(jadeOptions).to.include({ engine: 'jade' });
+                    expect(jadeOptions).to.include({ engine: 'pug' });
                     done();
                 });
             });
@@ -862,7 +862,7 @@ describe('Manager', () => {
                 path: __dirname + '/templates/valid',
                 engines: {
                     'html': require('handlebars'),
-                    'jade': require('jade'),
+                    'pug': require('pug'),
                     'hbar': {
                         module: {
                             compile: function (engine) {
@@ -884,7 +884,7 @@ describe('Manager', () => {
             });
         });
 
-        it('renders jade template', (done) => {
+        it('renders pug template', (done) => {
 
             const server = new Hapi.Server();
             server.connection();
@@ -893,7 +893,7 @@ describe('Manager', () => {
                 path: __dirname + '/templates/valid',
                 engines: {
                     'html': require('handlebars'),
-                    'jade': require('jade'),
+                    'pug': require('pug'),
                     'hbar': {
                         module: {
                             compile: function (engine) {
@@ -905,7 +905,7 @@ describe('Manager', () => {
                 }
             });
 
-            server.route({ method: 'GET', path: '/', handler: { view: { template: 'testMulti.jade', context: { message: 'Hello World!' } } } });
+            server.route({ method: 'GET', path: '/', handler: { view: { template: 'testMulti.pug', context: { message: 'Hello World!' } } } });
 
             server.inject('/', (res) => {
 
@@ -924,7 +924,7 @@ describe('Manager', () => {
                 path: __dirname + '/templates/valid',
                 engines: {
                     'html': require('handlebars'),
-                    'jade': require('jade'),
+                    'pug': require('pug'),
                     'hbar': {
                         module: {
                             compile: function (engine) {
@@ -954,7 +954,7 @@ describe('Manager', () => {
                 path: __dirname + '/templates/valid',
                 engines: {
                     'html': require('handlebars'),
-                    'jade': require('jade'),
+                    'pug': require('pug'),
                     'hbar': {
                         module: {
                             compile: function (engine) {
@@ -1195,7 +1195,7 @@ describe('Manager', () => {
 
             const testView = new Manager({
                 defaultExtension: 'html',
-                engines: { html: require('handlebars'), jade: Jade },
+                engines: { html: require('handlebars'), pug: Pug },
                 path: __dirname + '/templates'
             });
 
@@ -1423,10 +1423,10 @@ describe('Manager', () => {
             });
         });
 
-        it('allows valid jade layouts', (done) => {
+        it('allows valid pug layouts', (done) => {
 
             const testViewWithJadeLayouts = new Manager({
-                engines: { jade: Jade },
+                engines: { pug: Pug },
                 path: __dirname + '/templates' + '/valid/',
                 layout: true
             });
@@ -1439,10 +1439,10 @@ describe('Manager', () => {
             });
         });
 
-        it('should work and not throw without jade layouts', (done) => {
+        it('should work and not throw without pug layouts', (done) => {
 
             const testViewWithoutJadeLayouts = new Manager({
-                engines: { jade: Jade },
+                engines: { pug: Pug },
                 path: __dirname + '/templates' + '/valid/',
                 layout: false
             });
@@ -1665,7 +1665,7 @@ describe('Manager', () => {
                 path: __dirname + '/templates/valid',
                 partialsPath: __dirname + '/templates/valid/partials',
                 helpersPath: __dirname + '/templates/valid/helpers',
-                engines: { html: Jade }
+                engines: { html: Pug }
             });
 
             tempView.render('testPartials', {}, null, (err, rendered, config) => {
@@ -2007,7 +2007,7 @@ describe('Manager', () => {
                 return reply.view('test.html', { message: 'hi' });
             };
 
-            server.route({ method: 'GET', path: '/', handler: handler });
+            server.route({ method: 'GET', path: '/', handler });
             server.inject('/', (res) => {
 
                 expect(res.headers['content-type']).to.contain('text/html');
@@ -2031,7 +2031,7 @@ describe('Manager', () => {
                 return reply.view('test.html', { message: 'hi' }).type('text/plain');
             };
 
-            server.route({ method: 'GET', path: '/', handler: handler });
+            server.route({ method: 'GET', path: '/', handler });
             server.inject('/', (res) => {
 
                 expect(res.headers['content-type']).to.contain('text/plain');
@@ -2054,7 +2054,7 @@ describe('Manager', () => {
                 return reply.view('test.html', { message: 'hi' });
             };
 
-            server.route({ method: 'GET', path: '/', handler: handler });
+            server.route({ method: 'GET', path: '/', handler });
             server.inject('/', (res) => {
 
                 expect(res.statusCode).to.equal(500);
@@ -2088,7 +2088,7 @@ describe('Manager', () => {
                 return reply.view('testContext');
             };
 
-            server.route({ method: 'GET', path: '/', handler: handler });
+            server.route({ method: 'GET', path: '/', handler });
             server.inject('/', (res) => {
 
                 expect(res.payload).to.contain('<h1>/</h1>');

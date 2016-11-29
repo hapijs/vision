@@ -35,7 +35,7 @@ internals.main = function () {
             partialsPath: __dirname + '/templates/withPartials'
         });
 
-        server.route({ method: 'GET', path: '/', handler: handler });
+        server.route({ method: 'GET', path: '/', handler });
         server.start((err) => {
 
             if (err) {
