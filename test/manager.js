@@ -229,6 +229,82 @@ describe('Manager', () => {
         });
     });
 
+    it('allows view manager override if allowManagerOverride is true', (done) => {
+
+        const server = new Hapi.Server();
+        server.connection();
+        server.register(Vision, Hoek.ignore);
+        server.ext('onRequest', (request, reply) => {
+
+            const templatePath = request.query.path;
+            server.views({
+                engines: { 'html': require('handlebars') },
+                allowManagerOverride: true,
+                path: __dirname + templatePath
+            });
+            return reply.continue();
+        });
+
+        server.route({ method: 'GET', path: '/', handler: { view: { template: 'test', context: { message: 'Hello, World!' } } } });
+        server.route({ method: 'GET', path: '/elsewhere', handler: { view: { template: 'elsewhere', context: { title: 'Changed Path', content: 'Hello, World!' } } } });
+
+        server.inject('/?path=/templates/valid', (res) => {
+
+            expect(res.result).to.exist();
+            expect(res.result).to.have.string('Hello, World!');
+            expect(res.statusCode).to.equal(200);
+            server.inject('/elsewhere?path=/templates/layout', (overrideRes) => {
+
+                expect(overrideRes.result).to.exist();
+                expect(overrideRes.result).to.have.string('Changed Path+Hello, World!');
+                expect(overrideRes.statusCode).to.equal(200);
+                done();
+            });
+        });
+    });
+
+    it('errors if view manager is called more than once and allowManagerOverride is false', (done) => {
+
+        const server = new Hapi.Server({ debug: false });
+        server.connection();
+        server.register(Vision, Hoek.ignore);
+
+        let error = null;
+        server.ext('onRequest', (request, reply) => {
+
+            const templatePath = request.query.path;
+            try {
+                server.views({
+                    engines: { 'html': require('handlebars') },
+                    allowManagerOverride: false,
+                    path: __dirname + templatePath
+                });
+                return reply.continue();
+            }
+            catch (viewManagerError) {
+                error = viewManagerError;
+                return reply.continue();
+            }
+        });
+
+        server.route({ method: 'GET', path: '/', handler: { view: { template: 'test', context: { message: 'Hello, World!' } } } });
+        server.route({ method: 'GET', path: '/elsewhere', handler: { view: { template: 'elsewhere', context: { title: 'Changed Path', content: 'Hello, World!' } } } });
+
+        server.inject('/?path=/templates/valid', (res) => {
+
+            expect(res.result).to.exist();
+            expect(res.result).to.have.string('Hello, World!');
+            expect(res.statusCode).to.equal(200);
+            server.inject('/elsewhere?path=/templates/layout', (overrideRes) => {
+
+                expect(overrideRes.result).to.exist();
+                expect(overrideRes.statusCode).to.equal(500);
+                expect(error).to.be.an.instanceof(Error);
+                done();
+            });
+        });
+    });
+
     it('errors if template does not exist()', (done) => {
 
         const server = new Hapi.Server({ debug: false });
