@@ -85,6 +85,8 @@ Initializes the server views manager where:
     - `allowInsecureAccess` - if set to `true`, allows template paths passed to
       [`reply.view()`](https://github.com/hapijs/hapi/blob/master/API.md#replyviewtemplate-context-options)
       to contain '../'. Defaults to `false`.
+    - `allowManagerOverride` - if set to `true`, allows view manager options to be overridden by subsequent
+      calls. Useful for dynamic view path configurations that may vary per request. Defaults to `false`.
     - `compileOptions` - options object passed to the engine's compile function. Defaults to empty
       options `{}`.
     - `runtimeOptions` - options object passed to the returned function from the compile operation.
