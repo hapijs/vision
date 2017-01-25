@@ -2,7 +2,7 @@
 
 Templates rendering plugin support for hapi.js.
 
-[![Build Status](https://secure.travis-ci.org/hapijs/vision.png)](http://travis-ci.org/hapijs/vision)
+[![Build Status](https://travis-ci.org/hapijs/vision.svg)](http://travis-ci.org/hapijs/vision)
 
 Lead Maintainer - [Jeffrey Jagoda](https://github.com/jagoda)
 
