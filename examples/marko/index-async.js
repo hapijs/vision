@@ -33,15 +33,15 @@ internals.main = function () {
         server.views({
             engines: {
                 marko: {
-                    compileMode: 'sync',
-                    compile: function (src, options) {
+                    compileMode: 'async',
+                    compile: function (src, options, next) {
 
                         const template = require(options.filename);
 
-                        return function (context) {
+                        return next(null, function(context, options, callback) {
 
-                            return template.renderToString(context);
-                        };
+                            return template.renderToString(context, callback);
+                        });
                     }
                 }
             },

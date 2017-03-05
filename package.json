@@ -29,7 +29,7 @@
     "hapi-react-views": "6.x.x",
     "pug": ">=2.0.0-beta6",
     "lab": "11.x.x",
-    "marko": "3.x.x",
+    "marko": "4.x.x",
     "mustache": "2.x.x",
     "nunjucks": "2.x.0",
     "react": "0.14.x",

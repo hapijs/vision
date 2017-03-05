@@ -32,6 +32,7 @@ server.register(require('vision'), (err) => {
     - [EJS](#ejs)
     - [Handlebars](#handlebars)
     - [Jade](#jade)
+    - [Marko](#marko)
     - [Mustache](#mustache)
     - [Nunjucks](#nunjucks)
 
@@ -140,6 +141,50 @@ server.register(require('vision'), (err) => {
 
     server.route({ method: 'GET', path: '/', handler: rootHandler });
     server.route({ method: 'GET', path: '/about', handler: aboutHandler });
+});
+```
+
+### Marko
+**NOTE:** Async example: examples/views/marko/index-async.js
+
+```js
+const Marko = require('marko/node-require');
+const server = new Hapi.Server();
+server.connection({ port: 8000 });
+
+const rootHandler = function (request, reply) {
+
+    reply.view('index', {
+        title: 'examples/views/marko/index.js | Hapi ' + request.server.version,
+        message: 'Index - Hello World!'
+    });
+};
+
+server.register(require('vision'), (err) => {
+
+    if (err) {
+        throw err;
+    }
+
+    server.views({
+        engines: {
+            marko: {
+                compile: function (template, options) {
+
+                    const template = require(options.filename);
+
+                    return function (context) {
+
+                        return template.renderToString(context);
+                    };
+                }
+            }
+        },
+        relativeTo: __dirname,
+        path: 'templates'
+    });
+
+    server.route({ method: 'GET', path: '/', handler: rootHandler });
 });
 ```
 
