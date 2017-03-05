@@ -1,8 +1,8 @@
 'use strict';
 // Load modules
 
+require('marko/node-require');
 const Hapi = require('hapi');
-const Marko = require('marko/node-require');
 const Vision = require('../..');
 
 

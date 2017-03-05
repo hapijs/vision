@@ -1,8 +1,8 @@
 'use strict';
 // Load modules
 
+require('marko/node-require');
 const Hapi = require('hapi');
-const Marko = require('marko/node-require');
 const Vision = require('../..');
 
 
@@ -38,7 +38,7 @@ internals.main = function () {
 
                         const template = require(options.filename);
 
-                        return next(null, function(context, options, callback) {
+                        return next(null, function (context, opts, callback) {
 
                             return template.renderToString(context, callback);
                         });
