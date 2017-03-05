@@ -38,7 +38,7 @@ internals.main = function () {
 
                         const template = require(options.filename);
 
-                        return next(null, function (context, opts, callback) {
+                        return next(null, (context, opts, callback) => {
 
                             return template.renderToString(context, callback);
                         });
