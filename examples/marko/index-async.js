@@ -35,13 +35,13 @@ internals.main = function () {
                 marko: {
                     compileMode: 'async',
                     module: {
-                        compile: function (src, options, next) {
+                        compile: function (string, options, callback) {
 
                             const template = require(options.filename);
 
-                            return next(null, (context, opts, callback) => {
+                            return callback(null, (context, opt, next) => {
 
-                                return template.renderToString(context, callback);
+                                return template.renderToString(context, next);
                             });
                         }
                     }

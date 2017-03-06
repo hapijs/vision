@@ -35,7 +35,7 @@ internals.main = function () {
                 marko: {
                     compileMode: 'sync',
                     module: {
-                        compile: function (src, options) {
+                        compile: function (string, options) {
 
                             const template = require(options.filename);
 
