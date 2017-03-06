@@ -7,8 +7,8 @@ const Vision = require('../..');
 
 Marko.install({
     compilerOptions: {
-      preserveWhitespace: true,
-      writeToDisk: false
+        preserveWhitespace: true,
+        writeToDisk: false
     }
 });
 
