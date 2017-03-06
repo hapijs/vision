@@ -34,14 +34,16 @@ internals.main = function () {
             engines: {
                 marko: {
                     compileMode: 'sync',
-                    compile: function (src, options) {
+                    module: {
+                        compile: function (src, options) {
 
-                        const template = require(options.filename);
+                            const template = require(options.filename);
 
-                        return function (context) {
+                            return function (context) {
 
-                            return template.renderToString(context);
-                        };
+                                return template.renderToString(context);
+                            };
+                        }
                     }
                 }
             },

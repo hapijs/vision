@@ -34,14 +34,16 @@ internals.main = function () {
             engines: {
                 marko: {
                     compileMode: 'async',
-                    compile: function (src, options, next) {
+                    module: {
+                        compile: function (src, options, next) {
 
-                        const template = require(options.filename);
+                            const template = require(options.filename);
 
-                        return next(null, (context, opts, callback) => {
+                            return next(null, (context, opts, callback) => {
 
-                            return template.renderToString(context, callback);
-                        });
+                                return template.renderToString(context, callback);
+                            });
+                        }
                     }
                 }
             },
