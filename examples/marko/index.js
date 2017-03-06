@@ -2,10 +2,10 @@
 // Load modules
 
 require('marko/node-require').install({
-  compilerOptions: {
-    preserveWhitespace: true,
-    writeToDisk: false
-  }
+    compilerOptions: {
+        preserveWhitespace: true,
+        writeToDisk: false
+    }
 });
 const Hapi = require('hapi');
 const Vision = require('../..');

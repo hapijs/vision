@@ -1,12 +1,7 @@
 'use strict';
 // Load modules
 
-require('marko/node-require').install({
-    compilerOptions: {
-        preserveWhitespace: true,
-        writeToDisk: false
-    }
-});
+const Marko = require('marko');
 const Hapi = require('hapi');
 const Vision = require('../..');
 
@@ -38,16 +33,16 @@ internals.main = function () {
         server.views({
             engines: {
                 marko: {
-                    compileMode: 'async',
+                    compileMode: 'sync',
                     module: {
-                        compile: function (string, options, callback) {
+                        compile: function (string, options) {
 
-                            const template = require(options.filename);
+                            const template = Marko.load(require.resolve(options.filename), { writeToDisk: false });
 
-                            return callback(null, (context, opt, next) => {
+                            return function (context) {
 
-                                return template.renderToString(context, next);
-                            });
+                                return template.renderToString(context);
+                            };
                         }
                     }
                 }
