@@ -147,8 +147,10 @@ server.register(require('vision'), (err) => {
 ### Marko
 **NOTE:** Async example: examples/views/marko/index-async.js
 
+**NOTE:** Alternative example: examples/views/marko/index-alter.js
+
 ```js
-require('marko/node-require').install({compilerOptions: {writeToDisk: false}});
+require('marko/node-require').install({ compilerOptions: { writeToDisk: false } });
 const server = new Hapi.Server();
 server.connection({ port: 8000 });
 
