@@ -37,7 +37,7 @@ internals.main = function () {
                     module: {
                         compile: function (string, options) {
 
-                            const template = Marko.load(require.resolve(options.filename), { writeToDisk: false });
+                            const template = Marko.load(require.resolve(options.filename), { preserveWhitespace: true, writeToDisk: false });
 
                             return function (context) {
 

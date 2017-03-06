@@ -150,9 +150,16 @@ server.register(require('vision'), (err) => {
 **NOTE:** Alternative example: examples/views/marko/index-alter.js
 
 ```js
-require('marko/node-require').install({ compilerOptions: { writeToDisk: false } });
+const Marko = require('marko/node-require');
 const server = new Hapi.Server();
 server.connection({ port: 8000 });
+
+Marko.install({
+    compilerOptions: {
+        preserveWhitespace: true,
+        writeToDisk: false
+    }
+});
 
 const rootHandler = function (request, reply) {
 
