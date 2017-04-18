@@ -1,4 +1,4 @@
-#vision
+# vision
 
 Templates rendering plugin support for hapi.js.
 
