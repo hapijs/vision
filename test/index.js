@@ -901,4 +901,30 @@ describe('Plugin', () => {
             done();
         });
     });
+
+    it('runs views() with pluginOptions', (done) => {
+
+        const plugins = {
+            register: Vision,
+            options: {
+                engines: { html: require('handlebars') },
+                path: __dirname + '/templates'
+            }
+        };
+        const server = new Hapi.Server();
+        server.connection();
+        server.register(plugins, Hoek.ignore);
+
+        server.route({ method: 'GET', path: '/{param}', handler: { view: 'valid/handler' } });
+        server.inject({
+            method: 'GET',
+            url: '/hello'
+        }, (res) => {
+
+            expect(res.result).to.contain('hello');
+            done();
+        });
+
+
+    });
 });
