@@ -1862,8 +1862,11 @@ describe('Manager', () => {
 
             expect(output).to.match(/^WARNING:/);
             expect(output).to.contain('vision failed to load helper');
-            expect(output).to.contain('invalid/helpers/bad1.module');
-            expect(output).to.contain('invalid/helpers/bad2.module');
+            expect(output).to.contain('invalid/helpers/bad1.js');
+            expect(output).to.contain('invalid/helpers/bad1.json');
+            // Ignore non-requirable file extensions
+            expect(output).to.not.contain('invalid/helpers/bad1.foo');
+            expect(output).to.not.contain('invalid/helpers/README.md');
             done();
         });
 
