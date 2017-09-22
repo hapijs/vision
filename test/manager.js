@@ -300,8 +300,7 @@ describe('Manager', () => {
 
             const response = request.response;
             response.source.context.message = 'goodbye';
-
-            reply.continue();
+            return reply.continue;
         });
 
         server.route({ method: 'GET', path: '/', handler: { view: { template: 'test.html', context: { message: 'hello' } } } });

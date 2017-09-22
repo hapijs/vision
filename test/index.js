@@ -437,10 +437,10 @@ describe('views()', () => {
             server.ext('onRequest', (request, reply) => {
 
                 if (request.path === '/ext') {
-                    return reply.view('test', { message: 'grabbed' });
+                    return reply.view('test', { message: 'grabbed' }).takeover();
                 }
 
-                return reply.continue();
+                return reply.continue;
             });
         };
 
