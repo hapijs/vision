@@ -134,14 +134,14 @@ describe('Manager', () => {
         // Compilation errors sould be available for extensions.
 
         let error = null;
-        server.ext('onPostHandler', (request, reply) => {
+        server.ext('onPreResponse', (request, reply) => {
 
             const response = request.response;
             if (response.isBoom) {
                 error = response;
             }
 
-            reply.continue();
+            return reply.continue;
         });
 
         server.route({ method: 'GET', path: '/', handler: { view: { template: __dirname + '/templates/valid/test', context: { message: 'Hello, World!' } } } });
@@ -164,14 +164,14 @@ describe('Manager', () => {
         // Compilation errors sould be available for extensions.
 
         let error = null;
-        server.ext('onPostHandler', (request, reply) => {
+        server.ext('onPreResponse', (request, reply) => {
 
             const response = request.response;
             if (response.isBoom) {
                 error = response;
             }
 
-            reply.continue();
+            return reply.continue;
         });
 
         server.route({ method: 'GET', path: '/', handler: { view: { template: '../test', context: { message: 'Hello, World!' } } } });
@@ -212,14 +212,14 @@ describe('Manager', () => {
         // Compilation errors sould be available for extensions.
 
         let error = null;
-        server.ext('onPostHandler', (request, reply) => {
+        server.ext('onPreResponse', (request, reply) => {
 
             const response = request.response;
             if (response.isBoom) {
                 error = response;
             }
 
-            reply.continue();
+            return reply.continue;
         });
 
         server.route({ method: 'GET', path: '/', handler: { view: { template: 'testNope', context: { message: 'Hello, World!' } } } });
@@ -242,14 +242,14 @@ describe('Manager', () => {
         // Compilation errors sould be available for extensions.
 
         let error = null;
-        server.ext('onPostHandler', (request, reply) => {
+        server.ext('onPreResponse', (request, reply) => {
 
             const response = request.response;
             if (response.isBoom) {
                 error = response;
             }
 
-            reply.continue();
+            return reply.continue;
         });
 
         server.route({ method: 'GET', path: '/', handler: { view: { template: 'badmustache', context: { message: 'Hello, World!' }, options: { path: __dirname + '/templates/valid/invalid' } } } });
@@ -645,14 +645,14 @@ describe('Manager', () => {
             // Compilation errors sould be available for extensions.
 
             let error = null;
-            server.ext('onPostHandler', (request, reply) => {
+            server.ext('onPreResponse', (request, reply) => {
 
                 const response = request.response;
                 if (response.isBoom) {
                     error = response;
                 }
 
-                reply.continue();
+                return reply.continue;
             });
 
             server.route({ method: 'GET', path: '/', handler: { view: { template: 'valid/test', context: { title: 'test', message: 'Hapi' } } } });
@@ -675,14 +675,14 @@ describe('Manager', () => {
             // Compilation errors sould be available for extensions.
 
             let error = null;
-            server.ext('onPostHandler', (request, reply) => {
+            server.ext('onPreResponse', (request, reply) => {
 
                 const response = request.response;
                 if (response.isBoom) {
                     error = response;
                 }
 
-                reply.continue();
+                return reply.continue;
             });
 
             server.route({ method: 'GET', path: '/', handler: { view: { template: 'valid/test', context: { title: 'test', message: 'Hapi' } } } });
@@ -742,14 +742,14 @@ describe('Manager', () => {
             // Compilation errors sould be available for extensions.
 
             let error = null;
-            server.ext('onPostHandler', (request, reply) => {
+            server.ext('onPreResponse', (request, reply) => {
 
                 const response = request.response;
                 if (response.isBoom) {
                     error = response;
                 }
 
-                reply.continue();
+                return reply.continue;
             });
 
             server.route({ method: 'GET', path: '/', handler: { view: { template: 'test', context: { title: 'test', message: 'Hapi' }, options: { path: __dirname + '/templates/valid/invalid' } } } });
