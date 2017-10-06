@@ -27,7 +27,7 @@ internals.main = function () {
     server.register(Vision, (err) => {
 
         if (err) {
-            throw error;
+            throw err;
         }
 
         const partials = {};
