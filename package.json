@@ -25,7 +25,7 @@
     "code": "5.x.x",
     "ejs": "2.x.x",
     "handlebars": "4.x.x",
-    "hapi": "17.x.x",
+    "hapi": "17.0.0-rc2",
     "hapi-react-views": "6.x.x",
     "pug": ">=2.0.0-beta6",
     "lab": "14.x.x",
