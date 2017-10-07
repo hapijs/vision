@@ -5,10 +5,3 @@ node_js:
   - "node"
 
 sudo: false
-
-env:
-    - HAPI_VERSION="17"
-
-install:
-    - npm install
-    - npm install hapi@$HAPI_VERSION

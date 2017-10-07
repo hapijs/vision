@@ -20,7 +20,7 @@
     "joi": "11.x.x"
   },
   "peerDependencies": {
-    "hapi": ">=17.0.0-0"
+    "hapi": "17.0.0-rc4"
   },
   "devDependencies": {
     "babel-core": "6.x.x",
