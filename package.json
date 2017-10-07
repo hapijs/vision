@@ -1,7 +1,7 @@
 {
   "name": "vision",
   "description": "Templates rendering plugin support for hapi.js",
-  "version": "5.0.0-rc4",
+  "version": "5.0.0-rc5",
   "repository": "git://github.com/hapijs/vision",
   "main": "lib/index.js",
   "keywords": [
@@ -20,7 +20,7 @@
     "joi": "11.x.x"
   },
   "peerDependencies": {
-    "hapi": "17.0.0-rc4"
+    "hapi": "17.0.0-rc5"
   },
   "devDependencies": {
     "babel-core": "6.x.x",
@@ -28,7 +28,7 @@
     "code": "5.x.x",
     "ejs": "2.x.x",
     "handlebars": "4.x.x",
-    "hapi": "^17.0.0-rc4",
+    "hapi": "^17.0.0-rc5",
     "hapi-react-views": "6.x.x",
     "pug": ">=2.0.0-beta6",
     "lab": "14.x.x",
