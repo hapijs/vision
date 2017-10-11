@@ -412,6 +412,22 @@ describe('render()', () => {
         const res = await server.inject({ method: 'GET', url: '/' });
         expect(res.result).to.contain('<h1>default</h1>');
     });
+
+    it('errors on missing manager', async () => {
+
+        const test = async function (server, options) {
+
+            await server.render('test', { message: 'steve' });
+        };
+
+        test.attributes = {
+            name: 'test'
+        };
+
+        const server = new Hapi.Server();
+        await server.register(Vision);
+        await expect(server.register(test)).to.reject('Missing views manager');
+    });
 });
 
 describe('views()', () => {
