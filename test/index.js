@@ -265,19 +265,19 @@ describe('render()', () => {
 
     it('renders view (plugin)', async () => {
 
-        const test = async function (server, options) {
+        const test = {
+            name: 'test',
 
-            server.views({
-                engines: { 'html': Handlebars },
-                relativeTo: Path.join(__dirname, '/templates/plugin')
-            });
+            register: async function (server, options) {
 
-            const rendered = await server.render('test', { message: 'steve' });
-            server.route({ path: '/view', method: 'GET', handler: () => rendered });
-        };
+                server.views({
+                    engines: { 'html': Handlebars },
+                    relativeTo: Path.join(__dirname, '/templates/plugin')
+                });
 
-        test.attributes = {
-            name: 'test'
+                const rendered = await server.render('test', { message: 'steve' });
+                server.route({ path: '/view', method: 'GET', handler: () => rendered });
+            }
         };
 
         const server = new Hapi.Server();
@@ -290,14 +290,14 @@ describe('render()', () => {
 
     it('renders view (plugin without views)', async () => {
 
-        const test = async function (server, options) {
+        const test = {
+            name: 'test',
 
-            const rendered = await server.render('test', { message: 'steve' });
-            server.route({ path: '/view', method: 'GET', handler: () => rendered });
-        };
+            register: async function (server, options) {
 
-        test.attributes = {
-            name: 'test'
+                const rendered = await server.render('test', { message: 'steve' });
+                server.route({ path: '/view', method: 'GET', handler: () => rendered });
+            }
         };
 
         const server = new Hapi.Server();
@@ -315,18 +315,18 @@ describe('render()', () => {
 
     it('renders view (plugin with options)', async () => {
 
-        const test = async function (server, options) {
+        const test = {
+            name: 'test',
 
-            server.views({
-                engines: { 'html': Handlebars }
-            });
+            register: async function (server, options) {
 
-            const rendered = await server.render('test', { message: 'steve' }, { relativeTo: Path.join(__dirname, '/templates/plugin') });
-            server.route({ path: '/view', method: 'GET', handler: () => rendered });
-        };
+                server.views({
+                    engines: { 'html': Handlebars }
+                });
 
-        test.attributes = {
-            name: 'test'
+                const rendered = await server.render('test', { message: 'steve' }, { relativeTo: Path.join(__dirname, '/templates/plugin') });
+                server.route({ path: '/view', method: 'GET', handler: () => rendered });
+            }
         };
 
         const server = new Hapi.Server();
@@ -347,22 +347,22 @@ describe('render()', () => {
 
     it('renders view (plugin request)', async () => {
 
-        const test = async function (server, options) {
+        const test = {
+            name: 'test',
 
-            server.views({
-                engines: { 'html': Handlebars },
-                relativeTo: Path.join(__dirname, '/templates/plugin')
-            });
+            register: async function (server, options) {
 
-            server.route({
-                method: 'GET',
-                path: '/view',
-                handler: (request) => request.render('test', { message: 'steve' })
-            });
-        };
+                server.views({
+                    engines: { 'html': Handlebars },
+                    relativeTo: Path.join(__dirname, '/templates/plugin')
+                });
 
-        test.attributes = {
-            name: 'test'
+                server.route({
+                    method: 'GET',
+                    path: '/view',
+                    handler: (request) => request.render('test', { message: 'steve' })
+                });
+            }
         };
 
         const server = new Hapi.Server();
@@ -415,13 +415,13 @@ describe('render()', () => {
 
     it('errors on missing manager', async () => {
 
-        const test = async function (server, options) {
+        const test = {
+            name: 'test',
 
-            await server.render('test', { message: 'steve' });
-        };
+            register: async function (server, options) {
 
-        test.attributes = {
-            name: 'test'
+                await server.render('test', { message: 'steve' });
+            }
         };
 
         const server = new Hapi.Server();
@@ -434,39 +434,39 @@ describe('views()', () => {
 
     it('requires plugin with views', async () => {
 
-        const test = async function (server, options) {
+        const test = {
+            name: 'test',
 
-            server.path(__dirname);
+            register: async function (server, options) {
 
-            const views = {
-                engines: { 'html': Handlebars },
-                path: './templates/plugin'
-            };
+                server.path(__dirname);
 
-            server.views(views);
+                const views = {
+                    engines: { 'html': Handlebars },
+                    path: './templates/plugin'
+                };
 
-            if (Object.keys(views).length !== 2) {
-                throw new Error('plugin.view() modified options');
-            }
+                server.views(views);
 
-            server.route({ path: '/view', method: 'GET', handler: (request, reply) => reply.view('test', { message: options.message }) });
-            server.ext('onRequest', (request, reply) => {
-
-                if (request.path === '/ext') {
-                    return reply.view('test', { message: 'grabbed' }).takeover();
+                if (Object.keys(views).length !== 2) {
+                    throw new Error('plugin.view() modified options');
                 }
 
-                return reply.continue;
-            });
-        };
+                server.route({ path: '/view', method: 'GET', handler: (request, reply) => reply.view('test', { message: options.message }) });
+                server.ext('onRequest', (request, reply) => {
 
-        test.attributes = {
-            name: 'test'
+                    if (request.path === '/ext') {
+                        return reply.view('test', { message: 'grabbed' }).takeover();
+                    }
+
+                    return reply.continue;
+                });
+            }
         };
 
         const server = new Hapi.Server();
         await server.register(Vision);
-        await server.register({ register: test, options: { message: 'viewing it' } });
+        await server.register({ plugin: test, options: { message: 'viewing it' } });
 
         const res1 = await server.inject('/view');
         expect(res1.result).to.equal('<h1>viewing it</h1>');
@@ -477,18 +477,18 @@ describe('views()', () => {
 
     it('requires plugin with views with specific relativeTo', async () => {
 
-        const test = async function (server, options) {
+        const test = {
+            name: 'test',
 
-            server.views({
-                engines: { 'html': Handlebars },
-                relativeTo: Path.join(__dirname, '/templates/plugin')
-            });
+            register: async function (server, options) {
 
-            server.route({ path: '/view', method: 'GET', handler: (request, reply) => reply.view('test', { message: 'steve' }) });
-        };
+                server.views({
+                    engines: { 'html': Handlebars },
+                    relativeTo: Path.join(__dirname, '/templates/plugin')
+                });
 
-        test.attributes = {
-            name: 'test'
+                server.route({ path: '/view', method: 'GET', handler: (request, reply) => reply.view('test', { message: 'steve' }) });
+            }
         };
 
         const server = new Hapi.Server();
@@ -501,17 +501,17 @@ describe('views()', () => {
 
     it('defaults to server views', async () => {
 
-        const test = async function (server, options) {
+        const test = {
+            name: 'test',
 
-            server.route({
-                path: '/view',
-                method: 'GET',
-                handler: (request, reply) => reply.view('test', { message: options.message })
-            });
-        };
+            register: async function (server, options) {
 
-        test.attributes = {
-            name: 'test'
+                server.route({
+                    path: '/view',
+                    method: 'GET',
+                    handler: (request, reply) => reply.view('test', { message: options.message })
+                });
+            }
         };
 
         const server = new Hapi.Server();
@@ -526,7 +526,7 @@ describe('views()', () => {
 
         server.views(views);
 
-        await server.register({ register: test, options: { message: 'viewing it' } });
+        await server.register({ plugin: test, options: { message: 'viewing it' } });
         const res = await server.inject('/view');
         expect(res.result).to.equal('<h1>viewing it</h1>');
     });
@@ -580,18 +580,23 @@ describe('Plugin', () => {
 
     it('only registers once', async () => {
 
-        const one = function (server, options) {
+        const one = {
+            name: 'one',
 
-            return server.register(Vision);
+            register: function (server, options) {
+
+                return server.register(Vision);
+            }
         };
 
-        const two = function (server, options) {
+        const two = {
+            name: 'two',
 
-            return server.register(Vision);
+            register: function (server, options) {
+
+                return server.register(Vision);
+            }
         };
-
-        one.attributes = { name: 'one' };
-        two.attributes = { name: 'two' };
 
         const server = new Hapi.Server();
         await server.register([one, two]);
