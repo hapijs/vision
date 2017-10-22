@@ -17,7 +17,7 @@
     "boom": "6.x.x",
     "hoek": "5.x.x",
     "items": "2.x.x",
-    "joi": "11.x.x"
+    "joi": "13.x.x"
   },
   "peerDependencies": {
     "hapi": "17.0.0-rc8"
