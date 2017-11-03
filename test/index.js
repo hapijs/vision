@@ -29,7 +29,7 @@ describe('handler()', () => {
 
     it('handles routes to views', async () => {
 
-        const server = new Hapi.Server();
+        const server = Hapi.server();
         await server.register(Vision);
         server.views({
             engines: { html: require('handlebars') },
@@ -43,7 +43,7 @@ describe('handler()', () => {
 
     it('handles custom context', async () => {
 
-        const server = new Hapi.Server();
+        const server = Hapi.server();
         await server.register(Vision);
         server.views({
             engines: { pug: Pug },
@@ -57,7 +57,7 @@ describe('handler()', () => {
 
     it('handles custom options', async () => {
 
-        const server = new Hapi.Server();
+        const server = Hapi.server();
         await server.register(Vision);
         server.views({
             engines: { html: require('handlebars') },
@@ -77,7 +77,7 @@ describe('handler()', () => {
             return 'PreHello';
         };
 
-        const server = new Hapi.Server();
+        const server = Hapi.server();
         await server.register(Vision);
         server.views({
             engines: { html: require('handlebars') },
@@ -103,7 +103,7 @@ describe('handler()', () => {
 
     it('handles both custom and default contexts', async () => {
 
-        const server = new Hapi.Server();
+        const server = Hapi.server();
         await server.register(Vision);
         server.views({
             engines: { html: require('handlebars') },
@@ -118,7 +118,7 @@ describe('handler()', () => {
 
     it('overrides default contexts when provided with context of same name', async () => {
 
-        const server = new Hapi.Server();
+        const server = Hapi.server();
         await server.register(Vision);
         server.views({
             engines: { html: require('handlebars') },
@@ -133,7 +133,7 @@ describe('handler()', () => {
 
     it('handles a global context object', async () => {
 
-        const server = new Hapi.Server();
+        const server = Hapi.server();
         await server.register(Vision);
         server.views({
             engines: { html: require('handlebars') },
@@ -151,7 +151,7 @@ describe('handler()', () => {
 
     it('passes the request to a global context function', async () => {
 
-        const server = new Hapi.Server();
+        const server = Hapi.server();
         await server.register(Vision);
         server.views({
             engines: { html: require('handlebars') },
@@ -173,7 +173,7 @@ describe('handler()', () => {
 
     it('overrides the global context with the default handler context', async () => {
 
-        const server = new Hapi.Server();
+        const server = Hapi.server();
         await server.register(Vision);
         server.views({
             engines: { html: require('handlebars') },
@@ -195,7 +195,7 @@ describe('handler()', () => {
 
     it('overrides the global and default contexts with a custom handler context', async () => {
 
-        const server = new Hapi.Server();
+        const server = Hapi.server();
         await server.register(Vision);
         server.views({
             engines: { html: require('handlebars') },
@@ -218,7 +218,7 @@ describe('handler()', () => {
 
     it('throws on missing views', async () => {
 
-        const server = new Hapi.Server({ debug: false });
+        const server = Hapi.server({ debug: false });
         await server.register(Vision);
         server.route({
             path: '/',
@@ -238,7 +238,7 @@ describe('render()', () => {
 
     it('renders view (root)', async () => {
 
-        const server = new Hapi.Server();
+        const server = Hapi.server();
         await server.register(Vision);
 
         server.views({
@@ -252,7 +252,7 @@ describe('render()', () => {
 
     it('renders view (root with options)', async () => {
 
-        const server = new Hapi.Server();
+        const server = Hapi.server();
         await server.register(Vision);
 
         server.views({
@@ -280,7 +280,7 @@ describe('render()', () => {
             }
         };
 
-        const server = new Hapi.Server();
+        const server = Hapi.server();
         await server.register(Vision);
 
         await server.register(test);
@@ -300,7 +300,7 @@ describe('render()', () => {
             }
         };
 
-        const server = new Hapi.Server();
+        const server = Hapi.server();
         await server.register(Vision);
 
         server.views({
@@ -329,7 +329,7 @@ describe('render()', () => {
             }
         };
 
-        const server = new Hapi.Server();
+        const server = Hapi.server();
         await server.register(Vision);
 
         await server.register(test);
@@ -340,7 +340,7 @@ describe('render()', () => {
 
     it('rejects on missing views', async () => {
 
-        const server = new Hapi.Server();
+        const server = Hapi.server();
         await server.register(Vision);
         await expect(server.render('test')).to.reject('Missing views manager');
     });
@@ -350,7 +350,7 @@ describe('render()', () => {
         const test = {
             name: 'test',
 
-            register: async function (server, options) {
+            register: function (server, options) {
 
                 server.views({
                     engines: { 'html': Handlebars },
@@ -365,7 +365,7 @@ describe('render()', () => {
             }
         };
 
-        const server = new Hapi.Server();
+        const server = Hapi.server();
         await server.register(Vision);
         await server.register(test);
         const res = await server.inject('/view');
@@ -374,7 +374,7 @@ describe('render()', () => {
 
     it('does not pass the request to the global context function (server)', async () => {
 
-        const server = new Hapi.Server();
+        const server = Hapi.server();
         await server.register(Vision);
         server.views({
             engines: { html: require('handlebars') },
@@ -394,7 +394,7 @@ describe('render()', () => {
 
     it('does not pass the request to the global context function (request)', async () => {
 
-        const server = new Hapi.Server();
+        const server = Hapi.server();
         await server.register(Vision);
         server.views({
             engines: { html: require('handlebars') },
@@ -424,7 +424,7 @@ describe('render()', () => {
             }
         };
 
-        const server = new Hapi.Server();
+        const server = Hapi.server();
         await server.register(Vision);
         await expect(server.register(test)).to.reject('Missing views manager');
     });
@@ -437,7 +437,7 @@ describe('views()', () => {
         const test = {
             name: 'test',
 
-            register: async function (server, options) {
+            register: function (server, options) {
 
                 server.path(__dirname);
 
@@ -464,7 +464,7 @@ describe('views()', () => {
             }
         };
 
-        const server = new Hapi.Server();
+        const server = Hapi.server();
         await server.register(Vision);
         await server.register({ plugin: test, options: { message: 'viewing it' } });
 
@@ -480,7 +480,7 @@ describe('views()', () => {
         const test = {
             name: 'test',
 
-            register: async function (server, options) {
+            register: function (server, options) {
 
                 server.views({
                     engines: { 'html': Handlebars },
@@ -491,7 +491,7 @@ describe('views()', () => {
             }
         };
 
-        const server = new Hapi.Server();
+        const server = Hapi.server();
         await server.register(Vision);
         await server.register(test);
 
@@ -504,7 +504,7 @@ describe('views()', () => {
         const test = {
             name: 'test',
 
-            register: async function (server, options) {
+            register: function (server, options) {
 
                 server.route({
                     path: '/view',
@@ -514,7 +514,7 @@ describe('views()', () => {
             }
         };
 
-        const server = new Hapi.Server();
+        const server = Hapi.server();
         await server.register(Vision);
 
         server.path(__dirname);
@@ -533,7 +533,7 @@ describe('views()', () => {
 
     it('throws on multiple views', async () => {
 
-        const server = new Hapi.Server();
+        const server = Hapi.server();
         await server.register(Vision);
         server.views({ engines: { 'html': Handlebars } });
         expect(() => {
@@ -544,7 +544,7 @@ describe('views()', () => {
 
     it('can register helpers via the view manager', async () => {
 
-        const server = new Hapi.Server();
+        const server = Hapi.server();
         await server.register(Vision);
 
         const manager = server.views({
@@ -562,7 +562,7 @@ describe('views()', () => {
 
     it('can render templates via the view manager', async () => {
 
-        const server = new Hapi.Server();
+        const server = Hapi.server();
         await server.register(Vision);
 
         const manager = server.views({
@@ -598,7 +598,7 @@ describe('Plugin', () => {
             }
         };
 
-        const server = new Hapi.Server();
+        const server = Hapi.server();
         await server.register([one, two]);
     });
 });
