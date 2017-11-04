@@ -1,10 +1,10 @@
-#vision
+# vision
 
 Templates rendering plugin support for hapi.js.
 
-[![Build Status](https://travis-ci.org/hapijs/vision.svg)](http://travis-ci.org/hapijs/vision)
+[![Build Status](https://travis-ci.org/hapijs/vision.svg)](http://travis-ci.org/hapijs/vision) [![Coverage Status](https://coveralls.io/repos/github/hapijs/vision/badge.svg?branch=master)](https://coveralls.io/github/hapijs/vision?branch=master)
 
-Lead Maintainer - [Jeffrey Jagoda](https://github.com/jagoda)
+Lead Maintainer - [William Woodruff](https://github.com/wswoodruff)
 
 **vision** decorates the [server](https://github.com/hapijs/hapi/blob/master/API.md#server),
 [request](https://github.com/hapijs/hapi/blob/master/API.md#request-object), and

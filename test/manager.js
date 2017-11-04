@@ -2,16 +2,17 @@
 // Load modules
 
 const Fs = require('fs');
+const Util = require('util');
+
 const Code = require('code');
 const Handlebars = require('handlebars');
 const Hapi = require('hapi');
-const Hoek = require('hoek');
 const Pug = require('pug');
 const Lab = require('lab');
 const Vision = require('..');
-const Manager = require('../lib/manager');
 const Mustache = require('mustache');
-const Util = require('util');
+
+const Manager = require('../lib/manager');
 
 
 // Declare internals
@@ -29,11 +30,10 @@ const expect = Code.expect;
 
 describe('Manager', () => {
 
-    it('renders handlebars template', (done) => {
+    it('renders handlebars template', async () => {
 
-        const server = new Hapi.Server();
-        server.connection();
-        server.register(Vision, Hoek.ignore);
+        const server = Hapi.server();
+        await await server.register(Vision);
         server.views({
             engines: {
                 html: {
@@ -45,15 +45,12 @@ describe('Manager', () => {
 
         server.route({ method: 'GET', path: '/handlebars', handler: { view: { template: 'test.html', context: { message: 'Hello World!' } } } });
 
-        server.inject('/handlebars', (res) => {
-
-            expect(res.result).to.exist();
-            expect(res.statusCode).to.equal(200);
-            done();
-        });
+        const res = await server.inject('/handlebars');
+        expect(res.result).to.exist();
+        expect(res.statusCode).to.equal(200);
     });
 
-    it('shallow copies global context', (done) => {
+    it('shallow copies global context', () => {
 
         const options = {
             engines: {
@@ -68,16 +65,13 @@ describe('Manager', () => {
         };
 
         const manager = new Manager(options);
-
         expect(manager._context).to.equal(options.context);
-        done();
     });
 
-    it('sets content type', (done) => {
+    it('sets content type', async () => {
 
-        const server = new Hapi.Server();
-        server.connection();
-        server.register(Vision, Hoek.ignore);
+        const server = Hapi.server();
+        await await server.register(Vision);
         server.views({
             engines: {
                 html: {
@@ -89,20 +83,16 @@ describe('Manager', () => {
         });
 
         server.route({ method: 'GET', path: '/', handler: { view: { template: 'test', context: { message: 'Hello World!' } } } });
-        server.inject('/', (res) => {
-
-            expect(res.headers['content-type']).to.equal('something/else');
-            expect(res.result).to.exist();
-            expect(res.statusCode).to.equal(200);
-            done();
-        });
+        const res = await server.inject('/');
+        expect(res.headers['content-type']).to.equal('something/else');
+        expect(res.result).to.exist();
+        expect(res.statusCode).to.equal(200);
     });
 
-    it('errors on invalid template path', (done) => {
+    it('errors on invalid template path', async () => {
 
-        const server = new Hapi.Server({ debug: false });
-        server.connection();
-        server.register(Vision, Hoek.ignore);
+        const server = Hapi.server({ debug: false });
+        await await server.register(Vision);
         server.views({
             engines: { 'html': require('handlebars') },
             path: __dirname + '/templates/invalid'
@@ -111,18 +101,14 @@ describe('Manager', () => {
         // Rendering errors are not available to extensions.
 
         server.route({ method: 'GET', path: '/', handler: { view: { template: 'test', context: { message: 'Hello, World!' } } } });
-        server.inject('/', (res) => {
-
-            expect(res.statusCode).to.equal(500);
-            done();
-        });
+        const res = await server.inject('/');
+        expect(res.statusCode).to.equal(500);
     });
 
-    it('returns a compiled Handlebars template reply', (done) => {
+    it('returns a compiled Handlebars template reply', async () => {
 
-        const server = new Hapi.Server();
-        server.connection();
-        server.register(Vision, Hoek.ignore);
+        const server = Hapi.server();
+        await server.register(Vision);
         server.views({
             engines: { 'html': require('handlebars') },
             path: __dirname + '/templates/valid'
@@ -130,20 +116,16 @@ describe('Manager', () => {
 
         server.route({ method: 'GET', path: '/', handler: { view: { template: 'test', context: { message: 'Hello, World!' } } } });
 
-        server.inject('/', (res) => {
-
-            expect(res.result).to.exist();
-            expect(res.result).to.have.string('Hello, World!');
-            expect(res.statusCode).to.equal(200);
-            done();
-        });
+        const res = await server.inject('/');
+        expect(res.result).to.exist();
+        expect(res.result).to.have.string('Hello, World!');
+        expect(res.statusCode).to.equal(200);
     });
 
-    it('errors absolute path given and allowAbsolutePath is false (by default)', (done) => {
+    it('errors absolute path given and allowAbsolutePath is false (by default)', async () => {
 
-        const server = new Hapi.Server({ debug: false });
-        server.connection();
-        server.register(Vision, Hoek.ignore);
+        const server = Hapi.server({ debug: false });
+        await server.register(Vision);
         server.views({
             engines: { 'html': require('handlebars') },
             path: __dirname + '/templates/valid'
@@ -152,32 +134,28 @@ describe('Manager', () => {
         // Compilation errors sould be available for extensions.
 
         let error = null;
-        server.ext('onPostHandler', (request, reply) => {
+        server.ext('onPreResponse', (request, reply) => {
 
             const response = request.response;
             if (response.isBoom) {
                 error = response;
             }
 
-            reply.continue();
+            return reply.continue;
         });
 
         server.route({ method: 'GET', path: '/', handler: { view: { template: __dirname + '/templates/valid/test', context: { message: 'Hello, World!' } } } });
 
-        server.inject('/', (res) => {
-
-            expect(res.result).to.exist();
-            expect(res.statusCode).to.equal(500);
-            expect(error).to.be.an.instanceof(Error);
-            done();
-        });
+        const res = await server.inject('/');
+        expect(res.result).to.exist();
+        expect(res.statusCode).to.equal(500);
+        expect(error).to.be.an.instanceof(Error);
     });
 
-    it('errors if path given includes ../ and allowInsecureAccess is false (by default)', (done) => {
+    it('errors if path given includes ../ and allowInsecureAccess is false (by default)', async () => {
 
-        const server = new Hapi.Server({ debug: false });
-        server.connection();
-        server.register(Vision, Hoek.ignore);
+        const server = Hapi.server({ debug: false });
+        await server.register(Vision);
         server.views({
             engines: { 'html': require('handlebars') },
             path: __dirname + '/templates/valid'
@@ -186,32 +164,28 @@ describe('Manager', () => {
         // Compilation errors sould be available for extensions.
 
         let error = null;
-        server.ext('onPostHandler', (request, reply) => {
+        server.ext('onPreResponse', (request, reply) => {
 
             const response = request.response;
             if (response.isBoom) {
                 error = response;
             }
 
-            reply.continue();
+            return reply.continue;
         });
 
         server.route({ method: 'GET', path: '/', handler: { view: { template: '../test', context: { message: 'Hello, World!' } } } });
 
-        server.inject('/', (res) => {
-
-            expect(res.result).to.exist();
-            expect(res.statusCode).to.equal(500);
-            expect(error).to.be.an.instanceof(Error);
-            done();
-        });
+        const res = await server.inject('/');
+        expect(res.result).to.exist();
+        expect(res.statusCode).to.equal(500);
+        expect(error).to.be.an.instanceof(Error);
     });
 
-    it('allows if path given includes ../ and allowInsecureAccess is true', (done) => {
+    it('allows if path given includes ../ and allowInsecureAccess is true', async () => {
 
-        const server = new Hapi.Server();
-        server.connection();
-        server.register(Vision, Hoek.ignore);
+        const server = Hapi.server();
+        await server.register(Vision);
         server.views({
             engines: { 'html': require('handlebars') },
             allowInsecureAccess: true,
@@ -220,20 +194,16 @@ describe('Manager', () => {
 
         server.route({ method: 'GET', path: '/', handler: { view: { template: '../test', context: { message: 'Hello, World!' } } } });
 
-        server.inject('/', (res) => {
-
-            expect(res.result).to.exist();
-            expect(res.result).to.have.string('Hello, World!');
-            expect(res.statusCode).to.equal(200);
-            done();
-        });
+        const res = await server.inject('/');
+        expect(res.result).to.exist();
+        expect(res.result).to.have.string('Hello, World!');
+        expect(res.statusCode).to.equal(200);
     });
 
-    it('errors if template does not exist()', (done) => {
+    it('errors if template does not exist()', async () => {
 
-        const server = new Hapi.Server({ debug: false });
-        server.connection();
-        server.register(Vision, Hoek.ignore);
+        const server = Hapi.server({ debug: false });
+        await server.register(Vision);
         server.views({
             engines: { 'html': require('handlebars') },
             path: __dirname + '/templates/valid'
@@ -242,32 +212,28 @@ describe('Manager', () => {
         // Compilation errors sould be available for extensions.
 
         let error = null;
-        server.ext('onPostHandler', (request, reply) => {
+        server.ext('onPreResponse', (request, reply) => {
 
             const response = request.response;
             if (response.isBoom) {
                 error = response;
             }
 
-            reply.continue();
+            return reply.continue;
         });
 
         server.route({ method: 'GET', path: '/', handler: { view: { template: 'testNope', context: { message: 'Hello, World!' } } } });
 
-        server.inject('/', (res) => {
-
-            expect(res.result).to.exist();
-            expect(res.statusCode).to.equal(500);
-            expect(error).to.be.an.instanceof(Error);
-            done();
-        });
+        const res = await server.inject('/');
+        expect(res.result).to.exist();
+        expect(res.statusCode).to.equal(500);
+        expect(error).to.be.an.instanceof(Error);
     });
 
-    it('errors if engine.compile throws', (done) => {
+    it('errors if engine.compile throws', async () => {
 
-        const server = new Hapi.Server({ debug: false });
-        server.connection();
-        server.register(Vision, Hoek.ignore);
+        const server = Hapi.server({ debug: false });
+        await server.register(Vision);
         server.views({
             engines: { 'html': require('handlebars') },
             path: __dirname + '/templates/valid'
@@ -276,32 +242,28 @@ describe('Manager', () => {
         // Compilation errors sould be available for extensions.
 
         let error = null;
-        server.ext('onPostHandler', (request, reply) => {
+        server.ext('onPreResponse', (request, reply) => {
 
             const response = request.response;
             if (response.isBoom) {
                 error = response;
             }
 
-            reply.continue();
+            return reply.continue;
         });
 
         server.route({ method: 'GET', path: '/', handler: { view: { template: 'badmustache', context: { message: 'Hello, World!' }, options: { path: __dirname + '/templates/valid/invalid' } } } });
 
-        server.inject('/', (res) => {
-
-            expect(res.result).to.exist();
-            expect(res.statusCode).to.equal(500);
-            expect(error).to.be.an.instanceof(Error);
-            done();
-        });
+        const res = await server.inject('/');
+        expect(res.result).to.exist();
+        expect(res.statusCode).to.equal(500);
+        expect(error).to.be.an.instanceof(Error);
     });
 
-    it('should not fail if rendered template returns undefined', (done) => {
+    it('should not fail if rendered template returns undefined', async () => {
 
-        const server = new Hapi.Server();
-        server.connection();
-        server.register(Vision, Hoek.ignore);
+        const server = Hapi.server();
+        await server.register(Vision);
         server.views({
             engines: {
                 html: {
@@ -321,18 +283,14 @@ describe('Manager', () => {
 
         server.route({ method: 'GET', path: '/', handler: { view: { template: 'test.html' } } });
 
-        server.inject('/', (res) => {
-
-            expect(res.statusCode).to.equal(200);
-            done();
-        });
+        const res = await server.inject('/');
+        expect(res.statusCode).to.equal(200);
     });
 
-    it('allows the context to be modified by extensions', (done) => {
+    it('allows the context to be modified by extensions', async () => {
 
-        const server = new Hapi.Server();
-        server.connection();
-        server.register(Vision, Hoek.ignore);
+        const server = Hapi.server();
+        await server.register(Vision);
         server.views({
             engines: { html: require('handlebars') },
             path: __dirname + '/templates/valid'
@@ -342,25 +300,21 @@ describe('Manager', () => {
 
             const response = request.response;
             response.source.context.message = 'goodbye';
-
-            reply.continue();
+            return reply.continue;
         });
 
         server.route({ method: 'GET', path: '/', handler: { view: { template: 'test.html', context: { message: 'hello' } } } });
 
-        server.inject('/', (res) => {
-
-            expect(res.result).to.exist();
-            expect(res.result).not.to.contain('hello');
-            expect(res.result).to.contain('goodbye');
-            expect(res.statusCode).to.equal(200);
-            done();
-        });
+        const res = await server.inject('/');
+        expect(res.result).to.exist();
+        expect(res.result).not.to.contain('hello');
+        expect(res.result).to.contain('goodbye');
+        expect(res.statusCode).to.equal(200);
     });
 
     describe('with engine initialization', () => {
 
-        it('modifies the engine options', (done) => {
+        it('modifies the engine options', async () => {
 
             let compileOptions;
             let runtimeOptions;
@@ -390,16 +344,12 @@ describe('Manager', () => {
                 }
             });
 
-            manager.render('valid/test', null, null, (err, rendered) => {
-
-                expect(err).to.not.exist();
-                expect(compileOptions).to.include({ stage: 'compile' });
-                expect(runtimeOptions).to.include({ stage: 'render' });
-                done();
-            });
+            await manager.render('valid/test');
+            expect(compileOptions).to.include({ stage: 'compile' });
+            expect(runtimeOptions).to.include({ stage: 'render' });
         });
 
-        it('errors if initialization fails', (done) => {
+        it('errors if initialization fails', async () => {
 
             const manager = new Manager({
                 path: __dirname + '/templates',
@@ -421,16 +371,10 @@ describe('Manager', () => {
                 }
             });
 
-            manager.render('valid/test', null, null, (err, rendered) => {
-
-                expect(err).to.be.an.instanceOf(Error);
-                expect(err.message).to.equal('Initialization failed');
-                expect(rendered).to.not.exist();
-                done();
-            });
+            await expect(manager.render('valid/test')).to.reject('Initialization failed');
         });
 
-        it('errors if initialization throws', (done) => {
+        it('errors if initialization throws', async () => {
 
             const manager = new Manager({
                 path: __dirname + '/templates',
@@ -452,16 +396,10 @@ describe('Manager', () => {
                 }
             });
 
-            manager.render('valid/test', null, null, (err, rendered) => {
-
-                expect(err).to.be.an.instanceOf(Error);
-                expect(err.message).to.equal('Initialization error');
-                expect(rendered).to.not.exist();
-                done();
-            });
+            await expect(manager.render('valid/test')).to.reject('Initialization error');
         });
 
-        it('only initializes once before rendering', (done) => {
+        it('only initializes once before rendering', async () => {
 
             let initialized = 0;
 
@@ -487,22 +425,16 @@ describe('Manager', () => {
             });
 
             expect(initialized).to.equal(0);
-            manager.render('valid/test', null, null, (err, rendered1) => {
+            const rendered1 = await manager.render('valid/test');
+            expect(rendered1).to.exist();
+            expect(initialized).to.equal(1);
 
-                expect(err).to.not.exist();
-                expect(rendered1).to.exist();
-                expect(initialized).to.equal(1);
-                manager.render('valid/test', null, null, (err, rendered2) => {
-
-                    expect(err).to.not.exist();
-                    expect(rendered2).to.exist();
-                    expect(initialized).to.equal(1);
-                    done();
-                });
-            });
+            const rendered2 = await manager.render('valid/test');
+            expect(rendered2).to.exist();
+            expect(initialized).to.equal(1);
         });
 
-        it('initializes multiple engines independently', (done) => {
+        it('initializes multiple engines independently', async () => {
 
             let htmlOptions;
             let jadeOptions;
@@ -546,29 +478,21 @@ describe('Manager', () => {
                 }
             });
 
-            manager.render('valid/test.html', null, null, (err, rendered1) => {
+            const rendered1 = await manager.render('valid/test.html');
+            expect(rendered1).to.exist();
+            expect(htmlOptions).to.include({ engine: 'handlebars' });
+            expect(jadeOptions).to.not.exist();
 
-                expect(err).to.not.exist();
-                expect(rendered1).to.exist();
-                expect(htmlOptions).to.include({ engine: 'handlebars' });
-                expect(jadeOptions).to.not.exist();
-
-                manager.render('valid/test.pug', null, null, (err, rendered2) => {
-
-                    expect(err).to.not.exist();
-                    expect(rendered2).to.exist();
-                    expect(jadeOptions).to.include({ engine: 'pug' });
-                    done();
-                });
-            });
+            const rendered2 = await manager.render('valid/test.pug');
+            expect(rendered2).to.exist();
+            expect(jadeOptions).to.include({ engine: 'pug' });
         });
     });
 
-    it('should not error on layoutKeyword conflict', (done) => {
+    it('should not error on layoutKeyword conflict', async () => {
 
-        const server = new Hapi.Server({ debug: false });
-        server.connection();
-        server.register(Vision, Hoek.ignore);
+        const server = Hapi.server({ debug: false });
+        await server.register(Vision);
         server.views({
             engines: { 'html': require('handlebars') },
             path: __dirname + '/templates/valid'
@@ -578,22 +502,18 @@ describe('Manager', () => {
 
         server.route({ method: 'GET', path: '/', handler: { view: { template: 'test', context: { message: 'Hello, World!', content: 'fail' } } } });
 
-        server.inject('/', (res) => {
-
-            expect(res.result).to.exist();
-            expect(res.statusCode).to.equal(200);
-            expect(res.payload).to.contain('Hello, World!');
-            done();
-        });
+        const res = await server.inject('/');
+        expect(res.result).to.exist();
+        expect(res.statusCode).to.equal(200);
+        expect(res.payload).to.contain('Hello, World!');
     });
 
-    describe('with layout', (done) => {
+    describe('with layout', () => {
 
-        it('returns response', (done) => {
+        it('returns response', async () => {
 
-            const server = new Hapi.Server();
-            server.connection();
-            server.register(Vision, Hoek.ignore);
+            const server = Hapi.server();
+            await server.register(Vision);
             server.views({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
@@ -602,20 +522,16 @@ describe('Manager', () => {
 
             server.route({ method: 'GET', path: '/', handler: { view: { template: 'valid/test', context: { title: 'test', message: 'Hapi' } } } });
 
-            server.inject('/', (res) => {
-
-                expect(res.result).to.exist();
-                expect(res.statusCode).to.equal(200);
-                expect(res.result.replace(/\r/g, '')).to.equal('<!DOCTYPE html>\n<html>\n    <head>\n        <title>test</title>\n    </head>\n    <body>\n        <div>\n    <h1>Hapi</h1>\n</div>\n\n    </body>\n</html>\n');
-                done();
-            });
+            const res = await server.inject('/');
+            expect(res.result).to.exist();
+            expect(res.statusCode).to.equal(200);
+            expect(res.result.replace(/\r/g, '')).to.equal('<!DOCTYPE html>\n<html>\n    <head>\n        <title>test</title>\n    </head>\n    <body>\n        <div>\n    <h1>Hapi</h1>\n</div>\n\n    </body>\n</html>\n');
         });
 
-        it('returns response with relativeTo and absolute path', (done) => {
+        it('returns response with relativeTo and absolute path', async () => {
 
-            const server = new Hapi.Server();
-            server.connection();
-            server.register(Vision, Hoek.ignore);
+            const server = Hapi.server();
+            await server.register(Vision);
             server.views({
                 engines: { 'html': require('handlebars') },
                 relativeTo: '/none/shall/pass',
@@ -625,20 +541,16 @@ describe('Manager', () => {
 
             server.route({ method: 'GET', path: '/', handler: { view: { template: 'valid/test', context: { title: 'test', message: 'Hapi' } } } });
 
-            server.inject('/', (res) => {
-
-                expect(res.result).to.exist();
-                expect(res.statusCode).to.equal(200);
-                expect(res.result.replace(/\r/g, '')).to.equal('<!DOCTYPE html>\n<html>\n    <head>\n        <title>test</title>\n    </head>\n    <body>\n        <div>\n    <h1>Hapi</h1>\n</div>\n\n    </body>\n</html>\n');
-                done();
-            });
+            const res = await server.inject('/');
+            expect(res.result).to.exist();
+            expect(res.statusCode).to.equal(200);
+            expect(res.result.replace(/\r/g, '')).to.equal('<!DOCTYPE html>\n<html>\n    <head>\n        <title>test</title>\n    </head>\n    <body>\n        <div>\n    <h1>Hapi</h1>\n</div>\n\n    </body>\n</html>\n');
         });
 
-        it('returns response with layout override', (done) => {
+        it('returns response with layout override', async () => {
 
-            const server = new Hapi.Server();
-            server.connection();
-            server.register(Vision, Hoek.ignore);
+            const server = Hapi.server();
+            await server.register(Vision);
             server.views({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
@@ -647,20 +559,16 @@ describe('Manager', () => {
 
             server.route({ method: 'GET', path: '/', handler: { view: { template: 'valid/test', context: { title: 'test', message: 'Hapi' }, options: { layout: 'otherLayout' } } } });
 
-            server.inject('/', (res) => {
-
-                expect(res.result).to.exist();
-                expect(res.statusCode).to.equal(200);
-                expect(res.result.replace(/\r/g, '')).to.equal('test:<div>\n    <h1>Hapi</h1>\n</div>\n');
-                done();
-            });
+            const res = await server.inject('/');
+            expect(res.result).to.exist();
+            expect(res.statusCode).to.equal(200);
+            expect(res.result.replace(/\r/g, '')).to.equal('test:<div>\n    <h1>Hapi</h1>\n</div>\n');
         });
 
-        it('returns response with custom server layout', (done) => {
+        it('returns response with custom server layout', async () => {
 
-            const server = new Hapi.Server();
-            server.connection();
-            server.register(Vision, Hoek.ignore);
+            const server = Hapi.server();
+            await server.register(Vision);
             server.views({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
@@ -669,20 +577,16 @@ describe('Manager', () => {
 
             server.route({ method: 'GET', path: '/', handler: { view: { template: 'valid/test', context: { title: 'test', message: 'Hapi' } } } });
 
-            server.inject('/', (res) => {
-
-                expect(res.result).to.exist();
-                expect(res.statusCode).to.equal(200);
-                expect(res.result.replace(/\r/g, '')).to.equal('test:<div>\n    <h1>Hapi</h1>\n</div>\n');
-                done();
-            });
+            const res = await server.inject('/');
+            expect(res.result).to.exist();
+            expect(res.statusCode).to.equal(200);
+            expect(res.result.replace(/\r/g, '')).to.equal('test:<div>\n    <h1>Hapi</h1>\n</div>\n');
         });
 
-        it('returns response with custom server layout and path', (done) => {
+        it('returns response with custom server layout and path', async () => {
 
-            const server = new Hapi.Server();
-            server.connection();
-            server.register(Vision, Hoek.ignore);
+            const server = Hapi.server();
+            await server.register(Vision);
             server.views({
                 engines: { 'html': require('handlebars') },
                 relativeTo: __dirname,
@@ -693,20 +597,16 @@ describe('Manager', () => {
 
             server.route({ method: 'GET', path: '/', handler: { view: { template: 'valid/test', context: { title: 'test', message: 'Hapi' } } } });
 
-            server.inject('/', (res) => {
-
-                expect(res.result).to.exist();
-                expect(res.statusCode).to.equal(200);
-                expect(res.result.replace(/\r/g, '')).to.equal('test+<div>\n    <h1>Hapi</h1>\n</div>\n');
-                done();
-            });
+            const res = await server.inject('/');
+            expect(res.result).to.exist();
+            expect(res.statusCode).to.equal(200);
+            expect(res.result.replace(/\r/g, '')).to.equal('test+<div>\n    <h1>Hapi</h1>\n</div>\n');
         });
 
-        it('errors on missing layout', (done) => {
+        it('errors on missing layout', async () => {
 
-            const server = new Hapi.Server({ debug: false });
-            server.connection();
-            server.register(Vision, Hoek.ignore);
+            const server = Hapi.server({ debug: false });
+            await server.register(Vision);
             server.views({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
@@ -716,31 +616,27 @@ describe('Manager', () => {
             // Compilation errors sould be available for extensions.
 
             let error = null;
-            server.ext('onPostHandler', (request, reply) => {
+            server.ext('onPreResponse', (request, reply) => {
 
                 const response = request.response;
                 if (response.isBoom) {
                     error = response;
                 }
 
-                reply.continue();
+                return reply.continue;
             });
 
             server.route({ method: 'GET', path: '/', handler: { view: { template: 'valid/test', context: { title: 'test', message: 'Hapi' } } } });
 
-            server.inject('/', (res) => {
-
-                expect(res.statusCode).to.equal(500);
-                expect(error).to.be.an.instanceof(Error);
-                done();
-            });
+            const res = await server.inject('/');
+            expect(res.statusCode).to.equal(500);
+            expect(error).to.be.an.instanceof(Error);
         });
 
-        it('errors on invalid layout', (done) => {
+        it('errors on invalid layout', async () => {
 
-            const server = new Hapi.Server({ debug: false });
-            server.connection();
-            server.register(Vision, Hoek.ignore);
+            const server = Hapi.server({ debug: false });
+            await server.register(Vision);
             server.views({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
@@ -750,31 +646,27 @@ describe('Manager', () => {
             // Compilation errors sould be available for extensions.
 
             let error = null;
-            server.ext('onPostHandler', (request, reply) => {
+            server.ext('onPreResponse', (request, reply) => {
 
                 const response = request.response;
                 if (response.isBoom) {
                     error = response;
                 }
 
-                reply.continue();
+                return reply.continue;
             });
 
             server.route({ method: 'GET', path: '/', handler: { view: { template: 'valid/test', context: { title: 'test', message: 'Hapi' } } } });
 
-            server.inject('/', (res) => {
-
-                expect(res.statusCode).to.equal(500);
-                expect(error).to.be.an.instanceof(Error);
-                done();
-            });
+            const res = await server.inject('/');
+            expect(res.statusCode).to.equal(500);
+            expect(error).to.be.an.instanceof(Error);
         });
 
-        it('returns response without layout', (done) => {
+        it('returns response without layout', async () => {
 
-            const server = new Hapi.Server();
-            server.connection();
-            server.register(Vision, Hoek.ignore);
+            const server = Hapi.server();
+            await server.register(Vision);
             server.views({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates',
@@ -783,20 +675,16 @@ describe('Manager', () => {
 
             server.route({ method: 'GET', path: '/', handler: { view: { template: 'valid/test', context: { title: 'test', message: 'Hapi' }, options: { layout: false } } } });
 
-            server.inject('/', (res) => {
-
-                expect(res.result).to.exist();
-                expect(res.statusCode).to.equal(200);
-                expect(res.result.replace(/\r/g, '')).to.equal('<div>\n    <h1>Hapi</h1>\n</div>\n');
-                done();
-            });
+            const res = await server.inject('/');
+            expect(res.result).to.exist();
+            expect(res.statusCode).to.equal(200);
+            expect(res.result.replace(/\r/g, '')).to.equal('<div>\n    <h1>Hapi</h1>\n</div>\n');
         });
 
-        it('errors on layoutKeyword conflict', (done) => {
+        it('errors on layoutKeyword conflict', async () => {
 
-            const server = new Hapi.Server({ debug: false });
-            server.connection();
-            server.register(Vision, Hoek.ignore);
+            const server = Hapi.server({ debug: false });
+            await server.register(Vision);
             server.views({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates/valid',
@@ -807,19 +695,15 @@ describe('Manager', () => {
 
             server.route({ method: 'GET', path: '/', handler: { view: { template: 'test', context: { message: 'Hello, World!', content: 'fail' } } } });
 
-            server.inject('/', (res) => {
-
-                expect(res.result).to.exist();
-                expect(res.statusCode).to.equal(500);
-                done();
-            });
+            const res = await server.inject('/');
+            expect(res.result).to.exist();
+            expect(res.statusCode).to.equal(500);
         });
 
-        it('errors absolute path given and allowAbsolutePath is false (by default)', (done) => {
+        it('errors absolute path given and allowAbsolutePath is false (by default)', async () => {
 
-            const server = new Hapi.Server({ debug: false });
-            server.connection();
-            server.register(Vision, Hoek.ignore);
+            const server = Hapi.server({ debug: false });
+            await server.register(Vision);
             server.views({
                 engines: { 'html': require('handlebars') },
                 path: __dirname + '/templates/valid',
@@ -829,35 +713,31 @@ describe('Manager', () => {
             // Compilation errors sould be available for extensions.
 
             let error = null;
-            server.ext('onPostHandler', (request, reply) => {
+            server.ext('onPreResponse', (request, reply) => {
 
                 const response = request.response;
                 if (response.isBoom) {
                     error = response;
                 }
 
-                reply.continue();
+                return reply.continue;
             });
 
             server.route({ method: 'GET', path: '/', handler: { view: { template: 'test', context: { title: 'test', message: 'Hapi' }, options: { path: __dirname + '/templates/valid/invalid' } } } });
 
-            server.inject('/', (res) => {
-
-                expect(res.result).to.exist();
-                expect(res.statusCode).to.equal(500);
-                expect(error).to.be.an.instanceof(Error);
-                done();
-            });
+            const res = await server.inject('/');
+            expect(res.result).to.exist();
+            expect(res.statusCode).to.equal(500);
+            expect(error).to.be.an.instanceof(Error);
         });
     });
 
     describe('with multiple engines', () => {
 
-        it('renders handlebars template', (done) => {
+        it('renders handlebars template', async () => {
 
-            const server = new Hapi.Server();
-            server.connection();
-            server.register(Vision, Hoek.ignore);
+            const server = Hapi.server();
+            await server.register(Vision);
             server.views({
                 path: __dirname + '/templates/valid',
                 engines: {
@@ -876,19 +756,15 @@ describe('Manager', () => {
 
             server.route({ method: 'GET', path: '/', handler: { view: { template: 'test.html', context: { message: 'Hello World!' } } } });
 
-            server.inject('/', (res) => {
-
-                expect(res.result).to.exist();
-                expect(res.statusCode).to.equal(200);
-                done();
-            });
+            const res = await server.inject('/');
+            expect(res.result).to.exist();
+            expect(res.statusCode).to.equal(200);
         });
 
-        it('renders pug template', (done) => {
+        it('renders pug template', async () => {
 
-            const server = new Hapi.Server();
-            server.connection();
-            server.register(Vision, Hoek.ignore);
+            const server = Hapi.server();
+            await server.register(Vision);
             server.views({
                 path: __dirname + '/templates/valid',
                 engines: {
@@ -907,19 +783,15 @@ describe('Manager', () => {
 
             server.route({ method: 'GET', path: '/', handler: { view: { template: 'testMulti.pug', context: { message: 'Hello World!' } } } });
 
-            server.inject('/', (res) => {
-
-                expect(res.result).to.exist();
-                expect(res.statusCode).to.equal(200);
-                done();
-            });
+            const res = await server.inject('/');
+            expect(res.result).to.exist();
+            expect(res.statusCode).to.equal(200);
         });
 
-        it('returns 500 on unknown extension', (done) => {
+        it('returns 500 on unknown extension', async () => {
 
-            const server = new Hapi.Server({ debug: false });
-            server.connection();
-            server.register(Vision, Hoek.ignore);
+            const server = Hapi.server({ debug: false });
+            await server.register(Vision);
             server.views({
                 path: __dirname + '/templates/valid',
                 engines: {
@@ -938,18 +810,14 @@ describe('Manager', () => {
 
             server.route({ method: 'GET', path: '/', handler: { view: { template: 'test', context: { message: 'Hello World!' } } } });
 
-            server.inject('/', (res) => {
-
-                expect(res.statusCode).to.equal(500);
-                done();
-            });
+            const res = await server.inject('/');
+            expect(res.statusCode).to.equal(500);
         });
 
-        it('returns 500 on missing extension engine', (done) => {
+        it('returns 500 on missing extension engine', async () => {
 
-            const server = new Hapi.Server({ debug: false });
-            server.connection();
-            server.register(Vision, Hoek.ignore);
+            const server = Hapi.server({ debug: false });
+            await server.register(Vision);
             server.views({
                 path: __dirname + '/templates/valid',
                 engines: {
@@ -968,17 +836,14 @@ describe('Manager', () => {
 
             server.route({ method: 'GET', path: '/', handler: { view: { template: 'test.xyz', context: { message: 'Hello World!' } } } });
 
-            server.inject('/', (res) => {
-
-                expect(res.statusCode).to.equal(500);
-                done();
-            });
+            const res = await server.inject('/');
+            expect(res.statusCode).to.equal(500);
         });
     });
 
     describe('render()', () => {
 
-        it('renders with async compile', (done) => {
+        it('renders with async compile', async () => {
 
             const views = new Manager({
                 path: __dirname + '/templates',
@@ -1001,16 +866,12 @@ describe('Manager', () => {
                 }
             });
 
-            views.render('valid/test', { title: 'test', message: 'Hapi' }, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.exist();
-                expect(rendered).to.contain('Hapi');
-                done();
-            });
+            const rendered = await views.render('valid/test', { title: 'test', message: 'Hapi' });
+            expect(rendered).to.exist();
+            expect(rendered).to.contain('Hapi');
         });
 
-        it('errors on sync compile that throws', (done) => {
+        it('errors on sync compile that throws', async () => {
 
             const views = new Manager({
                 path: __dirname + '/templates',
@@ -1027,15 +888,10 @@ describe('Manager', () => {
                 }
             });
 
-            views.render('valid/test', { title: 'test', message: 'Hapi' }, null, (err, rendered, config) => {
-
-                expect(err).to.exist();
-                expect(err.message).to.equal('Bad bad view');
-                done();
-            });
+            await expect(views.render('valid/test', { title: 'test', message: 'Hapi' })).to.reject('Bad bad view');
         });
 
-        it('allows valid (no layouts)', (done) => {
+        it('allows valid (no layouts)', async () => {
 
             const testView = new Manager({
                 engines: { html: require('handlebars') },
@@ -1043,32 +899,24 @@ describe('Manager', () => {
                 layout: false
             });
 
-            testView.render('valid/test', { title: 'test', message: 'Hapi' }, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.exist();
-                expect(rendered).to.contain('Hapi');
-                done();
-            });
+            const rendered = await testView.render('valid/test', { title: 'test', message: 'Hapi' });
+            expect(rendered).to.exist();
+            expect(rendered).to.contain('Hapi');
         });
 
-        it('renders without context', (done) => {
+        it('renders without context', async () => {
 
             const testView = new Manager({
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates'
             });
 
-            testView.render('valid/test', null, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.exist();
-                expect(rendered.replace(/\r/g, '')).to.equal('<div>\n    <h1></h1>\n</div>\n');
-                done();
-            });
+            const rendered = await testView.render('valid/test');
+            expect(rendered).to.exist();
+            expect(rendered.replace(/\r/g, '')).to.equal('<div>\n    <h1></h1>\n</div>\n');
         });
 
-        it('renders without handler/global-context (with layout)', (done) => {
+        it('renders without handler/global-context (with layout)', async () => {
 
             const testView = new Manager({
                 engines: { html: require('handlebars') },
@@ -1076,16 +924,12 @@ describe('Manager', () => {
                 layout: true
             });
 
-            testView.render('valid/test', null, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.exist();
-                expect(rendered.replace(/\r/g, '')).to.contain('<div>\n    <h1></h1>\n</div>\n');
-                done();
-            });
+            const rendered = await testView.render('valid/test');
+            expect(rendered).to.exist();
+            expect(rendered.replace(/\r/g, '')).to.contain('<div>\n    <h1></h1>\n</div>\n');
         });
 
-        it('renders with a global context object', (done) => {
+        it('renders with a global context object', async () => {
 
             const testView = new Manager({
                 engines: { html: require('handlebars') },
@@ -1100,17 +944,13 @@ describe('Manager', () => {
                 }
             });
 
-            testView.render('valid/testContext', null, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.exist();
-                expect(rendered).to.contain('<h1>global</h1>');
-                expect(rendered.replace(/\r/g, '')).to.contain('<h1>default message</h1>');
-                done();
-            });
+            const rendered = await testView.render('valid/testContext');
+            expect(rendered).to.exist();
+            expect(rendered).to.contain('<h1>global</h1>');
+            expect(rendered.replace(/\r/g, '')).to.contain('<h1>default message</h1>');
         });
 
-        it('overrides the global context object with local values', (done) => {
+        it('overrides the global context object with local values', async () => {
 
             const testView = new Manager({
                 engines: { html: require('handlebars') },
@@ -1125,17 +965,13 @@ describe('Manager', () => {
                 }
             });
 
-            testView.render('valid/testContext', { message: 'override' }, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.exist();
-                expect(rendered).to.contain('<h1>global</h1>');
-                expect(rendered).to.contain('<h1>override</h1>');
-                done();
-            });
+            const rendered = await testView.render('valid/testContext', { message: 'override' });
+            expect(rendered).to.exist();
+            expect(rendered).to.contain('<h1>global</h1>');
+            expect(rendered).to.contain('<h1>override</h1>');
         });
 
-        it('renders with a global context function (no request)', (done) => {
+        it('renders with a global context function (no request)', async () => {
 
             const testView = new Manager({
                 engines: { html: require('handlebars') },
@@ -1153,17 +989,13 @@ describe('Manager', () => {
                 }
             });
 
-            testView.render('valid/testContext', null, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.exist();
-                expect(rendered).to.contain('<h1>global</h1>');
-                expect(rendered).to.contain('<h1>default message</h1>');
-                done();
-            });
+            const rendered = await testView.render('valid/testContext');
+            expect(rendered).to.exist();
+            expect(rendered).to.contain('<h1>global</h1>');
+            expect(rendered).to.contain('<h1>default message</h1>');
         });
 
-        it('overrides the global context function values with local values', (done) => {
+        it('overrides the global context function values with local values', async () => {
 
             const testView = new Manager({
                 engines: { html: require('handlebars') },
@@ -1181,17 +1013,13 @@ describe('Manager', () => {
                 }
             });
 
-            testView.render('valid/testContext', { message: 'override' }, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.exist();
-                expect(rendered).to.contain('<h1>global</h1>');
-                expect(rendered).to.contain('<h1>override</h1>');
-                done();
-            });
+            const rendered = await testView.render('valid/testContext', { message: 'override' });
+            expect(rendered).to.exist();
+            expect(rendered).to.contain('<h1>global</h1>');
+            expect(rendered).to.contain('<h1>override</h1>');
         });
 
-        it('uses specified default ext', (done) => {
+        it('uses specified default ext', async () => {
 
             const testView = new Manager({
                 defaultExtension: 'html',
@@ -1199,16 +1027,12 @@ describe('Manager', () => {
                 path: __dirname + '/templates'
             });
 
-            testView.render('valid/test', null, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.exist();
-                expect(rendered.replace(/\r/g, '')).to.equal('<div>\n    <h1></h1>\n</div>\n');
-                done();
-            });
+            const rendered = await testView.render('valid/test');
+            expect(rendered).to.exist();
+            expect(rendered.replace(/\r/g, '')).to.equal('<div>\n    <h1></h1>\n</div>\n');
         });
 
-        it('allows relative path with no base', (done) => {
+        it('allows relative path with no base', async () => {
 
             const testView = new Manager({
                 engines: { html: require('handlebars') },
@@ -1216,16 +1040,12 @@ describe('Manager', () => {
                 layout: false
             });
 
-            testView.render('valid/test', { title: 'test', message: 'Hapi' }, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.exist();
-                expect(rendered.replace(/\r/g, '')).to.equal('<div>\n    <h1>Hapi</h1>\n</div>\n');
-                done();
-            });
+            const rendered = await testView.render('valid/test', { title: 'test', message: 'Hapi' });
+            expect(rendered).to.exist();
+            expect(rendered.replace(/\r/g, '')).to.equal('<div>\n    <h1>Hapi</h1>\n</div>\n');
         });
 
-        it('allows multiple relative paths with no base', (done) => {
+        it('allows multiple relative paths with no base', async () => {
 
             const testView = new Manager({
                 engines: { html: require('handlebars') },
@@ -1233,16 +1053,12 @@ describe('Manager', () => {
                 layout: false
             });
 
-            testView.render('test', { message: 'Hapi' }, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.exist();
-                expect(rendered).to.contain('<h1>Hapi</h1>');
-                done();
-            });
+            const rendered = await testView.render('test', { message: 'Hapi' });
+            expect(rendered).to.exist();
+            expect(rendered).to.contain('<h1>Hapi</h1>');
         });
 
-        it('allows multiple relative paths with a base', (done) => {
+        it('allows multiple relative paths with a base', async () => {
 
             const testView = new Manager({
                 engines: { html: require('handlebars') },
@@ -1251,16 +1067,12 @@ describe('Manager', () => {
                 layout: false
             });
 
-            testView.render('test', { message: 'Hapi' }, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.exist();
-                expect(rendered.replace(/\r/g, '')).to.contain('<h1>Hapi</h1>');
-                done();
-            });
+            const rendered = await testView.render('test', { message: 'Hapi' });
+            expect(rendered).to.exist();
+            expect(rendered.replace(/\r/g, '')).to.contain('<h1>Hapi</h1>');
         });
 
-        it('uses the first matching template', (done) => {
+        it('uses the first matching template', async () => {
 
             const testView = new Manager({
                 engines: { html: require('handlebars') },
@@ -1269,16 +1081,12 @@ describe('Manager', () => {
                 layout: false
             });
 
-            testView.render('test', { message: 'Hapi' }, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.exist();
-                expect(rendered).to.contain('<h1>Hapi</h1>');
-                done();
-            });
+            const rendered = await testView.render('test', { message: 'Hapi' });
+            expect(rendered).to.exist();
+            expect(rendered).to.contain('<h1>Hapi</h1>');
         });
 
-        it('allows multiple absolute paths', (done) => {
+        it('allows multiple absolute paths', async () => {
 
             const testView = new Manager({
                 engines: { html: require('handlebars') },
@@ -1286,16 +1094,12 @@ describe('Manager', () => {
                 layout: false
             });
 
-            testView.render('test', { message: 'Hapi' }, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.exist();
-                expect(rendered).to.contain('<h1>Hapi</h1>');
-                done();
-            });
+            const rendered = await testView.render('test', { message: 'Hapi' });
+            expect(rendered).to.exist();
+            expect(rendered).to.contain('<h1>Hapi</h1>');
         });
 
-        it('allows valid (with layouts)', (done) => {
+        it('allows valid (with layouts)', async () => {
 
             const testViewWithLayouts = new Manager({
                 engines: { html: require('handlebars') },
@@ -1303,16 +1107,12 @@ describe('Manager', () => {
                 layout: true
             });
 
-            testViewWithLayouts.render('valid/test', { title: 'test', message: 'Hapi' }, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.exist();
-                expect(rendered).to.contain('Hapi');
-                done();
-            });
+            const rendered = await testViewWithLayouts.render('valid/test', { title: 'test', message: 'Hapi' });
+            expect(rendered).to.exist();
+            expect(rendered).to.contain('Hapi');
         });
 
-        it('allows absolute path', (done) => {
+        it('allows absolute path', async () => {
 
             const testViewWithLayouts = new Manager({
                 engines: { html: require('handlebars') },
@@ -1321,16 +1121,12 @@ describe('Manager', () => {
                 allowAbsolutePaths: true
             });
 
-            testViewWithLayouts.render('valid/test', { title: 'test', message: 'Hapi' }, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.exist();
-                expect(rendered).to.contain('Hapi');
-                done();
-            });
+            const rendered = await testViewWithLayouts.render('valid/test', { title: 'test', message: 'Hapi' });
+            expect(rendered).to.exist();
+            expect(rendered).to.contain('Hapi');
         });
 
-        it('errors on invalid layout', (done) => {
+        it('errors on invalid layout', async () => {
 
             const views = new Manager({
                 engines: { html: require('handlebars') },
@@ -1338,15 +1134,10 @@ describe('Manager', () => {
                 layout: 'badlayout'
             });
 
-            views.render('valid/test', { title: 'test', message: 'Hapi' }, null, (err, rendered, config) => {
-
-                expect(err).to.exist();
-                expect(err.message).to.equal('Parse error on line 1:\n{{}\n--^\nExpecting \'ID\', \'STRING\', \'NUMBER\', \'BOOLEAN\', \'UNDEFINED\', \'NULL\', \'DATA\', got \'INVALID\': Parse error on line 1:\n{{}\n--^\nExpecting \'ID\', \'STRING\', \'NUMBER\', \'BOOLEAN\', \'UNDEFINED\', \'NULL\', \'DATA\', got \'INVALID\'');
-                done();
-            });
+            await expect(views.render('valid/test', { title: 'test', message: 'Hapi' })).to.reject('Parse error on line 1:\n{{}\n--^\nExpecting \'ID\', \'STRING\', \'NUMBER\', \'BOOLEAN\', \'UNDEFINED\', \'NULL\', \'DATA\', got \'INVALID\': Parse error on line 1:\n{{}\n--^\nExpecting \'ID\', \'STRING\', \'NUMBER\', \'BOOLEAN\', \'UNDEFINED\', \'NULL\', \'DATA\', got \'INVALID\'');
         });
 
-        it('errors on layout compile error', (done) => {
+        it('errors on layout compile error', async () => {
 
             const views = new Manager({
                 engines: { html: require('handlebars') },
@@ -1358,20 +1149,15 @@ describe('Manager', () => {
             const mode = Fs.statSync(layout).mode;
 
             Fs.chmodSync(layout, '0300');
-            views.render('valid/test', { title: 'test', message: 'Hapi' }, null, (err, rendered, config) => {
-
-                try {
-                    expect(err).to.exist();
-                    expect(err.message).to.contain('Failed to read view file');
-                }
-                finally {
-                    Fs.chmodSync(layout, mode);
-                }
-                done();
-            });
+            try {
+                await expect(views.render('valid/test', { title: 'test', message: 'Hapi' })).to.reject('Failed to read view file: ' + layout);
+            }
+            finally {
+                Fs.chmodSync(layout, mode);
+            }
         });
 
-        it('errors on invalid layout path', (done) => {
+        it('errors on invalid layout path', async () => {
 
             const views = new Manager({
                 engines: { html: require('handlebars') },
@@ -1379,15 +1165,10 @@ describe('Manager', () => {
                 layout: '/badlayout'
             });
 
-            views.render('valid/test', { title: 'test', message: 'Hapi' }, null, (err, rendered, config) => {
-
-                expect(err).to.exist();
-                expect(err.message).to.equal('Absolute paths are not allowed in views');
-                done();
-            });
+            await expect(views.render('valid/test', { title: 'test', message: 'Hapi' })).to.reject('Absolute paths are not allowed in views');
         });
 
-        it('allows multiple layout paths', (done) => {
+        it('allows multiple layout paths', async () => {
 
             const views = new Manager({
                 engines: { html: require('handlebars') },
@@ -1397,15 +1178,11 @@ describe('Manager', () => {
                 layout: 'elsewhere'
             });
 
-            views.render('test', { title: 'test', message: 'Hapi' }, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.contain('Hapi');
-                done();
-            });
+            const rendered = await views.render('test', { title: 'test', message: 'Hapi' });
+            expect(rendered).to.contain('Hapi');
         });
 
-        it('uses the first matching layout', (done) => {
+        it('uses the first matching layout', async () => {
 
             const views = new Manager({
                 engines: { html: require('handlebars') },
@@ -1415,15 +1192,11 @@ describe('Manager', () => {
                 layout: true
             });
 
-            views.render('test', { title: 'test', message: 'Hapi' }, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.contain('Hapi');
-                done();
-            });
+            const rendered = await views.render('test', { title: 'test', message: 'Hapi' });
+            expect(rendered).to.contain('Hapi');
         });
 
-        it('allows valid pug layouts', (done) => {
+        it('allows valid pug layouts', async () => {
 
             const testViewWithJadeLayouts = new Manager({
                 engines: { pug: Pug },
@@ -1431,15 +1204,11 @@ describe('Manager', () => {
                 layout: true
             });
 
-            testViewWithJadeLayouts.render('index', { title: 'test', message: 'Hapi' }, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.contain('Hapi');
-                done();
-            });
+            const rendered = await testViewWithJadeLayouts.render('index', { title: 'test', message: 'Hapi' });
+            expect(rendered).to.contain('Hapi');
         });
 
-        it('should work and not throw without pug layouts', (done) => {
+        it('should work and not throw without pug layouts', async () => {
 
             const testViewWithoutJadeLayouts = new Manager({
                 engines: { pug: Pug },
@@ -1447,27 +1216,18 @@ describe('Manager', () => {
                 layout: false
             });
 
-            testViewWithoutJadeLayouts.render('test', { title: 'test', message: 'Hapi Message' }, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.contain('Hapi Message');
-                done();
-            });
+            const rendered = await testViewWithoutJadeLayouts.render('test', { title: 'test', message: 'Hapi Message' });
+            expect(rendered).to.contain('Hapi Message');
         });
 
-        it('allows relativeTo, template name, and no path', (done) => {
+        it('allows relativeTo, template name, and no path', async () => {
 
             const views = new Manager({ engines: { html: require('handlebars') } });
-            views.render('test', { title: 'test', message: 'Hapi' }, { relativeTo: __dirname + '/templates/valid' }, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.exist();
-                expect(rendered).to.contain('Hapi');
-                done();
-            });
+            const rendered = await views.render('test', { title: 'test', message: 'Hapi' }, { relativeTo: __dirname + '/templates/valid' });
+            expect(rendered).to.contain('Hapi');
         });
 
-        it('errors when referencing non existant partial (with layouts)', (done) => {
+        it('errors when referencing non existant partial (with layouts)', async () => {
 
             const testViewWithLayouts = new Manager({
                 engines: { html: require('handlebars') },
@@ -1475,14 +1235,10 @@ describe('Manager', () => {
                 layout: true
             });
 
-            testViewWithLayouts.render('invalid/test', { title: 'test', message: 'Hapi' }, null, (err, rendered, config) => {
-
-                expect(err).to.exist();
-                done();
-            });
+            await expect(testViewWithLayouts.render('invalid/test', { title: 'test', message: 'Hapi' })).to.reject();
         });
 
-        it('errors when referencing non existant partial (no layouts)', (done) => {
+        it('errors when referencing non existant partial (no layouts)', async () => {
 
             const testView = new Manager({
                 engines: { html: require('handlebars') },
@@ -1490,15 +1246,10 @@ describe('Manager', () => {
                 layout: false
             });
 
-            testView.render('invalid/test', { title: 'test', message: 'Hapi' }, null, (err, rendered, config) => {
-
-                expect(err).to.exist();
-                done();
-            });
-
+            await expect(testView.render('invalid/test', { title: 'test', message: 'Hapi' })).to.reject();
         });
 
-        it('errors if context uses layoutKeyword as a key', (done) => {
+        it('errors if context uses layoutKeyword as a key', async () => {
 
             const testViewWithLayouts = new Manager({
                 engines: { html: require('handlebars') },
@@ -1507,14 +1258,10 @@ describe('Manager', () => {
             });
 
             const opts = { title: 'test', message: 'Hapi', content: 1 };
-            testViewWithLayouts.render('valid/test', opts, null, (err, rendered, config) => {
-
-                expect(err).to.exist();
-                done();
-            });
+            await expect(testViewWithLayouts.render('valid/test', opts)).to.reject();
         });
 
-        it('errors on compile error (invalid template code)', (done) => {
+        it('errors on compile error (invalid template code)', async () => {
 
             const testView = new Manager({
                 engines: { html: require('handlebars') },
@@ -1522,14 +1269,10 @@ describe('Manager', () => {
                 layout: false
             });
 
-            testView.render('invalid/badmustache', { title: 'test', message: 'Hapi' }, null, (err, rendered, config) => {
-
-                expect(err instanceof Error).to.equal(true);
-                done();
-            });
+            await expect(testView.render('invalid/badmustache', { title: 'test', message: 'Hapi' })).to.reject();
         });
 
-        it('loads partials and be able to render them', (done) => {
+        it('loads partials and be able to render them', async () => {
 
             const tempView = new Manager({
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
@@ -1537,15 +1280,11 @@ describe('Manager', () => {
                 partialsPath: __dirname + '/templates/valid/partials'
             });
 
-            tempView.render('testPartials', {}, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.equal(' Nav:<nav>Nav</nav>|<nav>Nested</nav>');
-                done();
-            });
+            const rendered = await tempView.render('testPartials', {});
+            expect(rendered).to.equal(' Nav:<nav>Nav</nav>|<nav>Nested</nav>');
         });
 
-        it('normalizes full partial name (windows)', (done) => {
+        it('normalizes full partial name (windows)', async () => {
 
             const tempView = new Manager({
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
@@ -1553,15 +1292,11 @@ describe('Manager', () => {
                 partialsPath: __dirname + '/templates/valid/partials'
             });
 
-            tempView.render('testPartialsName', {}, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.equal(' Nav:<nav>Nav</nav>|<nav>Nested</nav>');
-                done();
-            });
+            const rendered = await tempView.render('testPartialsName', {});
+            expect(rendered).to.equal(' Nav:<nav>Nav</nav>|<nav>Nested</nav>');
         });
 
-        it('loads partials from relative path without base', (done) => {
+        it('loads partials from relative path without base', async () => {
 
             const tempView = new Manager({
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
@@ -1569,15 +1304,11 @@ describe('Manager', () => {
                 partialsPath: './test/templates/valid/partials'
             });
 
-            tempView.render('testPartials', {}, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.equal(' Nav:<nav>Nav</nav>|<nav>Nested</nav>');
-                done();
-            });
+            const rendered = await tempView.render('testPartials', {});
+            expect(rendered).to.equal(' Nav:<nav>Nav</nav>|<nav>Nested</nav>');
         });
 
-        it('loads partals from multiple relative paths without base', (done) => {
+        it('loads partals from multiple relative paths without base', async () => {
 
             const tempView = new Manager({
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
@@ -1585,15 +1316,11 @@ describe('Manager', () => {
                 partialsPath: ['./test/templates/invalid', './test/templates/valid/partials']
             });
 
-            tempView.render('testPartials', {}, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.equal(' Nav:<nav>Nav</nav>|<nav>Nested</nav>');
-                done();
-            });
+            const rendered = await tempView.render('testPartials', {});
+            expect(rendered).to.equal(' Nav:<nav>Nav</nav>|<nav>Nested</nav>');
         });
 
-        it('loads partals from multiple relative paths with base', (done) => {
+        it('loads partals from multiple relative paths with base', async () => {
 
             const tempView = new Manager({
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
@@ -1602,15 +1329,11 @@ describe('Manager', () => {
                 partialsPath: ['invalid', 'valid/partials']
             });
 
-            tempView.render('testPartials', {}, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.equal(' Nav:<nav>Nav</nav>|<nav>Nested</nav>');
-                done();
-            });
+            const rendered = await tempView.render('testPartials', {});
+            expect(rendered).to.equal(' Nav:<nav>Nav</nav>|<nav>Nested</nav>');
         });
 
-        it('loads partials from multiple absolute paths', (done) => {
+        it('loads partials from multiple absolute paths', async () => {
 
             const tempView = new Manager({
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
@@ -1618,15 +1341,11 @@ describe('Manager', () => {
                 partialsPath: [__dirname + '/templates/invalid', __dirname + '/templates/valid/partials']
             });
 
-            tempView.render('testPartials', {}, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.equal(' Nav:<nav>Nav</nav>|<nav>Nested</nav>');
-                done();
-            });
+            const rendered = await tempView.render('testPartials', {});
+            expect(rendered).to.equal(' Nav:<nav>Nav</nav>|<nav>Nested</nav>');
         });
 
-        it('loads partials from relative path without base (no dot)', (done) => {
+        it('loads partials from relative path without base (no dot)', async () => {
 
             const tempView = new Manager({
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
@@ -1634,15 +1353,11 @@ describe('Manager', () => {
                 partialsPath: 'test/templates/valid/partials'
             });
 
-            tempView.render('testPartials', {}, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.equal(' Nav:<nav>Nav</nav>|<nav>Nested</nav>');
-                done();
-            });
+            const rendered = await tempView.render('testPartials', {});
+            expect(rendered).to.equal(' Nav:<nav>Nav</nav>|<nav>Nested</nav>');
         });
 
-        it('loads partials and render them EVEN if viewsPath has trailing slash', (done) => {
+        it('loads partials and render them EVEN if viewsPath has trailing slash', async () => {
 
             const tempView = new Manager({
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
@@ -1650,16 +1365,12 @@ describe('Manager', () => {
                 partialsPath: __dirname + '/templates/valid/partials/'
             });
 
-            tempView.render('testPartials', {}, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.exist();
-                expect(rendered.length).above(1);
-                done();
-            });
+            const rendered = await tempView.render('testPartials', {});
+            expect(rendered).to.exist();
+            expect(rendered.length).above(1);
         });
 
-        it('skips loading partials and helpers if engine does not support them', (done) => {
+        it('skips loading partials and helpers if engine does not support them', async () => {
 
             const tempView = new Manager({
                 path: __dirname + '/templates/valid',
@@ -1668,15 +1379,11 @@ describe('Manager', () => {
                 engines: { html: Pug }
             });
 
-            tempView.render('testPartials', {}, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.equal('Nav:{{> nav}}|{{> nested/nav}}');
-                done();
-            });
+            const rendered = await tempView.render('testPartials', {});
+            expect(rendered).to.equal('Nav:{{> nav}}|{{> nested/nav}}');
         });
 
-        it('loads helpers and render them', (done) => {
+        it('loads helpers and render them', async () => {
 
             const tempView = new Manager({
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
@@ -1684,15 +1391,11 @@ describe('Manager', () => {
                 helpersPath: __dirname + '/templates/valid/helpers'
             });
 
-            tempView.render('testHelpers', { something: 'uppercase' }, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.equal('<p>This is all UPPERCASE and this is how we like it!</p>');
-                done();
-            });
+            const rendered = await tempView.render('testHelpers', { something: 'uppercase' });
+            expect(rendered).to.equal('<p>This is all UPPERCASE and this is how we like it!</p>');
         });
 
-        it('loads helpers and render them when helpersPath ends with a slash', (done) => {
+        it('loads helpers and render them when helpersPath ends with a slash', async () => {
 
             const tempView = new Manager({
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
@@ -1700,15 +1403,11 @@ describe('Manager', () => {
                 helpersPath: __dirname + '/templates/valid/helpers/'
             });
 
-            tempView.render('testHelpers', { something: 'uppercase' }, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.equal('<p>This is all UPPERCASE and this is how we like it!</p>');
-                done();
-            });
+            const rendered = await tempView.render('testHelpers', { something: 'uppercase' });
+            expect(rendered).to.equal('<p>This is all UPPERCASE and this is how we like it!</p>');
         });
 
-        it('loads helpers using relative paths', (done) => {
+        it('loads helpers using relative paths', async () => {
 
             const tempView = new Manager({
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
@@ -1717,15 +1416,11 @@ describe('Manager', () => {
                 helpersPath: './valid/helpers'
             });
 
-            tempView.render('testHelpers', { something: 'uppercase' }, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.equal('<p>This is all UPPERCASE and this is how we like it!</p>');
-                done();
-            });
+            const rendered = await tempView.render('testHelpers', { something: 'uppercase' });
+            expect(rendered).to.equal('<p>This is all UPPERCASE and this is how we like it!</p>');
         });
 
-        it('loads helpers from multiple paths without a base', (done) => {
+        it('loads helpers from multiple paths without a base', async () => {
 
             const tempView = new Manager({
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
@@ -1733,15 +1428,11 @@ describe('Manager', () => {
                 helpersPath: ['./test/templates/valid/helpers/tools', './test/templates/valid/helpers']
             });
 
-            tempView.render('testHelpers', { something: 'uppercase' }, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.equal('<p>This is all UPPERCASE and this is how we like it!</p>');
-                done();
-            });
+            const rendered = await tempView.render('testHelpers', { something: 'uppercase' });
+            expect(rendered).to.equal('<p>This is all UPPERCASE and this is how we like it!</p>');
         });
 
-        it('loads helpers from multiple paths with a base', (done) => {
+        it('loads helpers from multiple paths with a base', async () => {
 
             const tempView = new Manager({
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
@@ -1750,15 +1441,11 @@ describe('Manager', () => {
                 helpersPath: ['./valid/helpers/tools', './valid/helpers']
             });
 
-            tempView.render('testHelpers', { something: 'uppercase' }, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.equal('<p>This is all UPPERCASE and this is how we like it!</p>');
-                done();
-            });
+            const rendered = await tempView.render('testHelpers', { something: 'uppercase' });
+            expect(rendered).to.equal('<p>This is all UPPERCASE and this is how we like it!</p>');
         });
 
-        it('loads helpers using relative paths (without dots)', (done) => {
+        it('loads helpers using relative paths (without dots)', async () => {
 
             const tempView = new Manager({
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
@@ -1767,15 +1454,11 @@ describe('Manager', () => {
                 helpersPath: 'valid/helpers'
             });
 
-            tempView.render('testHelpers', { something: 'uppercase' }, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.equal('<p>This is all UPPERCASE and this is how we like it!</p>');
-                done();
-            });
+            const rendered = await tempView.render('testHelpers', { something: 'uppercase' });
+            expect(rendered).to.equal('<p>This is all UPPERCASE and this is how we like it!</p>');
         });
 
-        it('registers helpers programmatically', (done) => {
+        it('registers helpers programmatically', async () => {
 
             const tempView = new Manager({
                 engines: {
@@ -1789,21 +1472,14 @@ describe('Manager', () => {
             tempView.registerHelper('long', (string) => string + string.substr(-1).repeat(2));
             tempView.registerHelper('uppercase', (string) => string.toUpperCase());
 
-            tempView.render('testHelpers.html', { something: 'uppercase' }, null, (err, rendered1) => {
+            const rendered1 = await tempView.render('testHelpers.html', { something: 'uppercase' });
+            expect(rendered1).to.equal('<p>This is all UPPERCASE and this is howww we like it!</p>');
 
-                expect(err).not.to.exist();
-                expect(rendered1).to.equal('<p>This is all UPPERCASE and this is howww we like it!</p>');
-
-                tempView.render('testHelpers.txt', { something: 'uppercase' }, null, (err, rendered2) => {
-
-                    expect(err).not.to.exist();
-                    expect(rendered2).to.equal('This is all UPPERCASE and this is howww we like it!');
-                    done();
-                });
-            });
+            const rendered2 = await tempView.render('testHelpers.txt', { something: 'uppercase' });
+            expect(rendered2).to.equal('This is all UPPERCASE and this is howww we like it!');
         });
 
-        it('does not register helpers on engines that don\'t have helper support', (done) => {
+        it('does not register helpers on engines that don\'t have helper support', async () => {
 
             const tempView = new Manager({
                 engines: {
@@ -1826,22 +1502,18 @@ describe('Manager', () => {
             tempView.registerHelper('long', (string) => string + string.substr(-1).repeat(2));
             tempView.registerHelper('uppercase', (string) => string.toUpperCase());
 
-            tempView.render('testHelpers', { something: 'uppercase' }, null, (err, rendered, config) => {
-
-                expect(err).not.to.exist();
-                expect(rendered).to.equal('<p>This is all  and this is  we like it!</p>');
-                done();
-            });
+            const rendered = await tempView.render('testHelpers', { something: 'uppercase' });
+            expect(rendered).to.equal('<p>This is all  and this is  we like it!</p>');
         });
 
-        it('prints a warning message when helpers fail to load', (done) => {
+        it('prints a warning message when helpers fail to load', () => {
 
             const buffer = [];
             const oldWarn = console.warn;
 
-            console.warn = function () {
+            console.warn = (...args) => {
 
-                const message = Util.format.apply(Util, arguments);
+                const message = Util.format(...args);
 
                 buffer.push(message);
             };
@@ -1862,12 +1534,16 @@ describe('Manager', () => {
 
             expect(output).to.match(/^WARNING:/);
             expect(output).to.contain('vision failed to load helper');
-            expect(output).to.contain('invalid/helpers/bad1.module');
-            expect(output).to.contain('invalid/helpers/bad2.module');
-            done();
+
+            expect(output).to.contain('invalid/helpers/bad1.js');
+            expect(output).to.contain('invalid/helpers/bad1.json');
+
+            // Ignore non-requirable file extensions
+            expect(output).to.not.contain('invalid/helpers/bad1.foo');
+            expect(output).to.not.contain('invalid/helpers/README.md');
         });
 
-        it('reuses cached compilation', (done) => {
+        it('reuses cached compilation', async () => {
 
             let gen = 0;
             const views = new Manager({
@@ -1892,25 +1568,18 @@ describe('Manager', () => {
                 }
             });
 
-            views.render('valid/test', { title: 'test', message: 'Hapi' }, null, (err, original, originalConfig) => {
+            const original = await views.render('valid/test', { title: 'test', message: 'Hapi' });
+            expect(original).to.exist();
+            expect(original).to.contain('Hapi');
 
-                expect(err).not.to.exist();
-                expect(original).to.exist();
-                expect(original).to.contain('Hapi');
+            const cached = await views.render('valid/test', { title: 'test', message: 'Hapi' });
+            expect(cached).to.exist();
+            expect(cached).to.contain('Hapi');
 
-                views.render('valid/test', { title: 'test', message: 'Hapi' }, null, (err, cached, cachedConfig) => {
-
-                    expect(err).not.to.exist();
-                    expect(cached).to.exist();
-                    expect(cached).to.contain('Hapi');
-
-                    expect(gen).to.equal(1);
-                    done();
-                });
-            });
+            expect(gen).to.equal(1);
         });
 
-        it('disables caching', (done) => {
+        it('disables caching', async () => {
 
             let gen = 0;
             const views = new Manager({
@@ -1936,67 +1605,24 @@ describe('Manager', () => {
                 isCached: false
             });
 
-            views.render('valid/test', { title: 'test', message: 'Hapi' }, null, (err, original, originalConfig) => {
+            const original = await views.render('valid/test', { title: 'test', message: 'Hapi' });
+            expect(original).to.exist();
+            expect(original).to.contain('Hapi');
 
-                expect(err).not.to.exist();
-                expect(original).to.exist();
-                expect(original).to.contain('Hapi');
+            const cached = await views.render('valid/test', { title: 'test', message: 'Hapi' });
+            expect(cached).to.exist();
+            expect(cached).to.contain('Hapi');
 
-                views.render('valid/test', { title: 'test', message: 'Hapi' }, null, (err, cached, cachedConfig) => {
-
-                    expect(err).not.to.exist();
-                    expect(cached).to.exist();
-                    expect(cached).to.contain('Hapi');
-
-                    expect(gen).to.equal(2);
-                    done();
-                });
-            });
-        });
-
-        it('returns a promise that is resolved with the content if no callback is provided', () => {
-
-            const views = new Manager({
-                engines: { html: { module: Handlebars } },
-                path: __dirname + '/templates/valid'
-            });
-
-            return views.render('test', { message: 'Hello!' }, null)
-            .then((content) => {
-
-                expect(content).to.contain('<h1>Hello!</h1>');
-            });
-        });
-
-        it('returns a promise that is rejected on error if no callback is provided', () => {
-
-            const views = new Manager({
-                engines: { html: { module: Handlebars } },
-                path: __dirname + '/templates/valid'
-            });
-
-            return views.render('missing', null, null)
-            .then(
-                () => {
-
-                    throw new Error('should not resolve');
-                },
-                (err) => {
-
-                    expect(err).to.exist();
-                    expect(err.message).to.contain('missing.html');
-                }
-            );
+            expect(gen).to.equal(2);
         });
     });
 
     describe('_response()', () => {
 
-        it('sets Content-Type', (done) => {
+        it('sets Content-Type', async () => {
 
-            const server = new Hapi.Server();
-            server.register(Vision, Hoek.ignore);
-            server.connection();
+            const server = Hapi.server();
+            await server.register(Vision);
             server.views({
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates/valid'
@@ -2008,18 +1634,14 @@ describe('Manager', () => {
             };
 
             server.route({ method: 'GET', path: '/', handler });
-            server.inject('/', (res) => {
-
-                expect(res.headers['content-type']).to.contain('text/html');
-                done();
-            });
+            const res = await server.inject('/');
+            expect(res.headers['content-type']).to.contain('text/html');
         });
 
-        it('does not override Content-Type', (done) => {
+        it('does not override Content-Type', async () => {
 
-            const server = new Hapi.Server();
-            server.register(Vision, Hoek.ignore);
-            server.connection();
+            const server = Hapi.server();
+            await server.register(Vision);
 
             server.views({
                 engines: { html: require('handlebars') },
@@ -2032,18 +1654,14 @@ describe('Manager', () => {
             };
 
             server.route({ method: 'GET', path: '/', handler });
-            server.inject('/', (res) => {
-
-                expect(res.headers['content-type']).to.contain('text/plain');
-                done();
-            });
+            const res = await server.inject('/');
+            expect(res.headers['content-type']).to.contain('text/plain');
         });
 
-        it('errors on invalid template', (done) => {
+        it('errors on invalid template', async () => {
 
-            const server = new Hapi.Server({ debug: false });
-            server.register(Vision, Hoek.ignore);
-            server.connection();
+            const server = Hapi.server({ debug: false });
+            await server.register(Vision);
             server.views({
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates/invalid'
@@ -2055,18 +1673,14 @@ describe('Manager', () => {
             };
 
             server.route({ method: 'GET', path: '/', handler });
-            server.inject('/', (res) => {
-
-                expect(res.statusCode).to.equal(500);
-                done();
-            });
+            const res = await server.inject('/');
+            expect(res.statusCode).to.equal(500);
         });
 
-        it('passes the response object to the global context function', (done) => {
+        it('passes the response object to the global context function', async () => {
 
-            const server = new Hapi.Server();
-            server.register(Vision, Hoek.ignore);
-            server.connection();
+            const server = Hapi.server();
+            await server.register(Vision);
             server.views({
                 engines: { html: Handlebars },
                 path: __dirname + '/templates/valid',
@@ -2089,12 +1703,9 @@ describe('Manager', () => {
             };
 
             server.route({ method: 'GET', path: '/', handler });
-            server.inject('/', (res) => {
-
-                expect(res.payload).to.contain('<h1>/</h1>');
-                expect(res.payload).to.contain('<h1>global</h1>');
-                done();
-            });
+            const res = await server.inject('/');
+            expect(res.payload).to.contain('<h1>/</h1>');
+            expect(res.payload).to.contain('<h1>global</h1>');
         });
     });
 });
