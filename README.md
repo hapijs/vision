@@ -2,7 +2,7 @@
 
 Templates rendering plugin support for hapi.js.
 
-[![Build Status](https://travis-ci.org/hapijs/vision.svg)](http://travis-ci.org/hapijs/vision)
+[![Build Status](https://travis-ci.org/hapijs/vision.svg)](http://travis-ci.org/hapijs/vision) [![Coverage Status](https://coveralls.io/repos/github/hapijs/vision/badge.svg?branch=master)](https://coveralls.io/github/hapijs/vision?branch=master)
 
 Lead Maintainer - [William Woodruff](https://github.com/wswoodruff)
 

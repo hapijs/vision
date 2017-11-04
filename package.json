@@ -1,46 +1,48 @@
 {
-  "name": "vision",
-  "description": "Templates rendering plugin support for hapi.js",
-  "version": "5.0.0",
-  "repository": "git://github.com/hapijs/vision",
-  "main": "lib/index.js",
-  "keywords": [
-    "view",
-    "render",
-    "template",
-    "hapi"
-  ],
-  "engines": {
-    "node": ">=8.9.0"
-  },
-  "dependencies": {
-    "boom": "7.x.x",
-    "hoek": "5.x.x",
-    "items": "2.x.x",
-    "joi": "13.x.x"
-  },
-  "peerDependencies": {
-    "hapi": "17.x.x"
-  },
-  "devDependencies": {
-    "babel-core": "6.x.x",
-    "babel-plugin-transform-react-jsx": "6.x.x",
-    "code": "5.x.x",
-    "ejs": "2.x.x",
-    "handlebars": "4.x.x",
-    "hapi": "17.x.x",
-    "hapi-react-views": "6.x.x",
-    "pug": ">=2.0.0-beta6",
-    "lab": "15.x.x",
-    "marko": "3.x.x",
-    "mustache": "2.x.x",
-    "nunjucks": "2.x.0",
-    "react": "0.14.x",
-    "react-dom": "0.14.x"
-  },
-  "scripts": {
-    "test": "lab -a code -t 100 -L",
-    "test-cov-html": "lab -a code -r html -o coverage.html"
-  },
-  "license": "BSD-3-Clause"
+    "name": "vision",
+    "description": "Templates rendering plugin support for hapi.js",
+    "version": "5.0.0",
+    "repository": "git://github.com/hapijs/vision",
+    "main": "lib/index.js",
+    "keywords": [
+        "view",
+        "render",
+        "template",
+        "hapi"
+    ],
+    "engines": {
+        "node": ">=8.9.0"
+    },
+    "dependencies": {
+        "boom": "7.x.x",
+        "hoek": "5.x.x",
+        "items": "2.x.x",
+        "joi": "13.x.x"
+    },
+    "peerDependencies": {
+        "hapi": "17.x.x"
+    },
+    "devDependencies": {
+        "babel-core": "6.x.x",
+        "babel-plugin-transform-react-jsx": "6.x.x",
+        "code": "5.x.x",
+        "coveralls": "^3.0.0",
+        "ejs": "2.x.x",
+        "handlebars": "4.x.x",
+        "hapi": "17.x.x",
+        "hapi-react-views": "6.x.x",
+        "lab": "15.x.x",
+        "marko": "3.x.x",
+        "mustache": "2.x.x",
+        "nunjucks": "2.x.0",
+        "pug": ">=2.0.0-beta6",
+        "react": "0.14.x",
+        "react-dom": "0.14.x"
+    },
+    "scripts": {
+        "test": "lab -a code -t 100 -L",
+        "test-cov-html": "lab -a code -r html -o coverage.html",
+        "coveralls": "lab -r lcov | coveralls"
+    },
+    "license": "BSD-3-Clause"
 }
