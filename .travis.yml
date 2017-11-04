@@ -6,3 +6,5 @@ node_js:
   - "node"
 
 sudo: false
+
+after_script: "npm run coveralls"
