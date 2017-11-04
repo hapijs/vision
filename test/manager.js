@@ -1150,7 +1150,7 @@ describe('Manager', () => {
 
             Fs.chmodSync(layout, '0300');
             try {
-                await expect(views.render('valid/test', { title: 'test', message: 'Hapi' })).to.reject(`Failed to read view file: ${__dirname}/templates/layout.html`);
+                await expect(views.render('valid/test', { title: 'test', message: 'Hapi' })).to.reject('Failed to read view file: ' + layout);
             }
             finally {
                 Fs.chmodSync(layout, mode);
@@ -1511,9 +1511,9 @@ describe('Manager', () => {
             const buffer = [];
             const oldWarn = console.warn;
 
-            console.warn = function () {
+            console.warn = (...args) => {
 
-                const message = Util.format.apply(Util, arguments);
+                const message = Util.format(...args);
 
                 buffer.push(message);
             };
@@ -1534,8 +1534,13 @@ describe('Manager', () => {
 
             expect(output).to.match(/^WARNING:/);
             expect(output).to.contain('vision failed to load helper');
-            expect(output).to.contain('invalid/helpers/bad1.module');
-            expect(output).to.contain('invalid/helpers/bad2.module');
+
+            expect(output).to.contain('invalid/helpers/bad1.js');
+            expect(output).to.contain('invalid/helpers/bad1.json');
+
+            // Ignore non-requirable file extensions
+            expect(output).to.not.contain('invalid/helpers/bad1.foo');
+            expect(output).to.not.contain('invalid/helpers/README.md');
         });
 
         it('reuses cached compilation', async () => {
