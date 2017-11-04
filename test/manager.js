@@ -1150,7 +1150,7 @@ describe('Manager', () => {
 
             Fs.chmodSync(layout, '0300');
             try {
-                await expect(views.render('valid/test', { title: 'test', message: 'Hapi' })).to.reject('Failed to read view file: /home/eran/code/vision/test/templates/layout.html');
+                await expect(views.render('valid/test', { title: 'test', message: 'Hapi' })).to.reject(`Failed to read view file: ${__dirname}/templates/layout.html`);
             }
             finally {
                 Fs.chmodSync(layout, mode);
