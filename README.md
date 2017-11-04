@@ -4,7 +4,7 @@ Templates rendering plugin support for hapi.js.
 
 [![Build Status](https://travis-ci.org/hapijs/vision.svg)](http://travis-ci.org/hapijs/vision)
 
-Lead Maintainer - [Jeffrey Jagoda](https://github.com/jagoda)
+Lead Maintainer - [William Woodruff](https://github.com/wswoodruff)
 
 **vision** decorates the [server](https://github.com/hapijs/hapi/blob/master/API.md#server),
 [request](https://github.com/hapijs/hapi/blob/master/API.md#request-object), and
