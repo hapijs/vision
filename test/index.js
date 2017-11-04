@@ -1,11 +1,12 @@
 'use strict';
+
 // Load modules
 
 const Path = require('path');
+
 const Code = require('code');
 const Handlebars = require('handlebars');
 const Hapi = require('hapi');
-const Hoek = require('hoek');
 const Pug = require('pug');
 const Lab = require('lab');
 const Vision = require('..');
@@ -26,50 +27,38 @@ const expect = Code.expect;
 
 describe('handler()', () => {
 
-    it('handles routes to views', (done) => {
+    it('handles routes to views', async () => {
 
-        const server = new Hapi.Server();
-        server.connection();
-        server.register(Vision, Hoek.ignore);
+        const server = Hapi.server();
+        await server.register(Vision);
         server.views({
             engines: { html: require('handlebars') },
             path: __dirname + '/templates'
         });
 
         server.route({ method: 'GET', path: '/{param}', handler: { view: 'valid/handler' } });
-        server.inject({
-            method: 'GET',
-            url: '/hello'
-        }, (res) => {
-
-            expect(res.result).to.contain('hello');
-            done();
-        });
+        const res = await server.inject({ method: 'GET', url: '/hello' });
+        expect(res.result).to.contain('hello');
     });
 
-    it('handles custom context', (done) => {
+    it('handles custom context', async () => {
 
-        const server = new Hapi.Server();
-        server.connection();
-        server.register(Vision, Hoek.ignore);
+        const server = Hapi.server();
+        await server.register(Vision);
         server.views({
             engines: { pug: Pug },
             path: __dirname + '/templates'
         });
 
         server.route({ method: 'GET', path: '/', handler: { view: { template: 'valid/index', context: { message: 'heyloo' } } } });
-        server.inject('/', (res) => {
-
-            expect(res.result).to.contain('heyloo');
-            done();
-        });
+        const res = await server.inject('/');
+        expect(res.result).to.contain('heyloo');
     });
 
-    it('handles custom options', (done) => {
+    it('handles custom options', async () => {
 
-        const server = new Hapi.Server();
-        server.connection();
-        server.register(Vision, Hoek.ignore);
+        const server = Hapi.server();
+        await server.register(Vision);
         server.views({
             engines: { html: require('handlebars') },
             path: __dirname + '/templates',
@@ -77,23 +66,19 @@ describe('handler()', () => {
         });
 
         server.route({ method: 'GET', path: '/', handler: { view: { template: 'valid/options', options: { layout: 'elsewhere' } } } });
-        server.inject('/', (res) => {
-
-            expect(res.result).to.contain('+hello');
-            done();
-        });
+        const res = await server.inject('/');
+        expect(res.result).to.contain('+hello');
     });
 
-    it('includes prerequisites in the default view context', (done) => {
+    it('includes prerequisites in the default view context', async () => {
 
         const pre = function (request, reply) {
 
-            reply('PreHello');
+            return 'PreHello';
         };
 
-        const server = new Hapi.Server();
-        server.connection();
-        server.register(Vision, Hoek.ignore);
+        const server = Hapi.server();
+        await server.register(Vision);
         server.views({
             engines: { html: require('handlebars') },
             path: __dirname + '/templates'
@@ -112,56 +97,44 @@ describe('handler()', () => {
             }
         });
 
-        server.inject('/', (res) => {
-
-            expect(res.result).to.contain('PreHello');
-            done();
-        });
+        const res = await server.inject('/');
+        expect(res.result).to.contain('PreHello');
     });
 
-    it('handles both custom and default contexts', (done) => {
+    it('handles both custom and default contexts', async () => {
 
-        const server = new Hapi.Server();
-        server.connection();
-        server.register(Vision, Hoek.ignore);
+        const server = Hapi.server();
+        await server.register(Vision);
         server.views({
             engines: { html: require('handlebars') },
             path: __dirname + '/templates'
         });
 
         server.route({ method: 'GET', path: '/', handler: { view: { template: 'valid/testContext', context: { message: 'heyloo' } } } });
-        server.inject('/?test=yes', (res) => {
-
-            expect(res.result).to.contain('heyloo');
-            expect(res.result).to.contain('yes');
-            done();
-        });
+        const res = await server.inject('/?test=yes');
+        expect(res.result).to.contain('heyloo');
+        expect(res.result).to.contain('yes');
     });
 
-    it('overrides default contexts when provided with context of same name', (done) => {
+    it('overrides default contexts when provided with context of same name', async () => {
 
-        const server = new Hapi.Server();
-        server.connection();
-        server.register(Vision, Hoek.ignore);
+        const server = Hapi.server();
+        await server.register(Vision);
         server.views({
             engines: { html: require('handlebars') },
             path: __dirname + '/templates'
         });
 
         server.route({ method: 'GET', path: '/', handler: { view: { template: 'valid/testContext', context: { message: 'heyloo', query: { test: 'no' } } } } });
-        server.inject('/?test=yes', (res) => {
-
-            expect(res.result).to.contain('heyloo');
-            expect(res.result).to.contain('no');
-            done();
-        });
+        const res = await server.inject('/?test=yes');
+        expect(res.result).to.contain('heyloo');
+        expect(res.result).to.contain('no');
     });
 
-    it('handles a global context object', (done) => {
+    it('handles a global context object', async () => {
 
-        const server = new Hapi.Server();
-        server.connection();
-        server.register(Vision, Hoek.ignore);
+        const server = Hapi.server();
+        await server.register(Vision);
         server.views({
             engines: { html: require('handlebars') },
             path: __dirname + '/templates',
@@ -171,19 +144,15 @@ describe('handler()', () => {
         });
 
         server.route({ method: 'GET', path: '/', handler: { view: { template: 'valid/testContext' } } });
-        server.inject('/', (res) => {
-
-            expect(res.result).to.contain('<h1></h1>');
-            expect(res.result).to.contain('<h1>default message</h1>');
-            done();
-        });
+        const res = await server.inject('/');
+        expect(res.result).to.contain('<h1></h1>');
+        expect(res.result).to.contain('<h1>default message</h1>');
     });
 
-    it('passes the request to a global context function', (done) => {
+    it('passes the request to a global context function', async () => {
 
-        const server = new Hapi.Server();
-        server.connection();
-        server.register(Vision, Hoek.ignore);
+        const server = Hapi.server();
+        await server.register(Vision);
         server.views({
             engines: { html: require('handlebars') },
             path: __dirname + '/templates',
@@ -197,19 +166,15 @@ describe('handler()', () => {
         });
 
         server.route({ method: 'GET', path: '/', handler: { view: { template: 'valid/testContext' } } });
-        server.inject('/', (res) => {
-
-            expect(res.result).to.contain('<h1></h1>');
-            expect(res.result).to.contain('<h1>/</h1>');
-            done();
-        });
+        const res = await server.inject('/');
+        expect(res.result).to.contain('<h1></h1>');
+        expect(res.result).to.contain('<h1>/</h1>');
     });
 
-    it('overrides the global context with the default handler context', (done) => {
+    it('overrides the global context with the default handler context', async () => {
 
-        const server = new Hapi.Server();
-        server.connection();
-        server.register(Vision, Hoek.ignore);
+        const server = Hapi.server();
+        await server.register(Vision);
         server.views({
             engines: { html: require('handlebars') },
             path: __dirname + '/templates',
@@ -223,19 +188,15 @@ describe('handler()', () => {
         });
 
         server.route({ method: 'GET', path: '/', handler: { view: { template: 'valid/testContext' } } });
-        server.inject('/?test=yes', (res) => {
-
-            expect(res.result).to.contain('<h1>yes</h1>');
-            expect(res.result).to.contain('<h1>default message</h1>');
-            done();
-        });
+        const res = await server.inject('/?test=yes');
+        expect(res.result).to.contain('<h1>yes</h1>');
+        expect(res.result).to.contain('<h1>default message</h1>');
     });
 
-    it('overrides the global and default contexts with a custom handler context', (done) => {
+    it('overrides the global and default contexts with a custom handler context', async () => {
 
-        const server = new Hapi.Server();
-        server.connection();
-        server.register(Vision, Hoek.ignore);
+        const server = Hapi.server();
+        await server.register(Vision);
         server.views({
             engines: { html: require('handlebars') },
             path: __dirname + '/templates',
@@ -250,19 +211,15 @@ describe('handler()', () => {
         });
 
         server.route({ method: 'GET', path: '/', handler: { view: { template: 'valid/testContext', context: { message: 'override', query: { test: 'no' } } } } });
-        server.inject('/?test=yes', (res) => {
-
-            expect(res.result).to.contain('<h1>no</h1>');
-            expect(res.result).to.contain('<h1>override</h1>');
-            done();
-        });
+        const res = await server.inject('/?test=yes');
+        expect(res.result).to.contain('<h1>no</h1>');
+        expect(res.result).to.contain('<h1>override</h1>');
     });
 
-    it('throws on missing views', (done) => {
+    it('throws on missing views', async () => {
 
-        const server = new Hapi.Server({ debug: false });
-        server.register(Vision, Hoek.ignore);
-        server.connection();
+        const server = Hapi.server({ debug: false });
+        await server.register(Vision);
         server.route({
             path: '/',
             method: 'GET',
@@ -272,249 +229,153 @@ describe('handler()', () => {
             }
         });
 
-        server.inject('/', (res) => {
-
-            expect(res.statusCode).to.equal(500);
-            done();
-        });
+        const res = await server.inject('/');
+        expect(res.statusCode).to.equal(500);
     });
 });
 
 describe('render()', () => {
 
-    it('renders view (root)', (done) => {
+    it('renders view (root)', async () => {
 
-        const server = new Hapi.Server();
-        server.connection();
-        server.register(Vision, Hoek.ignore);
+        const server = Hapi.server();
+        await server.register(Vision);
 
         server.views({
             engines: { html: Handlebars },
             path: __dirname + '/templates/valid'
         });
 
-        server.render('test', { title: 'test', message: 'Hapi' }, (err, rendered, config) => {
-
-            expect(err).not.to.exist();
-            expect(rendered).to.exist();
-            expect(rendered).to.contain('Hapi');
-            done();
-        });
+        const rendered = await server.render('test', { title: 'test', message: 'Hapi' });
+        expect(rendered).to.contain('Hapi');
     });
 
-    it('renders view (root with options)', (done) => {
+    it('renders view (root with options)', async () => {
 
-        const server = new Hapi.Server();
-        server.connection();
-        server.register(Vision, Hoek.ignore);
+        const server = Hapi.server();
+        await server.register(Vision);
 
         server.views({
             engines: { html: Handlebars }
         });
 
-        server.render('test', { title: 'test', message: 'Hapi' }, { path: Path.join(__dirname, '/templates/valid') }, (err, rendered, config) => {
-
-            expect(err).not.to.exist();
-            expect(rendered).to.exist();
-            expect(rendered).to.contain('Hapi');
-            done();
-        });
+        const rendered = await server.render('test', { title: 'test', message: 'Hapi' }, { path: Path.join(__dirname, '/templates/valid') });
+        expect(rendered).to.contain('Hapi');
     });
 
-    it('renders view (plugin)', (done) => {
+    it('renders view (plugin)', async () => {
 
-        const test = function (server, options, next) {
+        const test = {
+            name: 'test',
 
-            server.views({
-                engines: { 'html': Handlebars },
-                relativeTo: Path.join(__dirname, '/templates/plugin')
-            });
+            register: async function (server, options) {
 
-            server.render('test', { message: 'steve' }, (err, rendered, config) => {
+                server.views({
+                    engines: { 'html': Handlebars },
+                    relativeTo: Path.join(__dirname, '/templates/plugin')
+                });
 
-                expect(err).not.to.exist();
-
-                server.route([
-                    {
-                        path: '/view', method: 'GET', handler: function (request, reply) {
-
-                            return reply(rendered);
-                        }
-                    }
-                ]);
-
-                return next();
-            });
+                const rendered = await server.render('test', { message: 'steve' });
+                server.route({ path: '/view', method: 'GET', handler: () => rendered });
+            }
         };
 
-        test.attributes = {
-            name: 'test'
-        };
+        const server = Hapi.server();
+        await server.register(Vision);
 
-        const server = new Hapi.Server();
-        server.connection();
-        server.register(Vision, Hoek.ignore);
-
-        server.register(test, (err) => {
-
-            expect(err).to.not.exist();
-            server.inject('/view', (res) => {
-
-                expect(res.result).to.equal('<h1>steve</h1>');
-                done();
-            });
-        });
+        await server.register(test);
+        const res = await server.inject('/view');
+        expect(res.result).to.equal('<h1>steve</h1>');
     });
 
-    it('renders view (plugin without views)', (done) => {
+    it('renders view (plugin without views)', async () => {
 
-        const test = function (server, options, next) {
+        const test = {
+            name: 'test',
 
-            server.render('test', { message: 'steve' }, (err, rendered, config) => {
+            register: async function (server, options) {
 
-                expect(err).not.to.exist();
-
-                server.route([
-                    {
-                        path: '/view', method: 'GET', handler: function (request, reply) {
-
-                            return reply(rendered);
-                        }
-                    }
-                ]);
-
-                return next();
-            });
+                const rendered = await server.render('test', { message: 'steve' });
+                server.route({ path: '/view', method: 'GET', handler: () => rendered });
+            }
         };
 
-        test.attributes = {
-            name: 'test'
-        };
-
-        const server = new Hapi.Server();
-        server.connection();
-        server.register(Vision, Hoek.ignore);
+        const server = Hapi.server();
+        await server.register(Vision);
 
         server.views({
             engines: { 'html': Handlebars },
             relativeTo: Path.join(__dirname, '/templates/plugin')
         });
 
-        server.register(test, (err) => {
-
-            expect(err).to.not.exist();
-            server.inject('/view', (res) => {
-
-                expect(res.result).to.equal('<h1>steve</h1>');
-                done();
-            });
-        });
+        await server.register(test);
+        const res = await server.inject('/view');
+        expect(res.result).to.equal('<h1>steve</h1>');
     });
 
-    it('renders view (plugin with options)', (done) => {
+    it('renders view (plugin with options)', async () => {
 
-        const test = function (server, options, next) {
+        const test = {
+            name: 'test',
 
-            server.views({
-                engines: { 'html': Handlebars }
-            });
+            register: async function (server, options) {
 
-            server.render('test', { message: 'steve' }, { relativeTo: Path.join(__dirname, '/templates/plugin') }, (err, rendered, config) => {
+                server.views({
+                    engines: { 'html': Handlebars }
+                });
 
-                expect(err).not.to.exist();
-
-                server.route([
-                    {
-                        path: '/view', method: 'GET', handler: function (request, reply) {
-
-                            return reply(rendered);
-                        }
-                    }
-                ]);
-
-                return next();
-            });
+                const rendered = await server.render('test', { message: 'steve' }, { relativeTo: Path.join(__dirname, '/templates/plugin') });
+                server.route({ path: '/view', method: 'GET', handler: () => rendered });
+            }
         };
 
-        test.attributes = {
-            name: 'test'
-        };
+        const server = Hapi.server();
+        await server.register(Vision);
 
-        const server = new Hapi.Server();
-        server.connection();
-        server.register(Vision, Hoek.ignore);
+        await server.register(test);
+        const res = await server.inject('/view');
 
-        server.register(test, (err) => {
-
-            expect(err).to.not.exist();
-            server.inject('/view', (res) => {
-
-                expect(res.result).to.equal('<h1>steve</h1>');
-                done();
-            });
-        });
+        expect(res.result).to.equal('<h1>steve</h1>');
     });
 
-    it('throws on missing views', (done) => {
+    it('rejects on missing views', async () => {
 
-        const server = new Hapi.Server();
-        server.register(Vision, Hoek.ignore);
-        expect(() => {
-
-            server.render('test');
-        }).to.throw('Missing views manager');
-        done();
+        const server = Hapi.server();
+        await server.register(Vision);
+        await expect(server.render('test')).to.reject('Missing views manager');
     });
 
-    it('renders view (plugin request)', (done) => {
+    it('renders view (plugin request)', async () => {
 
-        const test = function (server, options, next) {
+        const test = {
+            name: 'test',
 
-            server.views({
-                engines: { 'html': Handlebars },
-                relativeTo: Path.join(__dirname, '/templates/plugin')
-            });
+            register: function (server, options) {
 
-            server.route({
-                method: 'GET',
-                path: '/view',
-                handler: function (request, reply) {
+                server.views({
+                    engines: { 'html': Handlebars },
+                    relativeTo: Path.join(__dirname, '/templates/plugin')
+                });
 
-                    request.render('test', { message: 'steve' }, (err, rendered, config) => {
-
-                        expect(err).not.to.exist();
-                        return reply(rendered);
-                    });
-                }
-            });
-
-            return next();
+                server.route({
+                    method: 'GET',
+                    path: '/view',
+                    handler: (request) => request.render('test', { message: 'steve' })
+                });
+            }
         };
 
-        test.attributes = {
-            name: 'test'
-        };
-
-        const server = new Hapi.Server();
-        server.connection();
-        server.register(Vision, Hoek.ignore);
-
-        server.register(test, (err) => {
-
-            expect(err).to.not.exist();
-            server.inject('/view', (res) => {
-
-                expect(res.result).to.equal('<h1>steve</h1>');
-                done();
-            });
-        });
+        const server = Hapi.server();
+        await server.register(Vision);
+        await server.register(test);
+        const res = await server.inject('/view');
+        expect(res.result).to.equal('<h1>steve</h1>');
     });
 
-    it('does not pass the request to the global context function (server)', (done) => {
+    it('does not pass the request to the global context function (server)', async () => {
 
-        const server = new Hapi.Server();
-        server.connection();
-        server.register(Vision, Hoek.ignore);
+        const server = Hapi.server();
+        await server.register(Vision);
         server.views({
             engines: { html: require('handlebars') },
             path: __dirname + '/templates/valid',
@@ -527,19 +388,14 @@ describe('render()', () => {
             }
         });
 
-        server.render('testContext', null, null, (err, result) => {
-
-            expect(err).not.to.exist();
-            expect(result).to.contain('<h1>default</h1>');
-            done();
-        });
+        const rendered = await server.render('testContext', null, null);
+        expect(rendered).to.contain('<h1>default</h1>');
     });
 
-    it('does not pass the request to the global context function (request)', (done) => {
+    it('does not pass the request to the global context function (request)', async () => {
 
-        const server = new Hapi.Server();
-        server.connection();
-        server.register(Vision, Hoek.ignore);
+        const server = Hapi.server();
+        await server.register(Vision);
         server.views({
             engines: { html: require('handlebars') },
             path: __dirname + '/templates/valid',
@@ -552,231 +408,114 @@ describe('render()', () => {
             }
         });
 
-        const handler = (request, reply) => {
+        server.route({ method: 'GET', path: '/', handler: (request) => request.render('testContext', null, null) });
+        const res = await server.inject({ method: 'GET', url: '/' });
+        expect(res.result).to.contain('<h1>default</h1>');
+    });
 
-            request.render('testContext', null, null, (err, rendered) => {
+    it('errors on missing manager', async () => {
 
-                expect(err).not.to.exist();
-                reply(rendered);
-            });
+        const test = {
+            name: 'test',
+
+            register: async function (server, options) {
+
+                await server.render('test', { message: 'steve' });
+            }
         };
 
-        server.route({ method: 'GET', path: '/', handler });
-        server.inject({ method: 'GET', url: '/' }, (response) => {
-
-            expect(response.result).to.contain('<h1>default</h1>');
-            done();
-        });
-    });
-
-    it('returns a promise when no options or callback given (server)', () => {
-
-        const server = new Hapi.Server();
-        server.connection();
-        server.register(Vision, Hoek.ignore);
-        server.views({
-            engines: { html: Handlebars },
-            path: __dirname + '/templates/valid'
-        });
-
-        return server.render('test', { message: 'Hello!' })
-        .then((content) => expect(content).to.contain('<h1>Hello!</h1>'));
-    });
-
-    it('returns a promise when no callback given (server)', () => {
-
-        const server = new Hapi.Server();
-        server.connection();
-        server.register(Vision, Hoek.ignore);
-
-        server.views({
-            engines: { html: Handlebars },
-            path: __dirname + '/templates/valid'
-        });
-
-        return server.render('test', { message: 'Hello!' }, {})
-        .then((content) => expect(content).to.contain('<h1>Hello!</h1>'));
-    });
-
-    it('returns a promise when no options or callback given (request)', (done) => {
-
-        const server = new Hapi.Server();
-        server.connection();
-        server.register(Vision, Hoek.ignore);
-
-        server.views({
-            engines: { html: Handlebars },
-            path: __dirname + '/templates/valid'
-        });
-
-        const handler = (request, reply) => {
-
-            const promise = request.render('test', { message: 'Hello!' });
-            expect(promise).to.be.an.instanceof(Promise);
-            reply(promise);
-        };
-
-        server.route({ method: 'GET', path: '/', handler });
-        server.inject({ method: 'GET', url: '/' }, (response) => {
-
-            expect(response.result).to.contain('<h1>Hello!</h1>');
-            done();
-        });
-    });
-
-    it('returns a promise when no callback given (request)', (done) => {
-
-        const server = new Hapi.Server();
-        server.connection();
-        server.register(Vision, Hoek.ignore);
-
-        server.views({
-            engines: { html: Handlebars },
-            path: __dirname + '/templates/valid'
-        });
-
-        const handler = (request, reply) => {
-
-            const promise = request.render('test', { message: 'Hello!' }, {});
-            expect(promise).to.be.an.instanceof(Promise);
-            reply(promise);
-        };
-
-        server.route({ method: 'GET', path: '/', handler });
-        server.inject({ method: 'GET', url: '/' }, (response) => {
-
-            expect(response.result).to.contain('<h1>Hello!</h1>');
-            done();
-        });
+        const server = Hapi.server();
+        await server.register(Vision);
+        await expect(server.register(test)).to.reject('Missing views manager');
     });
 });
 
 describe('views()', () => {
 
-    it('requires plugin with views', (done) => {
+    it('requires plugin with views', async () => {
 
-        const test = function (server, options, next) {
+        const test = {
+            name: 'test',
 
-            server.path(__dirname);
+            register: function (server, options) {
 
-            const views = {
-                engines: { 'html': Handlebars },
-                path: './templates/plugin'
-            };
+                server.path(__dirname);
 
-            server.views(views);
-            if (Object.keys(views).length !== 2) {
-                return next(new Error('plugin.view() modified options'));
-            }
+                const views = {
+                    engines: { 'html': Handlebars },
+                    path: './templates/plugin'
+                };
 
-            server.route([
-                {
-                    path: '/view', method: 'GET', handler: function (request, reply) {
+                server.views(views);
 
-                        return reply.view('test', { message: options.message });
+                if (Object.keys(views).length !== 2) {
+                    throw new Error('plugin.view() modified options');
+                }
+
+                server.route({ path: '/view', method: 'GET', handler: (request, reply) => reply.view('test', { message: options.message }) });
+                server.ext('onRequest', (request, reply) => {
+
+                    if (request.path === '/ext') {
+                        return reply.view('test', { message: 'grabbed' }).takeover();
                     }
-                }
-            ]);
 
-            server.ext('onRequest', (request, reply) => {
-
-                if (request.path === '/ext') {
-                    return reply.view('test', { message: 'grabbed' });
-                }
-
-                return reply.continue();
-            });
-
-            return next();
-        };
-
-        test.attributes = {
-            name: 'test'
-        };
-
-        const server = new Hapi.Server();
-        server.connection();
-        server.register(Vision, Hoek.ignore);
-
-        server.register({ register: test, options: { message: 'viewing it' } }, (err) => {
-
-            expect(err).to.not.exist();
-            server.inject('/view', (viewResponse) => {
-
-                expect(viewResponse.result).to.equal('<h1>viewing it</h1>');
-
-                server.inject('/ext', (extResponse) => {
-
-                    expect(extResponse.result).to.equal('<h1>grabbed</h1>');
-                    done();
+                    return reply.continue;
                 });
-            });
-        });
+            }
+        };
+
+        const server = Hapi.server();
+        await server.register(Vision);
+        await server.register({ plugin: test, options: { message: 'viewing it' } });
+
+        const res1 = await server.inject('/view');
+        expect(res1.result).to.equal('<h1>viewing it</h1>');
+
+        const res2 = await server.inject('/ext');
+        expect(res2.result).to.equal('<h1>grabbed</h1>');
     });
 
-    it('requires plugin with views with specific relativeTo', (done) => {
+    it('requires plugin with views with specific relativeTo', async () => {
 
-        const test = function (server, options, next) {
+        const test = {
+            name: 'test',
 
-            server.views({
-                engines: { 'html': Handlebars },
-                relativeTo: Path.join(__dirname, '/templates/plugin')
-            });
+            register: function (server, options) {
 
-            server.route([
-                {
-                    path: '/view', method: 'GET', handler: function (request, reply) {
+                server.views({
+                    engines: { 'html': Handlebars },
+                    relativeTo: Path.join(__dirname, '/templates/plugin')
+                });
 
-                        return reply.view('test', { message: 'steve' });
-                    }
-                }
-            ]);
-
-            return next();
+                server.route({ path: '/view', method: 'GET', handler: (request, reply) => reply.view('test', { message: 'steve' }) });
+            }
         };
 
-        test.attributes = {
-            name: 'test'
-        };
+        const server = Hapi.server();
+        await server.register(Vision);
+        await server.register(test);
 
-        const server = new Hapi.Server();
-        server.connection();
-        server.register(Vision, Hoek.ignore);
-
-        server.register(test, (err) => {
-
-            expect(err).to.not.exist();
-            server.inject('/view', (res) => {
-
-                expect(res.result).to.equal('<h1>steve</h1>');
-                done();
-            });
-        });
+        const res = await server.inject('/view');
+        expect(res.result).to.equal('<h1>steve</h1>');
     });
 
-    it('defaults to server views', (done) => {
+    it('defaults to server views', async () => {
 
-        const test = function (server, options, next) {
+        const test = {
+            name: 'test',
 
-            server.route({
-                path: '/view',
-                method: 'GET',
-                handler: function (request, reply) {
+            register: function (server, options) {
 
-                    return reply.view('test', { message: options.message });
-                }
-            });
-
-            return next();
+                server.route({
+                    path: '/view',
+                    method: 'GET',
+                    handler: (request, reply) => reply.view('test', { message: options.message })
+                });
+            }
         };
 
-        test.attributes = {
-            name: 'test'
-        };
-
-        const server = new Hapi.Server();
-        server.connection();
-        server.register(Vision, Hoek.ignore);
+        const server = Hapi.server();
+        await server.register(Vision);
 
         server.path(__dirname);
 
@@ -787,33 +526,26 @@ describe('views()', () => {
 
         server.views(views);
 
-        server.register({ register: test, options: { message: 'viewing it' } }, (err) => {
-
-            expect(err).to.not.exist();
-            server.inject('/view', (res) => {
-
-                expect(res.result).to.equal('<h1>viewing it</h1>');
-                done();
-            });
-        });
+        await server.register({ plugin: test, options: { message: 'viewing it' } });
+        const res = await server.inject('/view');
+        expect(res.result).to.equal('<h1>viewing it</h1>');
     });
 
-    it('throws on multiple views', (done) => {
+    it('throws on multiple views', async () => {
 
-        const server = new Hapi.Server();
-        server.register(Vision, Hoek.ignore);
+        const server = Hapi.server();
+        await server.register(Vision);
         server.views({ engines: { 'html': Handlebars } });
         expect(() => {
 
             server.views({ engines: { 'html': Handlebars } });
         }).to.throw('Cannot set views manager more than once');
-        done();
     });
 
-    it('can register helpers via the view manager', (done) => {
+    it('can register helpers via the view manager', async () => {
 
-        const server = new Hapi.Server();
-        server.register(Vision, Hoek.ignore);
+        const server = Hapi.server();
+        await server.register(Vision);
 
         const manager = server.views({
             engines: { 'html': Handlebars.create() },
@@ -824,18 +556,14 @@ describe('views()', () => {
         manager.registerHelper('long', (string) => string);
         manager.registerHelper('uppercase', (string) => string);
 
-        server.render('testHelpers', { something: 'uppercase' }, (err, result) => {
-
-            expect(err).not.to.exist();
-            expect(result).to.equal('<p>This is all uppercase and this is how we like it!</p>');
-            done();
-        });
+        const rendered = await server.render('testHelpers', { something: 'uppercase' });
+        expect(rendered).to.equal('<p>This is all uppercase and this is how we like it!</p>');
     });
 
-    it('can render templates via the view manager', (done) => {
+    it('can render templates via the view manager', async () => {
 
-        const server = new Hapi.Server();
-        server.register(Vision, Hoek.ignore);
+        const server = Hapi.server();
+        await server.register(Vision);
 
         const manager = server.views({
             engines: { 'html': Handlebars },
@@ -843,62 +571,34 @@ describe('views()', () => {
             path: 'valid'
         });
 
-        manager.render('test', { message: 'Hello!' }, null, (err, result) => {
-
-            expect(err).not.to.exist();
-            expect(result).to.contain('<h1>Hello!</h1>');
-            done();
-        });
+        const rendered = await manager.render('test', { message: 'Hello!' }, null);
+        expect(rendered).to.contain('<h1>Hello!</h1>');
     });
 });
 
 describe('Plugin', () => {
 
-    it('can be registered before connections', (done) => {
+    it('only registers once', async () => {
 
-        const plugin = function (server, options, next) {
+        const one = {
+            name: 'one',
 
-            server.dependency('vision');
-            server.connection();
-            next();
+            register: function (server, options) {
+
+                return server.register(Vision);
+            }
         };
 
-        plugin.attributes = {
-            connections: false,
-            name: 'test'
+        const two = {
+            name: 'two',
+
+            register: function (server, options) {
+
+                return server.register(Vision);
+            }
         };
 
-        const server = new Hapi.Server();
-        server.register([Vision, plugin], Hoek.ignore);
-
-        expect(server.views).to.be.a.function();
-        server.initialize((err) => {
-
-            expect(err).to.not.exist();
-            server.stop(done);
-        });
-    });
-
-    it('only registers once', (done) => {
-
-        const one = function (server, options, next) {
-
-            server.register(Vision, next);
-        };
-
-        const two = function (server, options, next) {
-
-            server.register(Vision, next);
-        };
-
-        one.attributes = { name: 'one' };
-        two.attributes = { name: 'two' };
-
-        const server = new Hapi.Server();
-        server.register([one, two], (err) => {
-
-            expect(err).to.not.exist();
-            done();
-        });
+        const server = Hapi.server();
+        await server.register([one, two]);
     });
 });

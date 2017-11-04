@@ -59,7 +59,7 @@ Initializes the server views manager where:
       partials support (empty path).
     - `helpersPath` - the directory path, or array of directory paths, where helpers are located. Helpers are functions used
       within templates to perform transformations and other data manipulations using the template
-      context or other inputs. Each '.js' file in the helpers directory is loaded and the file name
+      context or other inputs. Each valid template file in the helpers directory is loaded and the file name
       is used as the helper name. The files must export a single method with the signature
       `function(context)` and return a string. Sub-folders are not supported and are ignored.
       Defaults to no helpers support (empty path). Note that jade does not support loading helpers
