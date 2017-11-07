@@ -72,7 +72,7 @@ describe('handler()', () => {
 
     it('includes prerequisites in the default view context', async () => {
 
-        const pre = function (request, reply) {
+        const pre = function (request, h) {
 
             return 'PreHello';
         };
@@ -223,9 +223,9 @@ describe('handler()', () => {
         server.route({
             path: '/',
             method: 'GET',
-            handler: function (request, reply) {
+            handler: function (request, h) {
 
-                return reply.view('test', { message: 'steve' });
+                return h.view('test', { message: 'steve' });
             }
         });
 
@@ -452,14 +452,14 @@ describe('views()', () => {
                     throw new Error('plugin.view() modified options');
                 }
 
-                server.route({ path: '/view', method: 'GET', handler: (request, reply) => reply.view('test', { message: options.message }) });
-                server.ext('onRequest', (request, reply) => {
+                server.route({ path: '/view', method: 'GET', handler: (request, h) => h.view('test', { message: options.message }) });
+                server.ext('onRequest', (request, h) => {
 
                     if (request.path === '/ext') {
-                        return reply.view('test', { message: 'grabbed' }).takeover();
+                        return h.view('test', { message: 'grabbed' }).takeover();
                     }
 
-                    return reply.continue;
+                    return h.continue;
                 });
             }
         };
@@ -487,7 +487,7 @@ describe('views()', () => {
                     relativeTo: Path.join(__dirname, '/templates/plugin')
                 });
 
-                server.route({ path: '/view', method: 'GET', handler: (request, reply) => reply.view('test', { message: 'steve' }) });
+                server.route({ path: '/view', method: 'GET', handler: (request, h) => h.view('test', { message: 'steve' }) });
             }
         };
 
@@ -509,7 +509,7 @@ describe('views()', () => {
                 server.route({
                     path: '/view',
                     method: 'GET',
-                    handler: (request, reply) => reply.view('test', { message: options.message })
+                    handler: (request, h) => h.view('test', { message: options.message })
                 });
             }
         };
