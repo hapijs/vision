@@ -134,14 +134,14 @@ describe('Manager', () => {
         // Compilation errors sould be available for extensions.
 
         let error = null;
-        server.ext('onPreResponse', (request, reply) => {
+        server.ext('onPreResponse', (request, h) => {
 
             const response = request.response;
             if (response.isBoom) {
                 error = response;
             }
 
-            return reply.continue;
+            return h.continue;
         });
 
         server.route({ method: 'GET', path: '/', handler: { view: { template: __dirname + '/templates/valid/test', context: { message: 'Hello, World!' } } } });
@@ -164,14 +164,14 @@ describe('Manager', () => {
         // Compilation errors sould be available for extensions.
 
         let error = null;
-        server.ext('onPreResponse', (request, reply) => {
+        server.ext('onPreResponse', (request, h) => {
 
             const response = request.response;
             if (response.isBoom) {
                 error = response;
             }
 
-            return reply.continue;
+            return h.continue;
         });
 
         server.route({ method: 'GET', path: '/', handler: { view: { template: '../test', context: { message: 'Hello, World!' } } } });
@@ -212,14 +212,14 @@ describe('Manager', () => {
         // Compilation errors sould be available for extensions.
 
         let error = null;
-        server.ext('onPreResponse', (request, reply) => {
+        server.ext('onPreResponse', (request, h) => {
 
             const response = request.response;
             if (response.isBoom) {
                 error = response;
             }
 
-            return reply.continue;
+            return h.continue;
         });
 
         server.route({ method: 'GET', path: '/', handler: { view: { template: 'testNope', context: { message: 'Hello, World!' } } } });
@@ -242,14 +242,14 @@ describe('Manager', () => {
         // Compilation errors sould be available for extensions.
 
         let error = null;
-        server.ext('onPreResponse', (request, reply) => {
+        server.ext('onPreResponse', (request, h) => {
 
             const response = request.response;
             if (response.isBoom) {
                 error = response;
             }
 
-            return reply.continue;
+            return h.continue;
         });
 
         server.route({ method: 'GET', path: '/', handler: { view: { template: 'badmustache', context: { message: 'Hello, World!' }, options: { path: __dirname + '/templates/valid/invalid' } } } });
@@ -296,11 +296,11 @@ describe('Manager', () => {
             path: __dirname + '/templates/valid'
         });
 
-        server.ext('onPreResponse', (request, reply) => {
+        server.ext('onPreResponse', (request, h) => {
 
             const response = request.response;
             response.source.context.message = 'goodbye';
-            return reply.continue;
+            return h.continue;
         });
 
         server.route({ method: 'GET', path: '/', handler: { view: { template: 'test.html', context: { message: 'hello' } } } });
@@ -616,14 +616,14 @@ describe('Manager', () => {
             // Compilation errors sould be available for extensions.
 
             let error = null;
-            server.ext('onPreResponse', (request, reply) => {
+            server.ext('onPreResponse', (request, h) => {
 
                 const response = request.response;
                 if (response.isBoom) {
                     error = response;
                 }
 
-                return reply.continue;
+                return h.continue;
             });
 
             server.route({ method: 'GET', path: '/', handler: { view: { template: 'valid/test', context: { title: 'test', message: 'Hapi' } } } });
@@ -646,14 +646,14 @@ describe('Manager', () => {
             // Compilation errors sould be available for extensions.
 
             let error = null;
-            server.ext('onPreResponse', (request, reply) => {
+            server.ext('onPreResponse', (request, h) => {
 
                 const response = request.response;
                 if (response.isBoom) {
                     error = response;
                 }
 
-                return reply.continue;
+                return h.continue;
             });
 
             server.route({ method: 'GET', path: '/', handler: { view: { template: 'valid/test', context: { title: 'test', message: 'Hapi' } } } });
@@ -713,14 +713,14 @@ describe('Manager', () => {
             // Compilation errors sould be available for extensions.
 
             let error = null;
-            server.ext('onPreResponse', (request, reply) => {
+            server.ext('onPreResponse', (request, h) => {
 
                 const response = request.response;
                 if (response.isBoom) {
                     error = response;
                 }
 
-                return reply.continue;
+                return h.continue;
             });
 
             server.route({ method: 'GET', path: '/', handler: { view: { template: 'test', context: { title: 'test', message: 'Hapi' }, options: { path: __dirname + '/templates/valid/invalid' } } } });
@@ -1628,9 +1628,9 @@ describe('Manager', () => {
                 path: __dirname + '/templates/valid'
             });
 
-            const handler = function (request, reply) {
+            const handler = function (request, h) {
 
-                return reply.view('test.html', { message: 'hi' });
+                return h.view('test.html', { message: 'hi' });
             };
 
             server.route({ method: 'GET', path: '/', handler });
@@ -1648,9 +1648,9 @@ describe('Manager', () => {
                 path: __dirname + '/templates/valid'
             });
 
-            const handler = function (request, reply) {
+            const handler = function (request, h) {
 
-                return reply.view('test.html', { message: 'hi' }).type('text/plain');
+                return h.view('test.html', { message: 'hi' }).type('text/plain');
             };
 
             server.route({ method: 'GET', path: '/', handler });
@@ -1667,9 +1667,9 @@ describe('Manager', () => {
                 path: __dirname + '/templates/invalid'
             });
 
-            const handler = function (request, reply) {
+            const handler = function (request, h) {
 
-                return reply.view('test.html', { message: 'hi' });
+                return h.view('test.html', { message: 'hi' });
             };
 
             server.route({ method: 'GET', path: '/', handler });
@@ -1697,9 +1697,9 @@ describe('Manager', () => {
                 }
             });
 
-            const handler = function (request, reply) {
+            const handler = function (request, h) {
 
-                return reply.view('testContext');
+                return h.view('testContext');
             };
 
             server.route({ method: 'GET', path: '/', handler });
