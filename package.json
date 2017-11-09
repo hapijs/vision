@@ -13,6 +13,12 @@
     "engines": {
         "node": ">=8.9.0"
     },
+    "scripts": {
+        "test": "lab -a code -t 100 -L",
+        "test-cov-html": "lab -a code -r html -o coverage.html",
+        "coveralls": "lab -r lcov | coveralls",
+        "lint": "eslint ."
+    },
     "dependencies": {
         "boom": "7.x.x",
         "hoek": "5.x.x",
@@ -23,11 +29,13 @@
         "hapi": "17.x.x"
     },
     "devDependencies": {
-        "babel-core": "6.x.x",
+        "babel-eslint": "^8.0.2",
         "babel-plugin-transform-react-jsx": "6.x.x",
         "code": "5.x.x",
         "coveralls": "^3.0.0",
         "ejs": "2.x.x",
+        "eslint-config-hapi": "^11.1.0",
+        "eslint-plugin-hapi": "^4.1.0",
         "handlebars": "4.x.x",
         "hapi": "17.x.x",
         "hapi-react-views": "6.x.x",
@@ -38,11 +46,6 @@
         "pug": ">=2.0.0-beta6",
         "react": "0.14.x",
         "react-dom": "0.14.x"
-    },
-    "scripts": {
-        "test": "lab -a code -t 100 -L",
-        "test-cov-html": "lab -a code -r html -o coverage.html",
-        "coveralls": "lab -r lcov | coveralls"
     },
     "license": "BSD-3-Clause"
 }

@@ -1,0 +1,12 @@
+{
+  "parser": "babel-eslint",
+  "extends": [
+    "hapi"
+  ],
+  "parserOptions": {
+    "sourceType": "script"
+  },
+  "rules": {
+    "space-before-function-paren": 0
+  }
+}
