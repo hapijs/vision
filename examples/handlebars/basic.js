@@ -14,7 +14,7 @@ const today = new Date();
 internals.thisYear = today.getFullYear();
 
 
-const handler = function (request, h) {
+const handler = (request, h) => {
 
     return h.view('index', {
         title: 'Running examples/handlebars/templates/basic | Hapi ' + request.server.version,
