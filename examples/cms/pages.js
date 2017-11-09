@@ -11,14 +11,14 @@ const internals = {};
 
 module.exports = class Pages {
 
-    constructor (dirPath) {
+    constructor(dirPath) {
 
         this._dirPath = dirPath;
         this._cache = {};
         this.loadPagesIntoCache();
     }
 
-    loadPagesIntoCache () {
+    loadPagesIntoCache() {
 
         const self = this;
         Fs.readdirSync(this._dirPath).forEach((file) => {
@@ -29,24 +29,24 @@ module.exports = class Pages {
         });
     }
 
-    getAll () {
+    getAll() {
 
         return this._cache;
     }
 
-    getPage (name) {
+    getPage(name) {
 
         return this._cache[name];
     }
 
-    savePage (name, contents) {
+    savePage(name, contents) {
 
         const pageName = Path.normalize(name);
         Fs.writeFileSync(Path.join(this._dirPath, pageName), contents);
         this._cache[pageName] = { pageName, contents };
     }
 
-    loadPageFile (file) {
+    loadPageFile(file) {
 
         const contents = Fs.readFileSync(Path.join(this._dirPath, file));
 
