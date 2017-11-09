@@ -75,6 +75,9 @@ const provision = async () => {
     });
 
     server.route({ method: 'GET', path: '/', handler: rootHandler });
+
+    await server.start();
+    console.log('Server running at:', server.info.uri);
 };
 
 provision();
@@ -107,6 +110,9 @@ const provision = async () => {
     });
 
     server.route({ method: 'GET', path: '/', handler: rootHandler });
+
+    await server.start();
+    console.log('Server running at:', server.info.uri);
 };
 
 provision();
@@ -140,6 +146,9 @@ const provision = async () => {
     });
 
     server.route({ method: 'GET', path: '/', handler: rootHandler });
+
+    await server.start();
+    console.log('Server running at:', server.info.uri);
 };
 
 provision();
@@ -185,6 +194,9 @@ const provision = async () => {
     });
 
     server.route({ method: 'GET', path: '/', handler: rootHandler });
+
+    await server.start();
+    console.log('Server running at:', server.info.uri);
 };
 
 provision();
@@ -237,6 +249,9 @@ const provision = async () => {
     });
 
     server.route({ method: 'GET', path: '/', handler: rootHandler });
+
+    await server.start();
+    console.log('Server running at:', server.info.uri);
 };
 
 provision();
