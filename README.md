@@ -20,7 +20,7 @@ methods for managing view engines that can be used to render templated responses
 const Hapi = require('hapi');
 const Vision = require('vision');
 
-const server = new Hapi.Server({ port: 3000 });
+const server = Hapi.Server({ port: 3000 });
 
 const provision = async () => {
 
@@ -54,7 +54,7 @@ const Hapi = require('hapi');
 const Vision = require('vision');
 const Ejs = require('ejs');
 
-const server = new Hapi.Server({ port: 3000 });
+const server = Hapi.Server({ port: 3000 });
 
 const rootHandler = (request, h) => {
 
@@ -86,7 +86,7 @@ const Hapi = require('hapi');
 const Vision = require('vision');
 const Handlebars = require('handlebars');
 
-const server = new Hapi.Server({ port: 3000 });
+const server = Hapi.Server({ port: 3000 });
 
 const rootHandler = (request, h) => {
 
@@ -119,7 +119,7 @@ const Hapi = require('hapi');
 const Vision = require('vision');
 const Pug = require('pug');
 
-const server = new Hapi.Server({ port: 3000 });
+const server = Hapi.Server({ port: 3000 });
 
 const rootHandler = (request, h) => {
 
@@ -152,7 +152,7 @@ const Hapi = require('hapi');
 const Vision = require('vision');
 const Mustache = require('mustache');
 
-const server = new Hapi.Server({ port: 3000 });
+const server = Hapi.Server({ port: 3000 });
 
 const rootHandler = (request, h) => {
 
@@ -197,7 +197,7 @@ const Hapi = require('hapi');
 const Vision = require('vision');
 const Nunjucks = require('nunjucks');
 
-const server = new Hapi.Server({ port: 3000 });
+const server = Hapi.Server({ port: 3000 });
 
 const rootHandler = (request, h) => {
 
