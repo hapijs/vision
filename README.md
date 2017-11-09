@@ -59,7 +59,7 @@ const server = Hapi.Server({ port: 3000 });
 const rootHandler = (request, h) => {
 
     return h.view('index', {
-        title: 'examples/ejs/templates/basic/index.js | Hapi ' + request.server.version,
+        title: 'examples/ejs/templates/basic | Hapi ' + request.server.version,
         message: 'Hello Ejs!'
     });
 };
@@ -91,7 +91,7 @@ const server = Hapi.Server({ port: 3000 });
 const rootHandler = (request, h) => {
 
     return h.view('index', {
-        title: 'examples/handlebars/templates/basic/index.js | Hapi ' + request.server.version,
+        title: 'examples/handlebars/templates/basic | Hapi ' + request.server.version,
         message: 'Hello Handlebars!'
     });
 };
@@ -124,7 +124,7 @@ const server = Hapi.Server({ port: 3000 });
 const rootHandler = (request, h) => {
 
     return h.view('index', {
-        title: 'examples/pug/templates/basic/index.js | Hapi ' + request.server.version,
+        title: 'examples/pug/templates/basic | Hapi ' + request.server.version,
         message: 'Hello Pug!'
     });
 };
@@ -157,7 +157,7 @@ const server = Hapi.Server({ port: 3000 });
 const rootHandler = (request, h) => {
 
     return h.view('index', {
-        title: 'examples/mustache/templates/basic/index.js | Hapi ' + request.server.version,
+        title: 'examples/mustache/templates/basic | Hapi ' + request.server.version,
         message: 'Hello Mustache!'
     });
 };
@@ -202,7 +202,7 @@ const server = Hapi.Server({ port: 3000 });
 const rootHandler = (request, h) => {
 
     return h.view('index', {
-        title: 'examples/nunjucks/templates/basic/index.js | Hapi ' + request.server.version,
+        title: 'examples/nunjucks/templates/basic | Hapi ' + request.server.version,
         message: 'Hello Nunjucks!'
     });
 };
