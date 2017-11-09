@@ -16,3 +16,5 @@ coverage.*
 .settings
 package-lock.json
 
+examples/cms/_pages/*
+!examples/cms/_pages/Test

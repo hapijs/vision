@@ -9,55 +9,50 @@ const Path = require('path');
 
 const internals = {};
 
+module.exports = class Pages {
 
-internals.Pages = function (dirPath) {
+    constructor (dirPath) {
 
-    this._dirPath = dirPath;
-    this._cache = {};
-    this.loadPagesIntoCache();
-};
+        this._dirPath = dirPath;
+        this._cache = {};
+        this.loadPagesIntoCache();
+    }
 
+    loadPagesIntoCache () {
 
-internals.Pages.prototype.loadPagesIntoCache = function () {
+        const self = this;
+        Fs.readdirSync(this._dirPath).forEach((file) => {
 
-    const self = this;
-    Fs.readdirSync(this._dirPath).forEach((file) => {
+            if (file[0] !== '.') {
+                self._cache[file] = self.loadPageFile(file);
+            }
+        });
+    }
 
-        if (file[0] !== '.') {
-            self._cache[file] = self.loadPageFile(file);
+    getAll () {
+
+        return this._cache;
+    }
+
+    getPage (name) {
+
+        return this._cache[name];
+    }
+
+    savePage (name, contents) {
+
+        const pageName = Path.normalize(name);
+        Fs.writeFileSync(Path.join(this._dirPath, pageName), contents);
+        this._cache[pageName] = { pageName, contents };
+    }
+
+    loadPageFile (file) {
+
+        const contents = Fs.readFileSync(Path.join(this._dirPath, file));
+
+        return {
+            name: file,
+            contents: contents.toString()
         }
-    });
+    }
 };
-
-
-internals.Pages.prototype.getAll = function () {
-
-    return this._cache;
-};
-
-
-internals.Pages.prototype.getPage = function (name) {
-
-    return this._cache[name];
-};
-
-
-internals.Pages.prototype.savePage = function (name, contents) {
-
-    name = Path.normalize(name);
-    Fs.writeFileSync(Path.join(this._dirPath, name), contents);
-    this._cache[name] = { name, contents };
-};
-
-
-internals.Pages.prototype.loadPageFile = function (file) {
-
-    const contents = Fs.readFileSync(Path.join(this._dirPath, file));
-
-    return {
-        name: file,
-        contents: contents.toString()
-    };
-};
-
-exports = module.exports = new internals.Pages(Path.join(__dirname, '_pages'));
