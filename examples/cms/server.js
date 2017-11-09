@@ -3,7 +3,7 @@
 
 const Path = require('path');
 const Hapi = require('hapi');
-const PagesClass = require('./pages')
+const PagesClass = require('./pages');
 const Vision = require('../..');
 const Handlebars = require('handlebars');
 
