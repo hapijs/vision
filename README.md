@@ -6,225 +6,213 @@ Templates rendering plugin support for hapi.js.
 
 Lead Maintainer - [William Woodruff](https://github.com/wswoodruff)
 
+> **vision** updated to `hapi v17.x.x`
+
 **vision** decorates the [server](https://github.com/hapijs/hapi/blob/master/API.md#server),
 [request](https://github.com/hapijs/hapi/blob/master/API.md#request-object), and
-[reply](https://github.com/hapijs/hapi/blob/master/API.md#reply-interface) interfaces with additional
-methods for managing view engines that can be used to render templated responses. **vision** also
-provides a built-in [handler](https://github.com/hapijs/hapi/blob/master/API.md#serverhandlername-method)
-implementation for creating templated responses.
+`h` response [toolkit](https://github.com/hapijs/hapi/blob/master/API.md#response-toolkit) interfaces with additional
+methods for managing view engines that can be used to render templated responses.
 
-**You will need to install `vision` using something like `npm install --save vision` before you can register it.**
+**vision** also provides a built-in [handler](https://github.com/hapijs/hapi/blob/master/API.md#-serverdecoratetype-property-method-options) implementation for creating templated responses.
+
+## Usage
+> See also the [API Reference](./API.md)
 
 ```js
-const server = new Hapi.Server();
-server.connection({ port: 8080 });
+const Hapi = require('hapi');
+const Vision = require('vision');
 
-server.register(require('vision'), (err) => {
+const server = Hapi.Server({ port: 3000 });
 
-    if (err) {
-        console.log("Failed to load vision.");
-    }
-});
+const provision = async () => {
+
+    await server.register(Vision);
+    await server.start();
+
+    console.log('Server running at:', server.info.uri);
+};
+
+provision();
 ```
 **NOTE:** Vision is included with and loaded by default in Hapi < 9.0.
 
-- [Examples](#examples)
-    - [EJS](#ejs)
-    - [Handlebars](#handlebars)
-    - [Jade](#jade)
-    - [Marko](#marko)
-    - [Mustache](#mustache)
-    - [Nunjucks](#nunjucks)
-
-See [API.md](./API.md) for detailed usage information.
-
 ## Examples
 
+The examples in the `examples` folder can be run with `node`.
+```
+git clone https://github.com/hapijs/vision.git && cd vision
+npm install
+
+node examples/handlebars
+```
+
+:point_up: That command will run the handlebars basic template.
+There are three more examples in there: for helpers, layout, and partials.
+
+Use this hierarchy to know which commands to run, e.g.
+```
+node examples/mustache
+node examples/mustache/partials
+node examples/jsx
+```
+
+```
+- cms // A bare-bones Content Management System with a WYSIWYG editor
+- ejs
+  - layout
+- handlebars
+  - helpers
+  - layout
+  - partials
+- jsx // React server-side rendering
+- marko
+- mixed // Using multiple render engines (handlebars and pug)
+- mustache
+  - layout
+  - partials
+- nunjucks
+- pug
+```
+
 **vision** is compatible with most major templating engines out of the box. Engines that don't follow
-the normal API pattern can still be used by mapping their API to the **vision** API. Working code for
-the following examples can be found in the [examples directory](./examples).
+the normal API pattern can still be used by mapping their API to the [**vision** API](./API.md). Some of the examples below use the `compile` and `prepare` methods which are part of the API.
 
 ### EJS
 
 ```js
-const server = new Hapi.Server();
-server.connection({ port: 8000 });
+const Hapi = require('hapi');
+const Vision = require('vision');
+const Ejs = require('ejs');
 
-const rootHandler = function (request, reply) {
+const server = Hapi.Server({ port: 3000 });
 
-    reply.view('index', {
-        title: 'examples/views/ejs/index.js | Hapi ' + request.server.version,
-        message: 'Index - Hello World!'
+const rootHandler = (request, h) => {
+
+    return h.view('index', {
+        title: 'examples/ejs/templates/basic | Hapi ' + request.server.version,
+        message: 'Hello Ejs!'
     });
 };
 
-server.register(require('vision'), (err) => {
+const provision = async () => {
 
-    if (err) {
-        throw err;
-    }
+    await server.register(Vision);
 
     server.views({
-        engines: { ejs: require('ejs') },
+        engines: { ejs: Ejs },
         relativeTo: __dirname,
-        path: 'templates'
+        path: 'examples/ejs/templates/basic'
     });
 
     server.route({ method: 'GET', path: '/', handler: rootHandler });
-});
+
+    await server.start();
+    console.log('Server running at:', server.info.uri);
+};
+
+provision();
 ```
 
 ### Handlebars
-
 ```js
-const server = new Hapi.Server();
-server.connection({ port: 8000 });
+const Hapi = require('hapi');
+const Vision = require('vision');
+const Handlebars = require('handlebars');
 
-const handler = function (request, reply) {
+const server = Hapi.Server({ port: 3000 });
 
-    reply.view('basic/index', {
-        title: 'examples/views/handlebars/basic.js | Hapi ' + request.server.version,
-        message: 'Hello World!'
+const rootHandler = (request, h) => {
+
+    return h.view('index', {
+        title: 'examples/handlebars/templates/basic | Hapi ' + request.server.version,
+        message: 'Hello Handlebars!'
     });
 };
 
-server.register(require('vision'), (err) => {
+const provision = async () => {
 
-    if (err) {
-        throw err;
-    }
+    await server.register(Vision);
 
     server.views({
-        engines: { html: require('handlebars') },
-        path: __dirname + '/templates'
-    });
-
-    server.route({ method: 'GET', path: '/', handler: handler });
-});
-```
-
-### Jade
-
-```js
-const server = new Hapi.Server();
-server.connection({ port: 8000 });
-
-const rootHandler = function (request, reply) {
-
-    reply.view('index', {
-        title: 'examples/views/jade/index.js | Hapi ' + request.server.version,
-        message: 'Index - Hello World!'
-    });
-};
-
-const aboutHandler = function (request, reply) {
-
-    reply.view('about', {
-        title: 'examples/views/jade/index.js | Hapi ' + request.server.version,
-        message: 'About - Hello World!'
-    });
-};
-
-server.register(require('vision'), (err) => {
-
-    if (err) {
-        throw err;
-    }
-
-    server.views({
-        engines: { jade: require('jade') },
-        path: __dirname + '/templates',
-        compileOptions: {
-            pretty: true
-        }
-    });
-
-    server.route({ method: 'GET', path: '/', handler: rootHandler });
-    server.route({ method: 'GET', path: '/about', handler: aboutHandler });
-});
-```
-
-### Marko
-**NOTE:** Async example: examples/views/marko/index-async.js
-
-**NOTE:** Alternative example: examples/views/marko/index-alter.js
-
-```js
-const Marko = require('marko/node-require');
-const server = new Hapi.Server();
-server.connection({ port: 8000 });
-
-Marko.install({
-    compilerOptions: {
-        preserveWhitespace: true,
-        writeToDisk: false
-    }
-});
-
-const rootHandler = function (request, reply) {
-
-    reply.view('index', {
-        title: 'examples/views/marko/index.js | Hapi ' + request.server.version,
-        message: 'Index - Hello World!'
-    });
-};
-
-server.register(require('vision'), (err) => {
-
-    if (err) {
-        throw err;
-    }
-
-    server.views({
-        engines: {
-            marko: {
-                compile: function (template, options) {
-
-                    const template = require(options.filename);
-
-                    return function (context) {
-
-                        return template.renderToString(context);
-                    };
-                }
-            }
-        },
+        engines: { html: Handlebars },
         relativeTo: __dirname,
-        path: 'templates'
+        path: 'examples/handlebars/templates/basic'
     });
 
     server.route({ method: 'GET', path: '/', handler: rootHandler });
-});
+
+    await server.start();
+    console.log('Server running at:', server.info.uri);
+};
+
+provision();
+```
+
+### Pug
+
+```js
+const Hapi = require('hapi');
+const Vision = require('vision');
+const Pug = require('pug');
+
+const server = Hapi.Server({ port: 3000 });
+
+const rootHandler = (request, h) => {
+
+    return h.view('index', {
+        title: 'examples/pug/templates | Hapi ' + request.server.version,
+        message: 'Hello Pug!'
+    });
+};
+
+const provision = async () => {
+
+    await server.register(Vision);
+
+    server.views({
+        engines: { pug: Pug },
+        relativeTo: __dirname,
+        path: 'examples/pug/templates'
+    });
+
+    server.route({ method: 'GET', path: '/', handler: rootHandler });
+
+    await server.start();
+    console.log('Server running at:', server.info.uri);
+};
+
+provision();
 ```
 
 ### Mustache
 
 ```js
-const server = new Hapi.Server();
-server.connection({ port: 8000 });
+const Hapi = require('hapi');
+const Vision = require('vision');
+const Mustache = require('mustache');
 
-const rootHandler = function (request, reply) {
+const server = Hapi.Server({ port: 3000 });
 
-    reply.view('index', {
-        title: 'examples/views/mustache/index.js | Hapi ' + request.server.version,
-        message: 'Index - Hello World!'
+const rootHandler = (request, h) => {
+
+    return h.view('index', {
+        title: 'examples/mustache/templates/basic | Hapi ' + request.server.version,
+        message: 'Hello Mustache!'
     });
 };
 
-server.register(require('vision'), (err) => {
+const provision = async () => {
 
-    if (err) {
-        throw err;
-    }
+    await server.register(Vision);
 
     server.views({
         engines: {
             html: {
-                compile: function (template) {
+                compile: (template) => {
 
                     Mustache.parse(template);
 
-                    return function (context) {
+                    return (context) => {
 
                         return Mustache.render(template, context);
                     };
@@ -232,56 +220,69 @@ server.register(require('vision'), (err) => {
             }
         },
         relativeTo: __dirname,
-        path: 'templates'
+        path: 'examples/mustache/templates/basic'
     });
 
     server.route({ method: 'GET', path: '/', handler: rootHandler });
-});
+
+    await server.start();
+    console.log('Server running at:', server.info.uri);
+};
+
+provision();
 ```
 
 ### Nunjucks
 
 ```js
-const server = new Hapi.Server();
-server.connection({ port: 8000 });
+const Hapi = require('hapi');
+const Vision = require('vision');
+const Nunjucks = require('nunjucks');
 
-const rootHandler = function (request, reply) {
+const server = Hapi.Server({ port: 3000 });
 
-    reply.view('index', {
-        title: 'examples/views/nunjucks/index.js | Hapi ' + request.server.version,
-        message: 'Index - Hello World!'
+const rootHandler = (request, h) => {
+
+    return h.view('index', {
+        title: 'examples/nunjucks/templates | Hapi ' + request.server.version,
+        message: 'Hello Nunjucks!'
     });
 };
 
-server.register(require('vision'), (err) => {
+const provision = async () => {
 
-    if (err) {
-        throw err;
-    }
+    await server.register(Vision);
 
     server.views({
         engines: {
             html: {
-                compile: function (src, options) {
+                compile: (src, options) => {
 
-                    var template = Nunjucks.compile(src, options.environment);
+                    const template = Nunjucks.compile(src, options.environment);
 
-                    return function (context) {
+                    return (context) => {
 
                         return template.render(context);
                     };
                 },
 
-                prepare: function (options, next) {
+                prepare: (options, next) => {
 
                     options.compileOptions.environment = Nunjucks.configure(options.path, { watch : false });
+
                     return next();
                 }
             }
         },
-        path: Path.join(__dirname, 'templates')
+        relativeTo: __dirname,
+        path: 'examples/nunjucks/templates'
     });
 
     server.route({ method: 'GET', path: '/', handler: rootHandler });
-});
+
+    await server.start();
+    console.log('Server running at:', server.info.uri);
+};
+
+provision();
 ```
