@@ -53,6 +53,6 @@ module.exports = class Pages {
         return {
             name: file,
             contents: contents.toString()
-        }
+        };
     }
 };
