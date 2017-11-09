@@ -3,48 +3,43 @@
 
 const Hapi = require('hapi');
 const Vision = require('../..');
+const Ejs = require('ejs');
 
 
 // Declare internals
 
 const internals = {};
 
+const today = new Date();
+internals.thisYear = today.getFullYear();
 
-const rootHandler = function (request, reply) {
 
-    reply.view('index', {
-        title: 'examples/views/ejs/basic.js | Hapi ' + request.server.version,
-        message: 'Index - Hello World!'
+const rootHandler = (request, h) => {
+
+    return h.view('basic/index', {
+        title: 'Running examples/ejs/templates/basic | Hapi ' + request.server.version,
+        message: 'Hello Ejs!',
+        year: internals.thisYear
     });
 };
 
 
-internals.main = function () {
+internals.main = async () => {
 
-    const server = new Hapi.Server();
-    server.connection({ port: 8000 });
-    server.register(Vision, (err) => {
+    const server = Hapi.Server({ port: 3000 });
 
-        if (err) {
-            throw err;
-        }
+    await server.register(Vision);
 
-        server.views({
-            engines: { ejs: require('ejs') },
-            relativeTo: __dirname,
-            path: 'templates/basic'
-        });
-
-        server.route({ method: 'GET', path: '/', handler: rootHandler });
-        server.start((err) => {
-
-            if (err) {
-                throw err;
-            }
-
-            console.log('Server is listening at ' + server.info.uri);
-        });
+    server.views({
+        engines: { ejs: Ejs },
+        relativeTo: __dirname,
+        path: 'templates'
     });
+
+    server.route({ method: 'GET', path: '/', handler: rootHandler });
+
+    await server.start();
+    console.log('Server is running at ' + server.info.uri);
 };
 
 

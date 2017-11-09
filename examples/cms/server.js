@@ -14,16 +14,15 @@ const Pages = new PagesClass(`${__dirname}/_pages`);
 const internals = {};
 
 const today = new Date();
-const thisYear = today.getFullYear();
+internals.thisYear = today.getFullYear();
 
 
 const getTplArgs = (argsToAppend) => {
 
-    console.log('thisYear', thisYear);
     return Object.assign(
         {},
         argsToAppend,
-        { year: thisYear }
+        { year: internals.thisYear }
     );
 };
 
@@ -84,7 +83,7 @@ const updatePage = (request, h) => {
 };
 
 
-internals.provision = async () => {
+internals.main = async () => {
 
     const server = Hapi.Server({
         port: 3000,
@@ -108,8 +107,8 @@ internals.provision = async () => {
     server.route({ method: 'POST', path: '/pages/{page}/edit', handler: updatePage });
 
     await server.start();
-    console.log('Server is listening at ' + server.info.uri);
+    console.log('Server is running at ' + server.info.uri);
 };
 
 
-internals.provision();
+internals.main();
