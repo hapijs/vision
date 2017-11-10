@@ -30,7 +30,7 @@ const rootHandler = (request, h) => {
 
 internals.main = async () => {
 
-    const server = Hapi.Server({port: 3000});
+    const server = Hapi.Server({ port: 3000 });
 
     await server.register(Vision);
 
@@ -52,7 +52,7 @@ internals.main = async () => {
         path: `templates/${internals.templatePath}`
     });
 
-    server.route({method: 'GET', path: '/', handler: rootHandler});
+    server.route({ method: 'GET', path: '/', handler: rootHandler });
 
     await server.start();
     console.log('Server is running at ' + server.info.uri);
