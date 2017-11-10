@@ -2,62 +2,60 @@
 // Load modules
 
 const Hapi = require('hapi');
-const Marko = require('marko');
 const Vision = require('../..');
+const Path = require('path');
+const Marko = require('marko');
 
 
 // Declare internals
 
-const internals = {};
+const internals = {
+    templatePath: '.'
+};
+
+const today = new Date();
+internals.thisYear = today.getFullYear();
 
 
-const handler = function (request, reply) {
+const rootHandler = (request, h) => {
 
-    reply.view('index', {
-        title: 'examples/views/marko/basic.js | Hapi ' + request.server.version,
-        message: 'Hello World!'
+    const relativePath = Path.relative(`${__dirname}/../..`, `${__dirname}/templates/${internals.templatePath}`);
+
+    return h.view('index', {
+        title: `Running ${relativePath} | Hapi ${request.server.version}`,
+        message: 'Hello Marko!',
+        year: internals.thisYear
     });
 };
 
+internals.main = async () => {
 
-internals.main = function () {
+    const server = Hapi.Server({ port: 3000 });
 
-    const server = new Hapi.Server();
-    server.connection({ port: 8000 });
-    server.register(Vision, (err) => {
+    await server.register(Vision);
 
-        if (err) {
-            throw err;
-        }
+    server.views({
+        engines: {
+            html: {
+                compile: (src, options) => {
 
-        server.views({
-            engines: {
-                html: {
-                    compile: function (src, options) {
+                    const template = Marko.load(options.filename);
 
-                        const template = Marko.load(options.filename, src);
+                    return (context) => {
 
-                        return function (context) {
-
-                            return template.renderSync(context);
-                        };
-                    }
+                        return template.renderToString(context);
+                    };
                 }
-            },
-            path: __dirname + '/templates'
-        });
-
-        server.route({ method: 'GET', path: '/', handler });
-        server.start((err) => {
-
-            if (err) {
-                throw err;
             }
-
-            console.log('Server is listening at ' + server.info.uri);
-        });
+        },
+        relativeTo: __dirname,
+        path: `templates/${internals.templatePath}`
     });
-};
 
+    server.route({ method: 'GET', path: '/', handler: rootHandler });
+
+    await server.start();
+    console.log('Server is running at ' + server.info.uri);
+};
 
 internals.main();
