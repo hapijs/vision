@@ -1,19 +1,21 @@
-var React = require('react');
-var Head = require('./includes/head.jsx');
-var Foot = require('./includes/foot.jsx');
+const React = require('react');
+const T = require('prop-types');
 
-var Component = React.createClass({
-  render: function() {
-    return (
-      <html>
-        <Head />
-        <body>
-          {this.props.children}
-          <Foot />
-        </body>
-      </html>
-    );
-  }
-});
+const Head = require('./includes/head.jsx');
+const Foot = require('./includes/foot.jsx');
 
-module.exports = Component;
+module.exports = class Layout extends React.PureComponent {
+
+    render() {
+
+        return (
+            <html>
+                <Head />
+                <body>
+                    {this.props.children}
+                </body>
+                <Foot year={this.props.year}/>
+            </html>
+        );
+    }
+};

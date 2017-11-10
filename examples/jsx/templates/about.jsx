@@ -1,19 +1,16 @@
-var React = require('react');
-var Head = require('./includes/head.jsx');
-var Foot = require('./includes/foot.jsx');
+const React = require('react');
 
-var Component = React.createClass({
-  render: function() {
-    return (
-      <html>
-        <Head />
-        <body>
-          {this.props.children}
-        </body>
-        <Foot />
-      </html>
-    );
-  }
-});
+const Layout = require('./layout.jsx');
 
-module.exports = Component;
+module.exports = class AboutPageComponent extends React.PureComponent {
+
+    render() {
+
+        return (
+            <Layout year={this.props.year}>
+                <h1>{this.props.title}</h1>
+                <p>{this.props.message}</p>
+            </Layout>
+        );
+    }
+};

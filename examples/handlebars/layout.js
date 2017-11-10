@@ -10,16 +10,16 @@ const Handlebars = require('handlebars');
 // Declare internals
 
 const internals = {
-    templateName: 'withLayout'
+    templatePath: 'withLayout'
 };
 
 const today = new Date();
 internals.thisYear = today.getFullYear();
 
 
-const rootHandler = function (request, h) {
+const rootHandler = (request, h) => {
 
-    const relativePath = Path.relative(`${__dirname}/../..`, `${__dirname}/templates/${internals.templateName}`)
+    const relativePath = Path.relative(`${__dirname}/../..`, `${__dirname}/templates/${internals.templatePath}`);
 
     return h.view('index', {
         title: `Running ${relativePath} | Hapi ${request.server.version}`,

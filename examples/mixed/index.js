@@ -3,63 +3,64 @@
 
 const Hapi = require('hapi');
 const Vision = require('../..');
-
+const Path = require('path');
+const Handlebars = require('handlebars');
+const Pug = require('pug');
 
 // Declare internals
 
-const internals = {};
-
-
-const indexHandler = function (request, reply) {
-
-    reply.view('index.html');
+const internals = {
+    templatePath: '.'
 };
 
-const oneHandler = function (request, reply) {
+const today = new Date();
+internals.thisYear = today.getFullYear();
 
-    reply.view('index.jade');
+
+const indexHandler = (request, h) => {
+
+    return h.view('index.html');
 };
 
-const twoHandler = function (request, reply) {
+const oneHandler = (request, h) => {
 
-    reply.view('handlebars.html');
+    return h.view('index.pug');
+};
+
+const twoHandler = (request, h) => {
+
+    return h.view('handlebars.html');
 };
 
 
-internals.main = function () {
+internals.main = async () => {
 
-    const server = new Hapi.Server();
-    server.connection({ port: 8000 });
-    server.register(Vision, (err) => {
+    const server = Hapi.Server({ port: 3000 });
 
-        if (err) {
-            throw err;
+    await server.register(Vision);
+
+    const relativePath = Path.relative(`${__dirname}/../..`, `${__dirname}/templates/${internals.templatePath}`);
+
+    server.views({
+        engines: {
+            'html': Handlebars,
+            'pug': Pug
+        },
+        relativeTo: __dirname,
+        path: `templates/${internals.templatePath}`,
+        context: {
+            title: `Running ${relativePath} | Hapi ${server.version}`,
+            message: 'Hello Mixed Engines!',
+            year: internals.thisYear
         }
-
-        server.views({
-            engines: {
-                'html': require('handlebars'),
-                'jade': require('jade')
-            },
-            path: __dirname + '/templates',
-            context: {
-                title: 'examples/views/mixed | Hapi ' + server.version,
-                message: 'Hello World!'
-            }
-        });
-
-        server.route({ method: 'GET', path: '/', handler: indexHandler });
-        server.route({ method: 'GET', path: '/one', handler: oneHandler });
-        server.route({ method: 'GET', path: '/two', handler: twoHandler });
-        server.start((err) => {
-
-            if (err) {
-                throw err;
-            }
-
-            console.log('Server is listening at ' + server.info.uri);
-        });
     });
+
+    server.route({ method: 'GET', path: '/', handler: indexHandler });
+    server.route({ method: 'GET', path: '/one', handler: oneHandler });
+    server.route({ method: 'GET', path: '/two', handler: twoHandler });
+
+    await server.start();
+    console.log('Server is running at ' + server.info.uri);
 };
 
 

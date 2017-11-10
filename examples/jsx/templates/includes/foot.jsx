@@ -1,13 +1,14 @@
-var React = require('react');
+const React = require('react');
 
-var Component = React.createClass({
-  render: function() {
-    return (
-      <div id="footer">
-        <p>hapi.js 203</p>
-      </div>
-    );
-  }
-});
+module.exports = class FootComponent extends React.PureComponent {
 
-module.exports = Component;
+    render() {
+
+        return (
+            <footer>
+                Footer component
+                <p>@ hapi visionaries {this.props.year}</p>
+            </footer>
+        );
+    }
+};

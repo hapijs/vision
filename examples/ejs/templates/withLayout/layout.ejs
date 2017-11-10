@@ -1,6 +1,7 @@
 <html>
-<body>
-<%- content %>
-<%- include('includes/foot', { year: year }); %>
-</body>
+    <body>
+        <%- include('includes/head'); %>
+        <%- content %>
+        <%- include('includes/foot', { year: year }); %>
+    </body>
 </html>

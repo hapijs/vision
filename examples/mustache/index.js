@@ -4,13 +4,13 @@
 const Hapi = require('hapi');
 const Vision = require('../..');
 const Path = require('path');
-const Handlebars = require('handlebars');
+const Mustache = require('mustache');
 
 
 // Declare internals
 
 const internals = {
-    templatePath: 'withPartials'
+    templatePath: 'basic'
 };
 
 const today = new Date();
@@ -23,7 +23,7 @@ const rootHandler = (request, h) => {
 
     return h.view('index', {
         title: `Running ${relativePath} | Hapi ${request.server.version}`,
-        message: 'Hello Handlebars Partials!',
+        message: 'Hello Mustache!',
         year: internals.thisYear
     });
 };
@@ -36,10 +36,21 @@ internals.main = async () => {
     await server.register(Vision);
 
     server.views({
-        engines: { html: Handlebars },
+        engines: {
+            html: {
+                compile: function (template) {
+
+                    Mustache.parse(template);
+
+                    return function (context) {
+
+                        return Mustache.render(template, context);
+                    };
+                }
+            }
+        },
         relativeTo: __dirname,
-        path: 'templates/withPartials',
-        partialsPath: 'templates/withPartials/partials'
+        path: `templates/${internals.templatePath}`
     });
 
     server.route({ method: 'GET', path: '/', handler: rootHandler });

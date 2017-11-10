@@ -2,70 +2,69 @@
 // Load modules
 
 const Hapi = require('hapi');
-const Mustache = require('mustache');
 const Vision = require('../..');
+const Path = require('path');
+const Mustache = require('mustache');
 
 
 // Declare internals
 
-const internals = {};
+const internals = {
+    templatePath: 'withPartials'
+};
+
+const today = new Date();
+internals.thisYear = today.getFullYear();
 
 
-const rootHandler = function (request, reply) {
+const rootHandler = (request, h) => {
 
-    reply.view('index', {
-        title: 'examples/views/mustache/partials.js | Hapi ' + request.server.version,
-        message: 'Index - Hello World!'
+    const relativePath = Path.relative(`${__dirname}/../..`, `${__dirname}/templates/${internals.templatePath}`);
+
+    return h.view('index', {
+        title: `Running ${relativePath} | Hapi ${request.server.version}`,
+        message: 'Hello Mustache Partials!',
+        year: internals.thisYear
     });
 };
 
 
-internals.main = function () {
+internals.main = async () => {
 
-    const server = new Hapi.Server();
-    server.connection({ port: 8000 });
-    server.register(Vision, (err) => {
+    const server = Hapi.Server({ port: 3000 });
 
-        if (err) {
-            throw err;
-        }
+    await server.register(Vision);
 
-        const partials = {};
+    const partials = {};
 
-        server.views({
-            engines: {
-                html: {
-                    compile: function (template) {
+    server.views({
+        engines: {
+            html: {
+                compile: function (template) {
 
-                        Mustache.parse(template);
+                    Mustache.parse(template);
 
-                        return function (context) {
+                    return function (context) {
 
-                            return Mustache.render(template, context, partials);
-                        };
-                    },
+                        return Mustache.render(template, context, partials);
+                    };
+                },
 
-                    registerPartial: function (name, src) {
+                registerPartial: function (name, src) {
 
-                        partials[name] = src;
-                    }
+                    partials[name] = src;
                 }
-            },
-            relativeTo: __dirname,
-            path: 'templates/withPartials',
-            partialsPath: 'templates/withPartials/partials'
-        });
-
-        server.route({ method: 'GET', path: '/', handler: rootHandler });
-        server.start((err) => {
-
-            if (err) {
-                throw err;
             }
-
-            console.log('Server is listening at ' + server.info.uri);
-        });
+        },
+        relativeTo: __dirname,
+        path: `templates/${internals.templatePath}`,
+        partialsPath: `templates/${internals.templatePath}/partials`
     });
+
+    server.route({ method: 'GET', path: '/', handler: rootHandler });
+
+    await server.start();
+    console.log('Server is running at ' + server.info.uri);
 };
 
 
