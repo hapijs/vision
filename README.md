@@ -13,7 +13,7 @@ methods for managing view engines that can be used to render templated responses
 
 **vision** also provides a built-in [handler](https://github.com/hapijs/hapi/blob/master/API.md#-serverdecoratetype-property-method-options) implementation for creating templated responses.
 
-### Usage
+## Usage
 > See also the [API Reference](./API.md)
 
 ```js
@@ -34,14 +34,43 @@ provision();
 ```
 **NOTE:** Vision is included with and loaded by default in Hapi < 9.0.
 
-- [Examples](#examples)
-    - [EJS](#ejs)
-    - [Handlebars](#handlebars)
-    - [Pug](#pug)
-    - [Mustache](#mustache)
-    - [Nunjucks](#nunjucks)
-
 ## Examples
+
+The examples in the `examples` folder can be run with `node`.
+```
+git clone https://github.com/hapijs/vision.git && cd vision
+npm install
+
+node examples/handlebars
+```
+
+:point_up: That command will run the handlebars basic template.
+There are three more examples in there: for helpers, layout, and partials.
+
+Use this hierarchy to know which commands to run, e.g.
+```
+node examples/mustache
+node examples/mustache/partials
+node examples/jsx
+```
+
+```
+- cms // A bare-bones Content Management System with a WYSIWYG editor
+- ejs
+  - layout
+- handlebars
+  - helpers
+  - layout
+  - partials
+- jsx // React server-side rendering
+- marko
+- mixed // Using multiple render engines (handlebars and pug)
+- mustache
+  - layout
+  - partials
+- nunjucks
+- pug
+```
 
 **vision** is compatible with most major templating engines out of the box. Engines that don't follow
 the normal API pattern can still be used by mapping their API to the **vision** API. Working code for
