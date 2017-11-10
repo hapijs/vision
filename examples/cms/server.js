@@ -31,7 +31,10 @@ const getViewSimpleHandler = (viewName) => {
 
     return (request, h) => {
 
-        return h.view(viewName, getTplArgs({ title: viewName }));
+        return h.view(viewName, getTplArgs({
+            page: Pages.getPage(request.params.page),
+            title: viewName
+        }));
     };
 };
 
