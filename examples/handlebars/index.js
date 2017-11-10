@@ -10,16 +10,16 @@ const Handlebars = require('handlebars');
 // Declare internals
 
 const internals = {
-    templateName: 'basic'
+    templatePath: 'basic'
 };
 
 const today = new Date();
 internals.thisYear = today.getFullYear();
 
 
-const rootHandler = function (request, h) {
+const rootHandler = (request, h) => {
 
-    const relativePath = Path.relative(`${__dirname}/../..`, `${__dirname}/templates/${internals.templateName}`)
+    const relativePath = Path.relative(`${__dirname}/../..`, `${__dirname}/templates/${internals.templatePath}`);
 
     return h.view('index', {
         title: `Running ${relativePath} | Hapi ${request.server.version}`,
@@ -38,7 +38,7 @@ internals.main = async () => {
     server.views({
         engines: { html: Handlebars },
         relativeTo: __dirname,
-        path: 'templates/basic'
+        path: `templates/${internals.templatePath}`
     });
 
     server.route({ method: 'GET', path: '/', handler: rootHandler });

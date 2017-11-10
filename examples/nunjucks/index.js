@@ -2,68 +2,66 @@
 // Load modules
 
 const Hapi = require('hapi');
-const Nunjucks = require('nunjucks');
-const Path = require('path');
 const Vision = require('../..');
+const Path = require('path');
+const Nunjucks = require('nunjucks');
 
 
 // Declare internals
 
-const internals = {};
+const internals = {
+    templatePath: '.'
+};
+
+const today = new Date();
+internals.thisYear = today.getFullYear();
 
 
-const rootHandler = function (request, reply) {
+const rootHandler = (request, h) => {
 
-    reply.view('index', {
-        title: 'examples/views/nunjucks/index.js | Hapi ' + request.server.version,
-        message: 'Index - Hello World!'
+    const relativePath = Path.relative(`${__dirname}/../..`, `${__dirname}/templates/${internals.templatePath}`);
+
+    return h.view('index', {
+        title: `Running ${relativePath} | Hapi ${request.server.version}`,
+        message: 'Hello Nunjucks!',
+        year: internals.thisYear
     });
 };
 
 
-internals.main = function () {
+internals.main = async () => {
 
-    const server = new Hapi.Server();
-    server.connection({ port: 8000 });
-    server.register(Vision, (err) => {
+    const server = Hapi.Server({ port: 3000 });
 
-        if (err) {
-            throw err;
-        }
+    await server.register(Vision);
 
-        server.views({
-            engines: {
-                html: {
-                    compile: function (src, options) {
+    server.views({
+        engines: {
+            html: {
+                compile: (src, options) => {
 
-                        const template = Nunjucks.compile(src, options.environment);
+                    const template = Nunjucks.compile(src, options.environment);
 
-                        return function (context) {
+                    return (context) => {
 
-                            return template.render(context);
-                        };
-                    },
+                        return template.render(context);
+                    };
+                },
 
-                    prepare: function (options, next) {
+                prepare: (options, next) => {
 
-                        options.compileOptions.environment = Nunjucks.configure(options.path, { watch: false });
-                        return next();
-                    }
+                    options.compileOptions.environment = Nunjucks.configure(options.path, { watch: false });
+                    return next();
                 }
-            },
-            path: Path.join(__dirname, 'templates')
-        });
-
-        server.route({ method: 'GET', path: '/', handler: rootHandler });
-        server.start((err) => {
-
-            if (err) {
-                throw err;
             }
-
-            console.log('Server is listening at ' + server.info.uri);
-        });
+        },
+        path: `${__dirname}/templates`
     });
+
+    server.route({ method: 'GET', path: '/', handler: rootHandler });
+
+    await server.start();
+    console.log('Server is running at ' + server.info.uri);
 };
 
 

@@ -1,62 +1,49 @@
 'use strict';
-
 // Load modules
 
 const Hapi = require('hapi');
 const Vision = require('../..');
+const Path = require('path');
+const Pug = require('pug');
 
 
 // Declare internals
 
-const internals = {};
+const internals = {
+    templatePath: '.'
+};
+
+const today = new Date();
+internals.thisYear = today.getFullYear();
 
 
-const rootHandler = function (request, reply) {
+const rootHandler = (request, h) => {
 
-    reply.view('index', {
-        title: 'examples/views/pug/index.js | Hapi ' + request.server.version,
-        message: 'Index - Hello World!'
+    const relativePath = Path.relative(`${__dirname}/../..`, `${__dirname}/templates/${internals.templatePath}`);
+
+    return h.view('index', {
+        title: `Running ${relativePath} | Hapi ${request.server.version}`,
+        message: 'Hello Pug!',
+        year: internals.thisYear
     });
 };
 
-const aboutHandler = function (request, reply) {
+internals.main = async () => {
 
-    reply.view('about', {
-        title: 'examples/views/pug/index.js | Hapi ' + request.server.version,
-        message: 'About - Hello World!'
+    const server = Hapi.Server({ port: 3000 });
+
+    await server.register(Vision);
+
+    server.views({
+        engines: { pug: Pug },
+        relativeTo: __dirname,
+        path: `templates/${internals.templatePath}`
     });
-};
 
+    server.route({ method: 'GET', path: '/', handler: rootHandler });
 
-internals.main = function () {
-
-    const server = new Hapi.Server();
-    server.connection({ port: 8000 });
-    server.register(Vision, (err) => {
-
-        if (err) {
-            throw err;
-        }
-
-        server.views({
-            engines: { pug: require('pug') },
-            path: __dirname + '/templates',
-            compileOptions: {
-                pretty: true
-            }
-        });
-
-        server.route({ method: 'GET', path: '/', handler: rootHandler });
-        server.route({ method: 'GET', path: '/about', handler: aboutHandler });
-        server.start((err) => {
-
-            if (err) {
-                throw err;
-            }
-
-            console.log('Server is listening at ' + server.info.uri);
-        });
-    });
+    await server.start();
+    console.log('Server is running at ' + server.info.uri);
 };
 
 

@@ -1,13 +1,17 @@
-var React = require('react');
+const React = require('react');
 
-var Component = React.createClass({
-  render: function() {
-    return (
-      <head>
-        <script src='//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js' />
-      </head>
-    );
-  }
-});
+module.exports = class HeadComponent extends React.PureComponent {
 
-module.exports = Component;
+    render() {
+        return (
+            <header>
+                <h3>Head component</h3>
+                <nav>
+                    <a href='/'>Index</a>
+                    <br />
+                    <a href='/about'>About</a>
+                </nav>
+            </header>
+        );
+    }
+};

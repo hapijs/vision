@@ -1,15 +1,15 @@
-var React = require('react');
-var Layout = require('./layout.jsx');
+const React = require('react');
+const Layout = require('./layout.jsx');
 
-var Component = React.createClass({
-  render: function() {
-    return (
-      <Layout>
-        <h1>{this.props.title}</h1>
-        <p>{this.props.message}</p>
-      </Layout>
-    );
-  }
-});
+module.exports = class IndexPage extends React.PureComponent {
 
-module.exports = Component;
+    render() {
+
+        return (
+            <Layout year={this.props.year}>
+                <h1>{this.props.title}</h1>
+                <p>{this.props.message}</p>
+            </Layout>
+        );
+    }
+};

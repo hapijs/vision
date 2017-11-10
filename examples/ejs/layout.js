@@ -3,12 +3,15 @@
 
 const Hapi = require('hapi');
 const Vision = require('../..');
+const Path = require('path');
 const Ejs = require('ejs');
 
 
 // Declare internals
 
-const internals = {};
+const internals = {
+    templatePath: 'withLayout'
+};
 
 const today = new Date();
 internals.thisYear = today.getFullYear();
@@ -16,8 +19,10 @@ internals.thisYear = today.getFullYear();
 
 const rootHandler = (request, h) => {
 
+    const relativePath = Path.relative(`${__dirname}/../..`, `${__dirname}/templates/${internals.templatePath}`);
+
     return h.view('index', {
-        title: 'Running examples/ejs/templates/withLayout | Hapi ' + request.server.version,
+        title: `Running ${relativePath} | Hapi ${request.server.version}`,
         message: 'Hello Ejs Layout!',
         year: internals.thisYear
     });
@@ -33,7 +38,7 @@ internals.main = async () => {
     server.views({
         engines: { ejs: Ejs },
         relativeTo: __dirname,
-        path: 'templates/withLayout',
+        path: `templates/${internals.templatePath}`,
         layout: true
     });
 

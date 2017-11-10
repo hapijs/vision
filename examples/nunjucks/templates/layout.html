@@ -1,8 +1,13 @@
 <html>
-{% include "includes/head.html" %}
-<body>
-{% block content %}
-{% endblock %}
-{% include "includes/foot.html" %}
-</body>
+    <body>
+        {% include 'includes/head.html' %}
+        <div>
+            <p>Layout header</p>
+            {% block content %}
+                Default content -- should not show up!
+            {% endblock %}
+            <p>Layout footer</p>
+        </div>
+        {% include 'includes/foot.html' %}
+    </body>
 </html>
