@@ -73,8 +73,7 @@ node examples/jsx
 ```
 
 **vision** is compatible with most major templating engines out of the box. Engines that don't follow
-the normal API pattern can still be used by mapping their API to the **vision** API. Working code for
-the following examples can be found in the [examples directory](./examples).
+the normal API pattern can still be used by mapping their API to the [**vision** API](./API.md). Some of the examples below use the `compile` and `prepare` methods which are part of the API.
 
 ### EJS
 
