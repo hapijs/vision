@@ -3,49 +3,48 @@
 
 const Hapi = require('hapi');
 const Vision = require('../..');
-
+const Path = require('path');
+const Handlebars = require('handlebars');
 
 // Declare internals
 
-const internals = {};
+const internals = {
+    templateName: 'withHelpers'
+};
+
+const today = new Date();
+internals.thisYear = today.getFullYear();
 
 
-const handler = function (request, reply) {
+const rootHandler = function (request, h) {
 
-    reply.view('index', {
-        title: 'examples/views/handlebars/helpers.js | Hapi ' + request.server.version,
-        message: 'Hello World!'
+    const relativePath = Path.relative(`${__dirname}/../..`, `${__dirname}/templates/${internals.templateName}`);
+
+    return h.view('index', {
+        title: `Running ${relativePath} | Hapi ${request.server.version}`,
+        message: 'Hello Handlebars Helper!',
+        year: internals.thisYear
     });
 };
 
 
-internals.main = function () {
+internals.main = async () => {
 
-    const server = new Hapi.Server();
-    server.connection({ port: 8000 });
-    server.register(Vision, (err) => {
+    const server = Hapi.Server({ port: 3000 });
 
-        if (err) {
-            throw err;
-        }
+    await server.register(Vision);
 
-        server.views({
-            engines: { html: require('handlebars') },
-            relativeTo: __dirname,
-            path: 'templates/withHelpers',
-            helpersPath: 'templates/withHelpers/helpers'
-        });
-
-        server.route({ method: 'GET', path: '/', handler });
-        server.start((err) => {
-
-            if (err) {
-                throw err;
-            }
-
-            console.log('Server is listening at ' + server.info.uri);
-        });
+    server.views({
+        engines: { html: Handlebars },
+        relativeTo: __dirname,
+        path: 'templates/withHelpers',
+        helpersPath: 'templates/withHelpers/helpers'
     });
+
+    server.route({ method: 'GET', path: '/', handler: rootHandler });
+
+    await server.start();
+    console.log('Server is running at ' + server.info.uri);
 };
 
 

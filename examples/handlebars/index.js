@@ -3,21 +3,26 @@
 
 const Hapi = require('hapi');
 const Vision = require('../..');
+const Path = require('path');
 const Handlebars = require('handlebars');
 
 
 // Declare internals
 
-const internals = {};
+const internals = {
+    templateName: 'basic'
+};
 
 const today = new Date();
 internals.thisYear = today.getFullYear();
 
 
-const handler = (request, h) => {
+const rootHandler = function (request, h) {
+
+    const relativePath = Path.relative(`${__dirname}/../..`, `${__dirname}/templates/${internals.templateName}`)
 
     return h.view('index', {
-        title: 'Running examples/handlebars/templates/basic | Hapi ' + request.server.version,
+        title: `Running ${relativePath} | Hapi ${request.server.version}`,
         message: 'Hello Handlebars!',
         year: internals.thisYear
     });
@@ -26,7 +31,7 @@ const handler = (request, h) => {
 
 internals.main = async () => {
 
-    const server = new Hapi.Server({ port: 3000 });
+    const server = Hapi.Server({ port: 3000 });
 
     await server.register(Vision);
 
@@ -36,7 +41,7 @@ internals.main = async () => {
         path: 'templates/basic'
     });
 
-    server.route({ method: 'GET', path: '/', handler });
+    server.route({ method: 'GET', path: '/', handler: rootHandler });
 
     await server.start();
     console.log('Server is running at ' + server.info.uri);
