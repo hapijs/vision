@@ -130,7 +130,7 @@ const server = Hapi.Server({ port: 3000 });
 const rootHandler = (request, h) => {
 
     return h.view('index', {
-        title: 'examples/pug/templates/basic | Hapi ' + request.server.version,
+        title: 'examples/pug/templates | Hapi ' + request.server.version,
         message: 'Hello Pug!'
     });
 };
@@ -142,7 +142,7 @@ const provision = async () => {
     server.views({
         engines: { pug: Pug },
         relativeTo: __dirname,
-        path: 'examples/pug/templates/basic'
+        path: 'examples/pug/templates'
     });
 
     server.route({ method: 'GET', path: '/', handler: rootHandler });
@@ -214,7 +214,7 @@ const server = Hapi.Server({ port: 3000 });
 const rootHandler = (request, h) => {
 
     return h.view('index', {
-        title: 'examples/nunjucks/templates/basic | Hapi ' + request.server.version,
+        title: 'examples/nunjucks/templates | Hapi ' + request.server.version,
         message: 'Hello Nunjucks!'
     });
 };
@@ -245,7 +245,7 @@ const provision = async () => {
             }
         },
         relativeTo: __dirname,
-        path: 'examples/nunjucks/templates/basic'
+        path: 'examples/nunjucks/templates'
     });
 
     server.route({ method: 'GET', path: '/', handler: rootHandler });
