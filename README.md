@@ -6,7 +6,7 @@ Templates rendering plugin support for hapi.js.
 
 Lead Maintainer - [William Woodruff](https://github.com/wswoodruff)
 
-> README and examples updated to `hapi v17`
+> **vision** updated to `hapi v17.x.x`
 
 **vision** decorates the [server](https://github.com/hapijs/hapi/blob/master/API.md#server),
 [request](https://github.com/hapijs/hapi/blob/master/API.md#request-object), and
