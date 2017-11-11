@@ -41,7 +41,8 @@ internals.main = async () => {
         engines: { html: Handlebars },
         relativeTo: __dirname,
         path: `templates/${internals.templatePath}`,
-        helpersPath: `templates/${internals.templatePath}/helpers`
+        helpersPath: `templates/${internals.templatePath}/helpers`,
+        isCached: false
     });
 
     server.route({ method: 'GET', path: '/', handler: rootHandler });
