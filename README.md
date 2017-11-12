@@ -6,6 +6,8 @@ Templates rendering plugin support for hapi.js.
 
 Lead Maintainer - [William Woodruff](https://github.com/wswoodruff)
 
+> **vision** updated to `hapi v17.x.x`
+
 **vision** decorates the [server](https://github.com/hapijs/hapi/blob/master/API.md#server),
 [request](https://github.com/hapijs/hapi/blob/master/API.md#request-object), and
 `h` response [toolkit](https://github.com/hapijs/hapi/blob/master/API.md#response-toolkit) interfaces with additional
@@ -171,6 +173,56 @@ const provision = async () => {
         engines: { pug: Pug },
         relativeTo: __dirname,
         path: 'examples/pug/templates'
+    });
+
+    server.route({ method: 'GET', path: '/', handler: rootHandler });
+
+    await server.start();
+    console.log('Server running at:', server.info.uri);
+};
+
+provision();
+```
+
+### Marko
+
+```js
+const Hapi = require('hapi');
+const Vision = require('vision');
+const Marko = require('marko');
+
+const server = Hapi.Server({ port: 3000 });
+
+const rootHandler = (request, h) => {
+
+    return h.view('index', {
+        title: 'examples/marko/templates | Hapi ' + request.server.version,
+        message: 'Hello Marko!'
+    });
+};
+
+const provision = async () => {
+
+    await server.register(Vision);
+
+    server.views({
+        engines: {
+            marko: {
+                compile: (src, options) => {
+                
+                    const opts = { preserveWhitespace: true, writeToDisk: false };
+
+                    const template = Marko.load(options.filename, opts);
+
+                    return (context) => {
+
+                        return template.renderToString(context);
+                    };
+                }
+            }
+        },
+        relativeTo: __dirname,
+        path: 'examples/marko/templates'
     });
 
     server.route({ method: 'GET', path: '/', handler: rootHandler });
