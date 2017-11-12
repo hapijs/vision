@@ -39,9 +39,9 @@ internals.main = async () => {
             marko: {
                 compile: (src, options) => {
 
-                    const params = { preserveWhitespace: true, writeToDisk: false };
+                    const opts = { preserveWhitespace: true, writeToDisk: false };
 
-                    const template = Marko.load(options.filename, params);
+                    const template = Marko.load(options.filename, opts);
 
                     return (context) => {
 
