@@ -36,10 +36,12 @@ internals.main = async () => {
 
     server.views({
         engines: {
-            html: {
+            marko: {
                 compile: (src, options) => {
 
-                    const template = Marko.load(options.filename);
+                    const opts = { preserveWhitespace: true, writeToDisk: false };
+
+                    const template = Marko.load(options.filename, opts);
 
                     return (context) => {
 

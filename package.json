@@ -38,7 +38,7 @@
         "hapi": "17.x.x",
         "hapi-react-views": "^9.0.0",
         "lab": "15.x.x",
-        "marko": "3.x.x",
+        "marko": "4.x.x",
         "mustache": "2.x.x",
         "nunjucks": "2.x.0",
         "pug": ">=2.0.0-beta6",
