@@ -1678,8 +1678,83 @@ describe('Manager', () => {
             });
 
             expect(mutatedPartialsAndHelper).to.exist();
-
             expect(mutatedPartialsAndHelper).to.equal(' Nav:<nav>N4v With Changes</nav>|<nav>N3st3d With Changes</nav>\n<p>This is all AABCEEEINOPPRSTTUW and this is how we like it!</p>');
+
+            // Revert the mutations
+
+            await resetMutatedValues();
+
+            // Verify they've reverted correctly
+
+            const changedBack = await views.render('testHelpersAndPartials', {
+                mutateToUppercase: mutateToUppercaseVal
+            });
+
+            expect(changedBack).to.equal(originalPartialAndHelperValues);
+        });
+
+        it('does not recompile partials/helpers when caching is enabled', async () => {
+
+            const partialsPath = __dirname + '/templates/valid/partials';
+            const helpersPath = __dirname + '/templates/valid/helpers';
+
+            const originalPartialVal = '<nav>Nav</nav>';
+            const originalNestedPartialVal = '<nav>Nested</nav>';
+            const originalHelperVal = '\'use strict\';\n\nexports = module.exports = function (context) {\n\n    return context.toUpperCase();\n};\n';
+
+            const mutateToUppercaseVal = 'i want to be uppercase';
+
+            const resetMutatedValues = () => {
+
+                return new Promise((resolve, reject) => {
+
+                    Fs.writeFileSync(partialsPath + '/navToMutate.html', originalPartialVal);
+                    Fs.writeFileSync(partialsPath + '/nested/navToMutate.html', originalNestedPartialVal);
+                    Fs.writeFileSync(helpersPath + '/uppercaseToMutate.js', originalHelperVal);
+
+                    return resolve();
+                });
+            };
+
+            // Set everything correct to start in case a failed test leaves
+            // these in a mutated state
+
+            await resetMutatedValues();
+
+            const views = new Manager({
+                path: __dirname + '/templates/valid',
+                partialsPath,
+                helpersPath,
+                engines: {
+                    html: Handlebars
+                },
+                isCached: true
+            });
+
+            const originalPartialAndHelperValues = ' Nav:<nav>Nav</nav>|<nav>Nested</nav>\n<p>This is all I WANT TO BE UPPERCASE and this is how we like it!</p>';
+
+            const original = await views.render('testHelpersAndPartials', {
+                mutateToUppercase: mutateToUppercaseVal
+            });
+
+            expect(original).to.exist();
+            expect(original).to.equal(originalPartialAndHelperValues);
+
+            // Mutate the partials here
+
+            Fs.writeFileSync(partialsPath + '/navToMutate.html', '<nav>N4v With Changes</nav>');
+            Fs.writeFileSync(partialsPath + '/nested/navToMutate.html', '<nav>N3st3d With Changes</nav>');
+
+            // Mutate the helpers here
+
+            Fs.writeFileSync(helpersPath + '/uppercaseToMutate.js', '\'use strict\';\n\nexports = module.exports = function (context) {\n\n    return context.toUpperCase().split(\'\').sort().join(\'\').trim();\n};\n');
+
+            const mutatedPartialsAndHelper = await views.render('testHelpersAndPartials', {
+                mutateToUppercase: mutateToUppercaseVal
+            });
+
+            expect(mutatedPartialsAndHelper).to.exist();
+            expect(mutatedPartialsAndHelper).to.equal(originalPartialAndHelperValues);
 
             // Revert the mutations
 
