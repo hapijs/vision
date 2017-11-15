@@ -34,8 +34,8 @@ provision();
 ```
 
 ### Note:
-- Vision `5.x.x` requires at least hapi >= v17
-- Vision is included with and loaded by default in Hapi < 9.0.
+- Vision `5.x.x` requires hapi `17.x.x`. For use with hapi `16.x.x`, use vision `4.x.x`.
+- Vision is included with and loaded by default in Hapi < `9.0`.
 
 
 ## Examples
