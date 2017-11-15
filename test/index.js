@@ -437,14 +437,16 @@ describe('views()', () => {
         const test = {
             name: 'test',
 
-            register: function (server, options) {
+            register: async function (server, options) {
 
                 server.path(__dirname);
 
                 const views = {
                     engines: { 'html': Handlebars },
-                    path: './templates/plugin'
+                    path: __dirname + '/templates/plugin'
                 };
+
+                await server.register(Vision);
 
                 server.views(views);
 
@@ -539,7 +541,7 @@ describe('views()', () => {
         expect(() => {
 
             server.views({ engines: { 'html': Handlebars } });
-        }).to.throw('Cannot set views manager more than once');
+        }).to.throw('Cannot set views manager more than once per realm');
     });
 
     it('can register helpers via the view manager', async () => {
@@ -578,27 +580,102 @@ describe('views()', () => {
 
 describe('Plugin', () => {
 
-    it('only registers once', async () => {
+    it('registers multiple times', async () => {
 
         const one = {
             name: 'one',
-
             register: function (server, options) {
 
-                return server.register(Vision);
+                server.register({
+                    plugin: Vision,
+                    options: {
+                        engines: { 'html': Handlebars },
+                        relativeTo: Path.join(__dirname, '/templates'),
+                        path: 'valid'
+                    }
+                });
+
+                return server.route({
+                    path: '/viewPluginOne',
+                    method: 'GET',
+                    handler: (request, h) => {
+
+                        return h.view('test', { message: 'Plugin One' });
+                    }
+                });
             }
         };
 
         const two = {
             name: 'two',
-
             register: function (server, options) {
 
-                return server.register(Vision);
+                server.register({
+                    plugin: Vision,
+                    options: {
+                        engines: { 'html': Handlebars },
+                        relativeTo: Path.join(__dirname, '/templates'),
+                        path: 'valid'
+                    }
+                });
+
+                return server.route({
+                    path: '/viewPluginTwo',
+                    method: 'GET',
+                    handler: (request, h) => {
+
+                        return h.view('test', { message: 'Plugin Two' });
+                    }
+                });
             }
         };
 
         const server = Hapi.server();
         await server.register([one, two]);
+
+        server.register({
+            plugin: Vision,
+            options: {
+                engines: { 'html': Handlebars },
+                relativeTo: Path.join(__dirname, '/templates'),
+                path: 'valid'
+            }
+        });
+
+        server.route({
+            path: '/viewRootServer',
+            method: 'GET',
+            handler: (request, h) => {
+
+                return h.view('test', { message: 'Root Server' });
+            }
+        });
+
+        const resPlugin1 = await server.inject('/viewPluginOne');
+        const resPlugin2 = await server.inject('/viewPluginTwo');
+        const resRootServer = await server.inject('/viewRootServer');
+
+        expect(resPlugin1.result).to.equal('<div>\n    <h1>Plugin One</h1>\n</div>\n');
+        expect(resPlugin2.result).to.equal('<div>\n    <h1>Plugin Two</h1>\n</div>\n');
+        expect(resRootServer.result).to.equal('<div>\n    <h1>Root Server</h1>\n</div>\n');
+    });
+
+    it('passes plugin options to manager', async () => {
+
+        const server = Hapi.server();
+
+        server.register({
+            plugin: Vision,
+            options: {
+                engines: { 'html': Handlebars },
+                relativeTo: Path.join(__dirname, '/templates'),
+                path: 'valid'
+            }
+        });
+
+        server.route({ path: '/view', method: 'GET', handler: (request, h) => h.view('test', { message: 'Hello!' }) });
+
+        const res = await server.inject('/view');
+        expect(res.result).to.equal('<div>\n    <h1>Hello!</h1>\n</div>\n');
     });
 });
