@@ -6,8 +6,6 @@ Templates rendering plugin support for hapi.js.
 
 Lead Maintainer - [William Woodruff](https://github.com/wswoodruff)
 
-> **vision** updated to `hapi v17.x.x`
-
 **vision** decorates the [server](https://github.com/hapijs/hapi/blob/master/API.md#server),
 [request](https://github.com/hapijs/hapi/blob/master/API.md#request-object), and
 `h` response [toolkit](https://github.com/hapijs/hapi/blob/master/API.md#response-toolkit) interfaces with additional
@@ -34,7 +32,11 @@ const provision = async () => {
 
 provision();
 ```
-**NOTE:** Vision is included with and loaded by default in Hapi < 9.0.
+
+### Note:
+- Vision now requires at least hapi >= v17
+- Vision is included with and loaded by default in Hapi < 9.0.
+
 
 ## Examples
 
