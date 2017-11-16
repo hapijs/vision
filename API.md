@@ -1,21 +1,21 @@
 # API Reference
 
 Most interaction with **vision** is done via the [server](https://github.com/hapijs/hapi/blob/master/API.md#server)
-and [reply](https://github.com/hapijs/hapi/blob/master/API.md#reply-interface) interfaces. When the
-**vision** plugin is registered, the base [Hapi APIs](https://github.com/hapijs/hapi/blob/master/API.md)
+and the `h` response [toolkit](https://hapijs.com/api/17.0.1#response-toolkit) interfaces. When the
+**vision** plugin is registered, the base [hapi APIs](https://github.com/hapijs/hapi/blob/master/API.md)
 are augmented as follows:
 
 - [Server](#server)
-    - [`server.views(options)`](#serverviewsoptions)
-    - [`server.render(template, context, [options], [callback])`](#serverrendertemplate-context-options-callback)
+  - [`server.views(options)`](#serverviewsoptions)
+  - [`server.render(template, context, [options], [callback])`](#serverrendertemplate-context-options-callback)
 - [Requests](#requests)
-    - [`request.render(template, context, [options], [callback])`](#requestrendertemplate-context-options-callback)
-    - [The `view` handler](#the-view-handler)
-- [Reply interface](#reply-interface)
-    - [`reply.view(template, [context, [options]])`](#replyviewtemplate-context-options)
+  - [`request.render(template, context, [options], [callback])`](#requestrendertemplate-context-options-callback)
+  - [The `view` handler](#the-view-handler)
+- [`h` response toolkit interface](https://hapijs.com/api/17.0.1#response-toolkit)
+  - [`h.view(template, [context], [options]])`](#replyviewtemplate-context-options)
 - [View Manager](#view-manager)
-    - [`manager.registerHelper(name, helper)`](#managerregisterhelpername-helper)
-    - [`manager.render(template, context, options, callback)`](#managerrendertemplate-context-options-callback)
+  - [`manager.registerHelper(name, helper)`](#managerregisterhelpername-helper)
+  - [`manager.render(template, context, options, callback)`](#managerrendertemplate-context-options-callback)
 
 ## [Server](https://github.com/hapijs/hapi/blob/master/API.md#server)
 
@@ -48,11 +48,14 @@ Initializes the server views manager where:
               is the function that will be invoked when the helper is called.
         - any of the `views` options listed below (except `defaultExtension`) to override the
           defaults for a specific engine.
+
+    - `compileMode` - specify whether the engine `compile()` method is `'sync'` or `'async'`.
+      Defaults to `'sync'`.
     - `defaultExtension` - defines the default filename extension to append to template names when
       multiple engines are configured and not explicit extension is provided for a given template.
       No default value.
     - `path` - the root file path, or array of file paths, used to resolve and load the templates identified when calling
-      [`reply.view()`](https://github.com/hapijs/hapi/blob/master/API.md#replyviewtemplate-context-options).
+      [`h.view()`](#replyviewtemplate-context-options).
       Defaults to current working directory.
     - `partialsPath` - the root file path, or array of file paths, where partials are located. Partials are small segments
       of template code that can be nested and reused throughout other templates. Defaults to no
@@ -62,7 +65,7 @@ Initializes the server views manager where:
       context or other inputs. Each valid template file in the helpers directory is loaded and the file name
       is used as the helper name. The files must export a single method with the signature
       `function(context)` and return a string. Sub-folders are not supported and are ignored.
-      Defaults to no helpers support (empty path). Note that jade does not support loading helpers
+      Defaults to no helpers support (empty path). Note that pug does not support loading helpers
       this way.
     - `relativeTo` - a base path used as prefix for `path` and `partialsPath`. No default.
     - `layout` - if set to `true` or a layout filename, layout support is enabled. A layout is a
@@ -80,28 +83,26 @@ Initializes the server views manager where:
     - `isCached` - if set to `false`, templates will not be cached (thus will be read from file on
       every use). Defaults to `true`.
     - `allowAbsolutePaths` - if set to `true`, allows absolute template paths passed to
-      [`reply.view()`](https://github.com/hapijs/hapi/blob/master/API.md#replyviewtemplate-context-options).
+      [`h.view()`](#replyviewtemplate-context-options).
       Defaults to `false`.
     - `allowInsecureAccess` - if set to `true`, allows template paths passed to
-      [`reply.view()`](https://github.com/hapijs/hapi/blob/master/API.md#replyviewtemplate-context-options)
+      [`h.view()`](#replyviewtemplate-context-options)
       to contain '../'. Defaults to `false`.
     - `compileOptions` - options object passed to the engine's compile function. Defaults to empty
       options `{}`.
     - `runtimeOptions` - options object passed to the returned function from the compile operation.
       Defaults to empty options `{}`.
     - `contentType` - the content type of the engine results. Defaults to `'text/html'`.
-    - `compileMode` - specify whether the engine `compile()` method is `'sync'` or `'async'`.
-      Defaults to `'sync'`.
     - `context` - a global context used with all templates. The global context option can be either
       an object or a function that takes the [`request`](https://github.com/hapijs/hapi/blob/master/API.md#request-properties)
       as its only argument and returns a context object. The
       [`request`](https://github.com/hapijs/hapi/blob/master/API.md#request-properties) object is only provided when using
-      the [view handler](#the-view-handler) or [`reply.view()`](#replyviewtemplate-context-options). When using
+      the [view handler](#the-view-handler) or [`h.view()`](#replyviewtemplate-context-options). When using
       [`server.render()`](#serverrendertemplate-context-options-callback) or
       [`request.render()`](#requestrendertemplate-context-options-callback), the
       [`request`](https://github.com/hapijs/hapi/blob/master/API.md#request-properties) argument will be `null`. When rendering
       views, the global context will be merged with any context object specified on the handler or using
-      [`reply.view()`](#replyviewtemplate-context-options). When multiple context objects are used, values from the global
+      [`h.view()`](#replyviewtemplate-context-options). When multiple context objects are used, values from the global
       context always have lowest precedence.
 
 When [`server.views()`](https://github.com/hapijs/hapi/blob/master/API.md#serverviewsoptions) is called within a
@@ -118,24 +119,23 @@ Utilizes the server views manager to render a template where:
 - `context` - optional object used by the template to render context-specific result. Defaults to
   no context (`{}`).
 - `options` - optional object used to override the views manager configuration.
-- `callback` - the callback function with signature `function (err, rendered, config)` where:
+- callback - the callback function with signature function (err, rendered, config) where:
     - `err` - the rendering error if any.
     - `rendered` - the result view string.
     - `config` - the configuration used to render the template.
 
 If no `callback` is provided, a `Promise` object is returned. The returned promise is resolved with only the
-rendered content an not the configuration object.
+rendered content and not the configuration object.
 
 ```js
 const Hapi = require('hapi');
-const server = new Hapi.Server();
-server.connection({ port: 80 });
+const server = Hapi.Server({ port: 3000 });
 
-server.register(require('vision'), (err) => {
+const internals = {};
 
-    if (err) {
-        throw err;
-    }
+internals.provision = async () => {
+
+    await server.register(require('vision'));
 
     server.views({
         engines: { html: require('handlebars') },
@@ -147,11 +147,10 @@ server.register(require('vision'), (err) => {
         message: 'Hello, World'
     };
 
-    server.render('hello', context, (err, rendered, config) => {
+    return server.render('hello', context);
+};
 
-        console.log(rendered);
-    });
-});
+internals.provision();
 ```
 
 ## [Requests](https://github.com/hapijs/hapi/blob/master/API.md#requests)
@@ -170,14 +169,13 @@ this point in the request lifecycle and the `request.render()` method will produ
 
 ```js
 const Hapi = require('hapi');
-const server = new Hapi.Server();
-server.connection({ port: 80 });
+const server = Hapi.Server({ port: 3000 });
 
-server.register(require('vision'), (err) => {
+const internals = {};
 
-    if (err) {
-        throw err;
-    }
+internals.provision = async () => {
+
+    await server.register(require('vision'));
 
     server.views({
         engines: { html: require('handlebars') },
@@ -187,15 +185,14 @@ server.register(require('vision'), (err) => {
     server.route({
         method: 'GET',
         path: '/view',
-        handler: function (request, reply) {
+        handler: function (request, h) {
 
-            request.render('test', { message: 'hello' }, (err, rendered, config) => {
-
-                return reply(rendered);
-            });
+            return request.render('test', { message: 'hello' });
         }
     });
-});
+};
+
+internals.provision();
 ```
 
 ### The `view` handler
@@ -220,14 +217,13 @@ can be overriden by values explicitly set via the `options`).
 
 ```js
 const Hapi = require('hapi');
-const server = new Hapi.Server();
-server.connection({ port: 80 });
+const server = Hapi.Server({ port: 3000 });
 
-server.register(require('vision'), (err) => {
+const internals = {};
 
-    if (err) {
-        throw err;
-    }
+internals.provision = async () => {
+
+    await server.register(require('vision'));
 
     server.views({
         engines: { html: require('handlebars') },
@@ -247,14 +243,16 @@ server.register(require('vision'), (err) => {
             }
         }
     });
-});
+};
+
+internals.provision();
 ```
 
-## [Reply Interface](https://github.com/hapijs/hapi/blob/master/API.md#reply-interface)
+## [Response Toolkit Interface](https://hapijs.com/api/17.0.1#response-toolkit)
 
-### `reply.view(template, [context, [options]])`
+### `h.view(template, [context, [options]])`
 
-Concludes the handler activity by returning control over to the router with a templatized view
+Uses the response [toolkit](https://hapijs.com/api/17.0.1#response-toolkit) interface by means of returning control over to the router with a templatized view
 response where:
 
 - `template` - the template filename and path, relative to the templates path configured via the
@@ -268,42 +266,42 @@ response where:
 Returns a [response object](https://github.com/hapijs/hapi/blob/master/API.md#response-object).
 The generated response will have the `variety` property set to `view`.
 
-The [response flow control rules](https://github.com/hapijs/hapi/blob/master/API.md#flow-control) apply.
+The same [lifecycle workflow](https://hapijs.com/api/17.0.1#lifecycle-workflow) applies.
 
 ```js
 const Hapi = require('hapi');
-const server = new Hapi.Server();
-server.connection({ port: 80 });
+const server = Hapi.Server({ port: 3000 });
 
-server.register(require('vision'), (err) => {
+const internals = {};
 
-    if (err) {
-        throw err;
-    }
+internals.provision = async () => {
+
+    await server.register(require('vision'));
 
     server.views({
         engines: { html: require('handlebars') },
         path: __dirname + '/templates'
     });
 
-    const handler = function (request, reply) {
+    const rootHandler = function (request, h) {
 
         const context = {
             title: 'Views Example',
             message: 'Hello, World'
         };
 
-        return reply.view('hello', context);
+        return h.view('hello', context);
     };
 
-    server.route({ method: 'GET', path: '/', handler: handler });
-});
+    server.route({ method: 'GET', path: '/', handler: rootHandler });
+};
+
+internals.provision();
 ```
 
 **templates/hello.html**
 
 ```html
-<!DOCTYPE html>
 <html>
     <head>
         <title>{{title}}</title>
