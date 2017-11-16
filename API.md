@@ -12,7 +12,7 @@ are augmented as follows:
   - [`request.render(template, context, [options], [callback])`](#requestrendertemplate-context-options-callback)
   - [The `view` handler](#the-view-handler)
 - [`h` response toolkit interface](https://hapijs.com/api/17.0.1#response-toolkit)
-  - [`h.view(template, [context], [options]])`](#replyviewtemplate-context-options)
+  - [`h.view(template, [context], [options]])`](#hviewtemplate-context-options)
 - [View Manager](#view-manager)
   - [`manager.registerHelper(name, helper)`](#managerregisterhelpername-helper)
   - [`manager.render(template, context, options, callback)`](#managerrendertemplate-context-options-callback)
@@ -55,7 +55,7 @@ Initializes the server views manager where:
       multiple engines are configured and not explicit extension is provided for a given template.
       No default value.
     - `path` - the root file path, or array of file paths, used to resolve and load the templates identified when calling
-      [`h.view()`](#replyviewtemplate-context-options).
+      [`h.view()`](#hviewtemplate-context-options).
       Defaults to current working directory.
     - `partialsPath` - the root file path, or array of file paths, where partials are located. Partials are small segments
       of template code that can be nested and reused throughout other templates. Defaults to no
@@ -83,10 +83,10 @@ Initializes the server views manager where:
     - `isCached` - if set to `false`, templates will not be cached (thus will be read from file on
       every use). Defaults to `true`.
     - `allowAbsolutePaths` - if set to `true`, allows absolute template paths passed to
-      [`h.view()`](#replyviewtemplate-context-options).
+      [`h.view()`](#hviewtemplate-context-options).
       Defaults to `false`.
     - `allowInsecureAccess` - if set to `true`, allows template paths passed to
-      [`h.view()`](#replyviewtemplate-context-options)
+      [`h.view()`](#hviewtemplate-context-options)
       to contain '../'. Defaults to `false`.
     - `compileOptions` - options object passed to the engine's compile function. Defaults to empty
       options `{}`.
@@ -97,12 +97,12 @@ Initializes the server views manager where:
       an object or a function that takes the [`request`](https://github.com/hapijs/hapi/blob/master/API.md#request-properties)
       as its only argument and returns a context object. The
       [`request`](https://github.com/hapijs/hapi/blob/master/API.md#request-properties) object is only provided when using
-      the [view handler](#the-view-handler) or [`h.view()`](#replyviewtemplate-context-options). When using
+      the [view handler](#the-view-handler) or [`h.view()`](#hviewtemplate-context-options). When using
       [`server.render()`](#serverrendertemplate-context-options-callback) or
       [`request.render()`](#requestrendertemplate-context-options-callback), the
       [`request`](https://github.com/hapijs/hapi/blob/master/API.md#request-properties) argument will be `null`. When rendering
       views, the global context will be merged with any context object specified on the handler or using
-      [`h.view()`](#replyviewtemplate-context-options). When multiple context objects are used, values from the global
+      [`h.view()`](#hviewtemplate-context-options). When multiple context objects are used, values from the global
       context always have lowest precedence.
 
 When [`server.views()`](https://github.com/hapijs/hapi/blob/master/API.md#serverviewsoptions) is called within a
