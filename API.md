@@ -195,7 +195,7 @@ internals.provision = async () => {
 internals.provision();
 ```
 
-### The `view` handler
+### The `view` [handler](https://hapijs.com/api/17.0.1#-serverdecoratetype-property-method-options)
 
 The `view` handler can be used with routes registered in the same realm as the view manager. The
 handler takes an `options` parameter that can be either a string or an object. When the `options`
