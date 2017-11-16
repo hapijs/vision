@@ -11,7 +11,7 @@ are augmented as follows:
 - [Requests](#requests)
   - [`request.render(template, context, [options], [callback])`](#requestrendertemplate-context-options-callback)
   - [The `view` handler](#the-view-handler)
-- [`h` response toolkit interface](https://hapijs.com/api/17.0.1#response-toolkit)
+- [`h` response toolkit interface](#response-toolkit-interface)
   - [`h.view(template, [context], [options]])`](#hviewtemplate-context-options)
 - [View Manager](#view-manager)
   - [`manager.registerHelper(name, helper)`](#managerregisterhelpername-helper)
