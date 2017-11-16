@@ -212,7 +212,7 @@ following keys:
   initialization.
 
 The rendering `context` contains the `params`, `payload`, `query`, and `pre` values from the
-[request](https://github.com/hapijs/hapi/blob/master/API.md#request-properties) by default (these
+[request](https://github.com/hapijs/hapi/blob/master/API.md#request) by default (these
 can be overriden by values explicitly set via the `options`).
 
 ```js
