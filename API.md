@@ -1,7 +1,7 @@
 # API Reference
 
 Most interaction with **vision** is done via the [server](https://github.com/hapijs/hapi/blob/master/API.md#server)
-and the `h` response [toolkit](https://hapijs.com/api/17.0.1#response-toolkit) interfaces. When the
+and the `h` response [toolkit](https://github.com/hapijs/hapi/blob/master/API.md#response-toolkit) interfaces. When the
 **vision** plugin is registered, the base [hapi APIs](https://github.com/hapijs/hapi/blob/master/API.md)
 are augmented as follows:
 
@@ -94,18 +94,18 @@ Initializes the server views manager where:
       Defaults to empty options `{}`.
     - `contentType` - the content type of the engine results. Defaults to `'text/html'`.
     - `context` - a global context used with all templates. The global context option can be either
-      an object or a function that takes the [`request`](https://github.com/hapijs/hapi/blob/master/API.md#request-properties)
+      an object or a function that takes the [`request`](https://github.com/hapijs/hapi/blob/master/API.md#request)
       as its only argument and returns a context object. The
-      [`request`](https://github.com/hapijs/hapi/blob/master/API.md#request-properties) object is only provided when using
+      [`request`](https://github.com/hapijs/hapi/blob/master/API.md#request) object is only provided when using
       the [view handler](#the-view-handler) or [`h.view()`](#hviewtemplate-context-options). When using
       [`server.render()`](#serverrendertemplate-context-options-callback) or
       [`request.render()`](#requestrendertemplate-context-options-callback), the
-      [`request`](https://github.com/hapijs/hapi/blob/master/API.md#request-properties) argument will be `null`. When rendering
+      [`request`](https://github.com/hapijs/hapi/blob/master/API.md#request) argument will be `null`. When rendering
       views, the global context will be merged with any context object specified on the handler or using
       [`h.view()`](#hviewtemplate-context-options). When multiple context objects are used, values from the global
       context always have lowest precedence.
 
-When [`server.views()`](https://github.com/hapijs/hapi/blob/master/API.md#serverviewsoptions) is called within a
+When [`server.views()`](#serverviewsoptions) is called within a
 plugin, the views manager is only available to [plugins](https://github.com/hapijs/hapi/blob/master/API.md#plugins)
 methods.
 
@@ -195,7 +195,7 @@ internals.provision = async () => {
 internals.provision();
 ```
 
-## The `view` [handler](https://hapijs.com/api/17.0.1#-serverdecoratetype-property-method-options)
+## The `view` [handler](https://github.com/hapijs/hapi/blob/master/API.md#serverdecoratetype-property-method-options)
 
 The `view` handler can be used with routes registered in the same realm as the view manager. The
 handler takes an `options` parameter that can be either a string or an object. When the `options`
@@ -248,11 +248,11 @@ internals.provision = async () => {
 internals.provision();
 ```
 
-## [Response Toolkit Interface](https://hapijs.com/api/17.0.1#response-toolkit)
+## [Response Toolkit Interface](https://github.com/hapijs/hapi/blob/master/API.md#response-toolkit)
 
 ### `h.view(template, [context, [options]])`
 
-Uses the response [toolkit](https://hapijs.com/api/17.0.1#response-toolkit) interface by means of returning control over to the router with a templatized view
+Uses the response [toolkit](https://github.com/hapijs/hapi/blob/master/API.md#response-toolkit) interface by means of returning control over to the router with a templatized view
 response where:
 
 - `template` - the template filename and path, relative to the templates path configured via the
@@ -266,7 +266,7 @@ response where:
 Returns a [response object](https://github.com/hapijs/hapi/blob/master/API.md#response-object).
 The generated response will have the `variety` property set to `view`.
 
-The same [lifecycle workflow](https://hapijs.com/api/17.0.1#lifecycle-workflow) applies.
+The same [lifecycle workflow](https://github.com/hapijs/hapi/blob/master/API.md#lifecycle-workflow) applies.
 
 ```js
 const Hapi = require('hapi');
