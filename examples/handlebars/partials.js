@@ -39,7 +39,8 @@ internals.main = async () => {
         engines: { html: Handlebars },
         relativeTo: __dirname,
         path: 'templates/withPartials',
-        partialsPath: 'templates/withPartials/partials'
+        partialsPath: 'templates/withPartials/partials',
+        isCached: false
     });
 
     server.route({ method: 'GET', path: '/', handler: rootHandler });
