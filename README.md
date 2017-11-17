@@ -7,7 +7,7 @@ Templates rendering plugin support for hapi.js.
 Lead Maintainer - [William Woodruff](https://github.com/wswoodruff)
 
 **vision** decorates the [server](https://github.com/hapijs/hapi/blob/master/API.md#server),
-[request](https://github.com/hapijs/hapi/blob/master/API.md#request-object), and
+[request](https://github.com/hapijs/hapi/blob/master/API.md#request), and
 `h` response [toolkit](https://github.com/hapijs/hapi/blob/master/API.md#response-toolkit) interfaces with additional
 methods for managing view engines that can be used to render templated responses.
 
