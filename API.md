@@ -95,12 +95,10 @@ Initializes the server views manager where:
     - `contentType` - the content type of the engine results. Defaults to `'text/html'`.
     - `context` - a global context used with all templates. The global context option can be either
       an object or a function that takes the [`request`](https://github.com/hapijs/hapi/blob/master/API.md#request)
-      as its only argument and returns a context object. The
-      [`request`](https://github.com/hapijs/hapi/blob/master/API.md#request) object is only provided when using
+      as its only argument and returns a context object. The [`request`](https://github.com/hapijs/hapi/blob/master/API.md#request) object is only provided when using
       the [view handler](#the-view-handler) or [`h.view()`](#hviewtemplate-context-options). When using
       [`server.render()`](#serverrendertemplate-context-options-callback) or
-      [`request.render()`](#requestrendertemplate-context-options-callback), the
-      [`request`](https://github.com/hapijs/hapi/blob/master/API.md#request) argument will be `null`. When rendering
+      [`request.render()`](#requestrendertemplate-context-options-callback), the [`request`](https://github.com/hapijs/hapi/blob/master/API.md#request) argument will be `null`. When rendering
       views, the global context will be merged with any context object specified on the handler or using
       [`h.view()`](#hviewtemplate-context-options). When multiple context objects are used, values from the global
       context always have lowest precedence.
@@ -157,14 +155,14 @@ internals.provision();
 
 ### `request.render(template, context, [options], [callback])`
 
-`request.render()` works the same way as [`server.render()`](#serverrendertemplate-context-options-callback)
+[`request.render()`](#requestrendertemplate-context-options-callback) works the same way as [`server.render()`](#serverrendertemplate-context-options-callback)
 but is for use inside of request handlers. [`server.render()`](#serverrendertemplate-context-options-callback)
 does not work inside request handlers when called via `request.server.render()` if the view manager was created
 by a plugin. This is because the `request.server` object does not have access to the plugin realm where the
-view manager was configured. `request.render()` gets its realm from the route that the request was bound to.
+view manager was configured. [`request.render()`](#requestrendertemplate-context-options-callback) gets its realm from the route that the request was bound to.
 
 Note that this will not work in `onRequest` extensions added by the plugin because the route isn't yet set at
-this point in the request lifecycle and the `request.render()` method will produce the same limited results
+this point in the request lifecycle and the [`request.render()`](#requestrendertemplate-context-options-callback) method will produce the same limited results
 [`server.render()`](#serverrendertemplate-context-options-callback) can.
 
 ```js
