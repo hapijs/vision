@@ -782,11 +782,13 @@ describe('Plugin', () => {
         const resPlugin1 = await server.inject('/viewPluginOne');
         const resPlugin2 = await server.inject('/viewPluginTwo');
         const resPlugin3 = await server.inject('/viewPluginThree');
+        const resPlugin4 = await server.inject('/viewPluginFour');
         const resRootServer = await server.inject('/viewRootServer');
 
         expect(resPlugin1.result).to.equal('<h1>Plugin One</h1>');
         expect(resPlugin2.result).to.equal('<h1>Plugin Two</h1>');
         expect(resPlugin3.result).to.equal('<div>\n    <h1>Plugin Three</h1>\n</div>\n');
+        expect(resPlugin4.result).to.equal('<h1>Plugin Four</h1>');
         expect(resRootServer.result).to.equal('<div>\n    <h1>Root Server</h1>\n</div>\n');
     });
 });
