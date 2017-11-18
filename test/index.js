@@ -591,7 +591,7 @@ describe('Plugin', () => {
                     options: {
                         engines: { 'html': Handlebars },
                         relativeTo: Path.join(__dirname, '/templates'),
-                        path: 'valid'
+                        path: 'plugin'
                     }
                 });
 
@@ -615,7 +615,7 @@ describe('Plugin', () => {
                     options: {
                         engines: { 'html': Handlebars },
                         relativeTo: Path.join(__dirname, '/templates'),
-                        path: 'valid'
+                        path: 'plugin'
                     }
                 });
 
@@ -655,8 +655,8 @@ describe('Plugin', () => {
         const resPlugin2 = await server.inject('/viewPluginTwo');
         const resRootServer = await server.inject('/viewRootServer');
 
-        expect(resPlugin1.result).to.equal('<div>\n    <h1>Plugin One</h1>\n</div>\n');
-        expect(resPlugin2.result).to.equal('<div>\n    <h1>Plugin Two</h1>\n</div>\n');
+        expect(resPlugin1.result).to.equal('<h1>Plugin One</h1>');
+        expect(resPlugin2.result).to.equal('<h1>Plugin Two</h1>');
         expect(resRootServer.result).to.equal('<div>\n    <h1>Root Server</h1>\n</div>\n');
     });
 
@@ -677,5 +677,116 @@ describe('Plugin', () => {
 
         const res = await server.inject('/view');
         expect(res.result).to.equal('<div>\n    <h1>Hello!</h1>\n</div>\n');
+    });
+
+    it('inherits managers up to root', async () => {
+
+        const one = {
+            name: 'one',
+            register: function (server, options) {
+
+                return server.route({
+                    path: '/viewPluginOne',
+                    method: 'GET',
+                    handler: (request, h) => {
+
+                        return h.view('test', { message: 'Plugin One' });
+                    }
+                });
+            }
+        };
+
+        const two = {
+            name: 'two',
+            register: async (server, options) => {
+
+                await server.register(one);
+
+                return server.route({
+                    path: '/viewPluginTwo',
+                    method: 'GET',
+                    handler: (request, h) => {
+
+                        return server.render('test', { message: 'Plugin Two' });
+                    }
+                });
+            }
+        };
+
+        const three = {
+            name: 'three',
+            register: async (server, options) => {
+
+                await server.register(two);
+
+                return server.route({
+                    path: '/viewPluginThree',
+                    method: 'GET',
+                    handler: (request, h) => {
+
+                        return request.render('test', { message: 'Plugin Three' });
+                    }
+                });
+            }
+        };
+
+        const four = {
+            name: 'four',
+            register: async (server, options) => {
+
+                await server.register(three);
+
+                server.register({
+                    plugin: Vision,
+                    options: {
+                        engines: { 'html': Handlebars },
+                        relativeTo: Path.join(__dirname, '/templates'),
+                        path: 'plugin'
+                    }
+                });
+
+                return server.route({
+                    path: '/viewPluginFour',
+                    method: 'GET',
+                    handler: {
+                        view: {
+                            template: 'test',
+                            context: { message: 'Plugin Four' }
+                        }
+                    }
+                });
+            }
+        };
+
+        const server = Hapi.server();
+        await server.register(four);
+
+        server.register({
+            plugin: Vision,
+            options: {
+                engines: { 'html': Handlebars },
+                relativeTo: Path.join(__dirname, '/templates'),
+                path: 'valid'
+            }
+        });
+
+        server.route({
+            path: '/viewRootServer',
+            method: 'GET',
+            handler: (request, h) => {
+
+                return server.render('test', { message: 'Root Server' });
+            }
+        });
+
+        const resPlugin1 = await server.inject('/viewPluginOne');
+        const resPlugin2 = await server.inject('/viewPluginTwo');
+        const resPlugin3 = await server.inject('/viewPluginThree');
+        const resRootServer = await server.inject('/viewRootServer');
+
+        expect(resPlugin1.result).to.equal('<h1>Plugin One</h1>');
+        expect(resPlugin2.result).to.equal('<h1>Plugin Two</h1>');
+        expect(resPlugin3.result).to.equal('<div>\n    <h1>Plugin Three</h1>\n</div>\n');
+        expect(resRootServer.result).to.equal('<div>\n    <h1>Root Server</h1>\n</div>\n');
     });
 });
