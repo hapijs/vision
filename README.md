@@ -66,7 +66,7 @@ node examples/jsx
   - helpers
   - layout
   - partials
-- jsx // React server-side rendering
+- jsx // React server-side rendering with `hapi-react-views`
 - marko
 - mixed // Using multiple render engines (handlebars and pug)
 - mustache
