@@ -401,6 +401,36 @@ describe('Manager', () => {
             await expect(manager.render('valid/test')).to.reject('Initialization error');
         });
 
+
+        it('throws on invalid options', () => {
+
+            expect(() => {
+
+                new Manager({
+                    path: __dirname + '/templates',
+                    engines: {
+                        html: {
+                            compile: function (string, options1) {
+
+                                return function (context, options2) {
+
+                                    return string;
+                                };
+                            },
+
+                            prepare: function (options, next) {
+
+                                throw new Error('Initialization error');
+                            }
+                        }
+                    },
+                    badValue: 'badValue'
+                });
+            })
+                .to.throw(/"badValue" is not allowed/);
+        });
+
+
         it('only initializes once before rendering', async () => {
 
             let initialized = 0;
