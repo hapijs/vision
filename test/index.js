@@ -690,7 +690,7 @@ describe('Plugin', () => {
                     method: 'GET',
                     handler: (request, h) => {
 
-                        return h.view('test', { message: 'Plugin One' });
+                        return request.render('test', { message: 'Plugin One' });
                     }
                 });
             }
@@ -717,6 +717,15 @@ describe('Plugin', () => {
             name: 'three',
             register: async (server, options) => {
 
+                await server.register({
+                    plugin: Vision,
+                    options: {
+                        engines: { 'html': Handlebars },
+                        relativeTo: Path.join(__dirname, '/templates'),
+                        path: 'plugin'
+                    }
+                });
+
                 await server.register(two);
 
                 return server.route({
@@ -724,7 +733,7 @@ describe('Plugin', () => {
                     method: 'GET',
                     handler: (request, h) => {
 
-                        return request.render('test', { message: 'Plugin Three' });
+                        return server.render('test', { message: 'Plugin Three' });
                     }
                 });
             }
@@ -735,15 +744,6 @@ describe('Plugin', () => {
             register: async (server, options) => {
 
                 await server.register(three);
-
-                server.register({
-                    plugin: Vision,
-                    options: {
-                        engines: { 'html': Handlebars },
-                        relativeTo: Path.join(__dirname, '/templates'),
-                        path: 'plugin'
-                    }
-                });
 
                 return server.route({
                     path: '/viewPluginFour',
@@ -787,8 +787,8 @@ describe('Plugin', () => {
 
         expect(resPlugin1.result).to.equal('<h1>Plugin One</h1>');
         expect(resPlugin2.result).to.equal('<h1>Plugin Two</h1>');
-        expect(resPlugin3.result).to.equal('<div>\n    <h1>Plugin Three</h1>\n</div>\n');
-        expect(resPlugin4.result).to.equal('<h1>Plugin Four</h1>');
+        expect(resPlugin3.result).to.equal('<h1>Plugin Three</h1>');
+        expect(resPlugin4.result).to.equal('<div>\n    <h1>Plugin Four</h1>\n</div>\n');
         expect(resRootServer.result).to.equal('<div>\n    <h1>Root Server</h1>\n</div>\n');
     });
 });
