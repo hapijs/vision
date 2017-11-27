@@ -29,21 +29,21 @@
         "hapi": "17.x.x"
     },
     "devDependencies": {
-        "babel-core": "^6.26.0",
+        "babel-core": "6.x.x",
         "babel-plugin-transform-react-jsx": "6.x.x",
         "code": "5.x.x",
-        "coveralls": "^3.0.0",
+        "coveralls": "3.x.X",
         "ejs": "2.x.x",
         "handlebars": "4.x.x",
         "hapi": "17.x.x",
         "hapi-react-views": "10.x.x",
         "lab": "15.x.x",
         "marko": "4.x.x",
-        "mustache": ">=2.2.1",
-        "nunjucks": "2.x.0",
-        "pug": ">=2.0.0-beta6",
-        "react": "^16.1.0",
-        "react-dom": "^16.0.0"
+        "mustache": "2.x.x",
+        "nunjucks": "3.x.x",
+        "pug": ">=2.0.0-rc.4",
+        "react": "16.x.x",
+        "react-dom": "16.x.x"
     },
     "license": "BSD-3-Clause"
 }
