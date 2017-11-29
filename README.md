@@ -74,6 +74,7 @@ node examples/jsx
   - partials
 - nunjucks
 - pug
+- twig
 ```
 
 **vision** is compatible with most major templating engines out of the box. Engines that don't follow
@@ -211,7 +212,7 @@ const provision = async () => {
         engines: {
             marko: {
                 compile: (src, options) => {
-                
+
                     const opts = { preserveWhitespace: true, writeToDisk: false };
 
                     const template = Marko.load(options.filename, opts);
@@ -328,6 +329,54 @@ const provision = async () => {
         },
         relativeTo: __dirname,
         path: 'examples/nunjucks/templates'
+    });
+
+    server.route({ method: 'GET', path: '/', handler: rootHandler });
+
+    await server.start();
+    console.log('Server running at:', server.info.uri);
+};
+
+provision();
+```
+
+### Twig
+
+```js
+const Hapi = require('hapi');
+const Vision = require('vision');
+const Twig = require('twig');
+
+const server = Hapi.Server({ port: 3000 });
+
+const rootHandler = (request, h) => {
+
+    return h.view('index', {
+        title: 'examples/twig/templates | Hapi ' + request.server.version,
+        message: 'Hello Twig!'
+    });
+};
+
+const provision = async () => {
+
+    await server.register(Vision);
+
+    server.views({
+        engines: {
+            twig: {
+                compile: (src, options) => {
+
+                    const template = Twig.twig({ id: options.filename, data: src });
+
+                    return (context) => {
+
+                        return template.render(context);
+                    };
+                }
+            }
+        },
+        relativeTo: __dirname,
+        path: 'examples/twig/templates'
     });
 
     server.route({ method: 'GET', path: '/', handler: rootHandler });
