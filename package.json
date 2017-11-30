@@ -33,7 +33,7 @@
         "babel-plugin-transform-react-jsx": "6.x.x",
         "code": "5.x.x",
         "coveralls": "3.x.x",
-        "ejs": "2.x.x",
+        "ejs": "^2.5.5",
         "handlebars": "4.x.x",
         "hapi": "17.x.x",
         "hapi-react-views": "10.x.x",
