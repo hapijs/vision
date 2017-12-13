@@ -22,38 +22,49 @@ are augmented as follows:
 ### `server.views(options)`
 
 Initializes the server views manager where:
-- `options` - a configuration object with the following:
+- `options` - a configuration object with the following optional keys (unless noted otherwise):
     - `engines` - required object where each key is a file extension (e.g. 'html', 'hbr'), mapped
       to the npm module used for rendering the templates. Alternatively, the extension can be
       mapped to an object with the following options:
         - `module` - the npm module used for rendering the templates. The module object must
-          contain the `compile()` function:
+          contain the `compile()` function, all other functions are optional:
             - `compile()` - the rendering function. The required function signature depends on the
-              `compileMode` settings (see below). If `compileMode` is `'sync'`, the signature is
-              `compile(template, options)`, the return value is a function with signature
-              `function(context, options)` (the compiled sync template), and the method is allowed to throw errors. If
-              `compileMode` is `'async'`, the signature is `compile(template, options, next)`
-              where `next` has the signature `function(err, compiled)`, `compiled` is a
-              function with signature `function(context, options, callback)` (the compiled async template) and `callback` has the
-              signature `function(err, rendered)`.
+              `compileMode` settings (see below).
+                - If `compileMode` is `'sync'`, the signature is `compile(src, options)`, where:
+                    - `src` - the template as a string.
+                    - `options` - the `compileOptions` object.
+                    - the return value is a function with signature `function(context, options)` (the compiled sync template), and the method is allowed to throw errors, where:
+                        - `context` - the object containing values to be rendered in the template.
+                        - `options` - the `runtimeOptions` object.
+                - If `compileMode` is `'async'`, the signature is `compile(src, options, next)` where:
+                    - `src` - the template as a string.
+                    - `options` - the `compileOptions` object.
+                    - `next` - has the signature `function(err, compiled)`.
+                        - `err` - is `null` or `Error`.
+                        - `compiled` is a function with signature `function(context, options, callback)` (the compiled async template) where:
+                            - `context` - the object containing values to be rendered in the template.
+                            - `options` - the `runtimeOptions` object.
+                            - `callback` has the signature `function(err, rendered)`, where:
+                                - `err` - is `null` or an `Error`.
+                                - `rendered` - is a string or `undefined`.
             - `prepare(config, next)` - initializes additional engine state.
               The `config` object is the engine configuration object allowing updates to be made.
               This is useful for engines like Nunjucks that rely on additional state for rendering.
               `next` has the signature `function(err)`.
             - `registerPartial(name, src)` - registers a partial for use during template rendering.
-              The `name` is the partial path that templates should use to reference the partial and
+              The `name` is the partial path (string) that templates should use to reference the partial and
               `src` is the uncompiled template string for the partial.
             - `registerHelper(name, helper)` - registers a helper for use during template rendering.
-              The `name` is the name that templates should use to reference the helper and `helper`
-              is the function that will be invoked when the helper is called.
+              The `name` is the name (string) that templates should use to reference the helper and `helper`
+              is the function that will be invoked when the helper is called, with signature: `(...args: any[]): void`.
         - any of the `views` options listed below (except `defaultExtension`) to override the
           defaults for a specific engine.
 
     - `compileMode` - specify whether the engine `compile()` method is `'sync'` or `'async'`.
       Defaults to `'sync'`.
     - `defaultExtension` - defines the default filename extension to append to template names when
-      multiple engines are configured and not explicit extension is provided for a given template.
-      No default value.
+      multiple engines are configured and no explicit extension is provided for a given template.
+      Default value is undefined.
     - `path` - the root file path, or array of file paths, used to resolve and load the templates identified when calling
       [`h.view()`](#hviewtemplate-context-options).
       Defaults to current working directory.
@@ -67,7 +78,7 @@ Initializes the server views manager where:
       `function(context)` and return a string. Sub-folders are not supported and are ignored.
       Defaults to no helpers support (empty path). Note that pug does not support loading helpers
       this way.
-    - `relativeTo` - a base path used as prefix for `path` and `partialsPath`. No default.
+    - `relativeTo` - a base path used as prefix for `path`, `partialsPath`, `helpersPath` and `layoutPath`. No default.
     - `layout` - if set to `true` or a layout filename, layout support is enabled. A layout is a
       single template file used as the parent template for other view templates in the same engine.
       If `true`, the layout template name must be 'layout.ext' where 'ext' is the engine's
@@ -119,8 +130,8 @@ Utilizes the server views manager to render a template where:
 - `options` - optional object used to override the views manager configuration.
 - callback - the callback function with signature function (err, rendered, config) where:
     - `err` - the rendering error if any.
-    - `rendered` - the result view string.
-    - `config` - the configuration used to render the template.
+    - `rendered` - the result view string or undefined if error.
+    - `config` - the configuration used to render the template or undefined if error.
 
 If no `callback` is provided, a `Promise` object is returned. The returned promise is resolved with only the
 rendered content and not the configuration object.
