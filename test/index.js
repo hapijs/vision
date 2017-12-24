@@ -455,14 +455,6 @@ describe('views()', () => {
                 }
 
                 server.route({ path: '/view', method: 'GET', handler: (request, h) => h.view('test', { message: options.message }) });
-                server.ext('onRequest', (request, h) => {
-
-                    if (request.path === '/ext') {
-                        return h.view('test', { message: 'grabbed' }).takeover();
-                    }
-
-                    return h.continue;
-                });
             }
         };
 
@@ -472,9 +464,6 @@ describe('views()', () => {
 
         const res1 = await server.inject('/view');
         expect(res1.result).to.equal('<h1>viewing it</h1>');
-
-        const res2 = await server.inject('/ext');
-        expect(res2.result).to.equal('<h1>grabbed</h1>');
     });
 
     it('requires plugin with views with specific relativeTo', async () => {
@@ -500,6 +489,51 @@ describe('views()', () => {
         const res = await server.inject('/view');
         expect(res.result).to.equal('<h1>steve</h1>');
     });
+
+    it('uses the correct manager when using the \'onRequest\' server extension', async () => {
+
+        const test = {
+            name: 'test',
+
+            register: async function (server, options) {
+
+                server.path(__dirname);
+
+                const views = {
+                    engines: { 'html': Handlebars },
+                    path: __dirname + '/templates/plugin'
+                };
+
+                await server.register(Vision);
+
+                server.views(views);
+
+                if (Object.keys(views).length !== 2) {
+                    throw new Error('plugin.view() modified options');
+                }
+
+                server.route({ path: '/view', method: 'GET', handler: (request, h) => h.view('test', { message: options.message }) });
+                server.ext('onRequest', (request, h) => {
+
+                    if (request.path === '/ext') {
+                        return h.view('test', { message: 'grabbed' }).takeover();
+                    }
+
+                    return h.continue;
+                });
+            }
+        };
+
+        const server = Hapi.server();
+        await server.register(Vision);
+        await server.register({ plugin: test, options: { message: 'viewing it' } });
+
+        const res1 = await server.inject('/view');
+        expect(res1.result).to.equal('<h1>viewing it</h1>');
+
+        const res2 = await server.inject('/ext');
+        expect(res2.result).to.equal('<h1>grabbed</h1>');
+    }),
 
     it('defaults to server views', async () => {
 
@@ -584,9 +618,9 @@ describe('Plugin', () => {
 
         const one = {
             name: 'one',
-            register: function (server, options) {
+            register: async function (server, options) {
 
-                server.register({
+                await server.register({
                     plugin: Vision,
                     options: {
                         engines: { 'html': Handlebars },
@@ -608,9 +642,9 @@ describe('Plugin', () => {
 
         const two = {
             name: 'two',
-            register: function (server, options) {
+            register: async function (server, options) {
 
-                server.register({
+                await server.register({
                     plugin: Vision,
                     options: {
                         engines: { 'html': Handlebars },
@@ -633,7 +667,7 @@ describe('Plugin', () => {
         const server = Hapi.server();
         await server.register([one, two]);
 
-        server.register({
+        await server.register({
             plugin: Vision,
             options: {
                 engines: { 'html': Handlebars },
@@ -664,7 +698,7 @@ describe('Plugin', () => {
 
         const server = Hapi.server();
 
-        server.register({
+        await server.register({
             plugin: Vision,
             options: {
                 engines: { 'html': Handlebars },
@@ -690,7 +724,7 @@ describe('Plugin', () => {
                     method: 'GET',
                     handler: (request, h) => {
 
-                        return request.render('test', { message: 'Plugin One' });
+                        return request.render('test', { plugin2Message: 'Plugin One' });
                     }
                 });
             }
@@ -700,6 +734,15 @@ describe('Plugin', () => {
             name: 'two',
             register: async (server, options) => {
 
+                await server.register({
+                    plugin: Vision,
+                    options: {
+                        engines: { 'html': Handlebars },
+                        relativeTo: Path.join(__dirname, '/templates'),
+                        path: 'plugin2'
+                    }
+                });
+
                 await server.register(one);
 
                 return server.route({
@@ -707,7 +750,7 @@ describe('Plugin', () => {
                     method: 'GET',
                     handler: (request, h) => {
 
-                        return server.render('test', { message: 'Plugin Two' });
+                        return server.render('test', { plugin2Message: 'Plugin Two' });
                     }
                 });
             }
@@ -717,23 +760,32 @@ describe('Plugin', () => {
             name: 'three',
             register: async (server, options) => {
 
-                await server.register({
-                    plugin: Vision,
-                    options: {
-                        engines: { 'html': Handlebars },
-                        relativeTo: Path.join(__dirname, '/templates'),
-                        path: 'plugin'
-                    }
+                await server.register(Vision);
+
+                server.views({
+                    engines: { 'html': Handlebars },
+                    relativeTo: Path.join(__dirname, '/templates'),
+                    path: 'plugin3'
                 });
 
                 await server.register(two);
+
+                // When user server.ext('onRequest'), it inherits from this plugin's realm
+                server.ext('onRequest', (request, h) => {
+
+                    if (request.path === '/ext') {
+                        return h.view('test', { plugin3Message: 'grabbed' }).takeover();
+                    }
+
+                    return h.continue;
+                });
 
                 return server.route({
                     path: '/viewPluginThree',
                     method: 'GET',
                     handler: (request, h) => {
 
-                        return server.render('test', { message: 'Plugin Three' });
+                        return server.render('test', { plugin3Message: 'Plugin Three' });
                     }
                 });
             }
@@ -761,7 +813,7 @@ describe('Plugin', () => {
         const server = Hapi.server();
         await server.register(four);
 
-        server.register({
+        await server.register({
             plugin: Vision,
             options: {
                 engines: { 'html': Handlebars },
@@ -785,9 +837,14 @@ describe('Plugin', () => {
         const resPlugin4 = await server.inject('/viewPluginFour');
         const resRootServer = await server.inject('/viewRootServer');
 
+        const ext = await server.inject('/ext');
+        expect(ext.result).to.equal('<h1>grabbed</h1>');
+
         expect(resPlugin1.result).to.equal('<h1>Plugin One</h1>');
         expect(resPlugin2.result).to.equal('<h1>Plugin Two</h1>');
         expect(resPlugin3.result).to.equal('<h1>Plugin Three</h1>');
+
+        // Inherits the root server's manager
         expect(resPlugin4.result).to.equal('<div>\n    <h1>Plugin Four</h1>\n</div>\n');
         expect(resRootServer.result).to.equal('<div>\n    <h1>Root Server</h1>\n</div>\n');
     });
