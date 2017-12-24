@@ -629,7 +629,7 @@ describe('Plugin', () => {
                     }
                 });
 
-                return server.route({
+                server.route({
                     path: '/viewPluginOne',
                     method: 'GET',
                     handler: (request, h) => {
@@ -653,7 +653,7 @@ describe('Plugin', () => {
                     }
                 });
 
-                return server.route({
+                server.route({
                     path: '/viewPluginTwo',
                     method: 'GET',
                     handler: (request, h) => {
@@ -719,7 +719,7 @@ describe('Plugin', () => {
             name: 'one',
             register: function (server, options) {
 
-                return server.route({
+                server.route({
                     path: '/viewPluginOne',
                     method: 'GET',
                     handler: (request, h) => {
@@ -745,7 +745,7 @@ describe('Plugin', () => {
 
                 await server.register(one);
 
-                return server.route({
+                server.route({
                     path: '/viewPluginTwo',
                     method: 'GET',
                     handler: (request, h) => {
@@ -780,7 +780,7 @@ describe('Plugin', () => {
                     return h.continue;
                 });
 
-                return server.route({
+                server.route({
                     path: '/viewPluginThree',
                     method: 'GET',
                     handler: (request, h) => {
@@ -797,7 +797,7 @@ describe('Plugin', () => {
 
                 await server.register(three);
 
-                return server.route({
+                server.route({
                     path: '/viewPluginFour',
                     method: 'GET',
                     handler: {
