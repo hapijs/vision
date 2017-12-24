@@ -441,12 +441,12 @@ describe('views()', () => {
 
                 server.path(__dirname);
 
+                await server.register(Vision);
+
                 const views = {
                     engines: { 'html': Handlebars },
                     path: './templates/plugin'
                 };
-
-                await server.register(Vision);
 
                 server.views(views);
 
@@ -499,12 +499,12 @@ describe('views()', () => {
 
                 server.path(__dirname);
 
+                await server.register(Vision);
+
                 const views = {
                     engines: { 'html': Handlebars },
-                    path: './templates/plugin'
+                    path: './templates/plugin2'
                 };
-
-                await server.register(Vision);
 
                 server.views(views);
 
@@ -512,11 +512,11 @@ describe('views()', () => {
                     throw new Error('plugin.view() modified options');
                 }
 
-                server.route({ path: '/view', method: 'GET', handler: (request, h) => h.view('test', { message: options.message }) });
+                server.route({ path: '/view', method: 'GET', handler: (request, h) => h.view('test', { plugin2Message: options.message }) });
                 server.ext('onRequest', (request, h) => {
 
                     if (request.path === '/ext') {
-                        return h.view('test', { message: 'grabbed' }).takeover();
+                        return h.view('test', { plugin2Message: 'grabbed' }).takeover();
                     }
 
                     return h.continue;
@@ -528,11 +528,21 @@ describe('views()', () => {
         await server.register(Vision);
         await server.register({ plugin: test, options: { message: 'viewing it' } });
 
+        server.views({
+            engines: { 'html': Handlebars },
+            path: __dirname + '/templates/valid'
+        });
+
+        server.route({ path: '/rootView', method: 'GET', handler: (request, h) => h.view('test', { message: 'root' }) });
+
         const res1 = await server.inject('/view');
         expect(res1.result).to.equal('<h1>viewing it</h1>');
 
         const res2 = await server.inject('/ext');
         expect(res2.result).to.equal('<h1>grabbed</h1>');
+
+        const rootServer = await server.inject('/rootView');
+        expect(rootServer.result).to.equal('<div>\n    <h1>root</h1>\n</div>\n');
     }),
 
     it('defaults to server views', async () => {
@@ -555,12 +565,10 @@ describe('views()', () => {
 
         server.path(__dirname);
 
-        const views = {
+        server.views({
             engines: { 'html': Handlebars },
             path: './templates/plugin'
-        };
-
-        server.views(views);
+        });
 
         await server.register({ plugin: test, options: { message: 'viewing it' } });
         const res = await server.inject('/view');
