@@ -443,7 +443,7 @@ describe('views()', () => {
 
                 const views = {
                     engines: { 'html': Handlebars },
-                    path: __dirname + '/templates/plugin'
+                    path: './templates/plugin'
                 };
 
                 await server.register(Vision);
@@ -501,7 +501,7 @@ describe('views()', () => {
 
                 const views = {
                     engines: { 'html': Handlebars },
-                    path: __dirname + '/templates/plugin'
+                    path: './templates/plugin'
                 };
 
                 await server.register(Vision);
