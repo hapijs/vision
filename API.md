@@ -142,7 +142,7 @@ Renders a template. This is typically not needed and it is usually more convenie
 ### `server.views(options)`
 
 - Initializes a plugin's view manager by receiving [`manager options`](#options)
-- Returns the newly created [view manager](#view-manager) for the plugin that called it.
+- Returns the newly created [view manager](#views-manager) for the plugin that called it.
 
 ### `server.render(template, context, [options], [callback])`
 
