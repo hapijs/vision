@@ -33,7 +33,9 @@ describe('Manager', () => {
     it('renders handlebars template', async () => {
 
         const server = Hapi.server();
-        await await server.register(Vision);
+
+        await server.register(Vision);
+
         server.views({
             engines: {
                 html: {
@@ -71,7 +73,7 @@ describe('Manager', () => {
     it('sets content type', async () => {
 
         const server = Hapi.server();
-        await await server.register(Vision);
+        await server.register(Vision);
         server.views({
             engines: {
                 html: {
@@ -92,7 +94,7 @@ describe('Manager', () => {
     it('errors on invalid template path', async () => {
 
         const server = Hapi.server({ debug: false });
-        await await server.register(Vision);
+        await server.register(Vision);
         server.views({
             engines: { 'html': require('handlebars') },
             path: __dirname + '/templates/invalid'
@@ -398,6 +400,36 @@ describe('Manager', () => {
 
             await expect(manager.render('valid/test')).to.reject('Initialization error');
         });
+
+
+        it('throws on invalid options', () => {
+
+            expect(() => {
+
+                new Manager({
+                    path: __dirname + '/templates',
+                    engines: {
+                        html: {
+                            compile: function (string, options1) {
+
+                                return function (context, options2) {
+
+                                    return string;
+                                };
+                            },
+
+                            prepare: function (options, next) {
+
+                                throw new Error('Initialization error');
+                            }
+                        }
+                    },
+                    badValue: 'badValue'
+                });
+            })
+                .to.throw(/"badValue" is not allowed/);
+        });
+
 
         it('only initializes once before rendering', async () => {
 

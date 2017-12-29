@@ -16,7 +16,6 @@
     "scripts": {
         "test": "lab -a code -t 100 -L",
         "test-cov-html": "lab -a code -r html -o coverage.html",
-        "coveralls": "lab -r lcov | coveralls",
         "lint": "lab -L -d"
     },
     "dependencies": {
