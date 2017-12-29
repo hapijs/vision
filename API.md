@@ -4,7 +4,7 @@ Most interaction with **vision** is done via the `h` [response toolkit](https://
 and [server](https://github.com/hapijs/hapi/blob/master/API.md#server) interfaces.
 
 - [Registration](#registration)
-- [View Manager](#view-manager)
+- [Views Manager](#views-manager)
   - [`options`](#options)
   - [`manager.registerHelper(name, helper)`](#managerregisterhelpername-helper)
   - [`manager.render(template, context, options, callback)`](#managerrendertemplate-context-options-callback)
@@ -19,7 +19,7 @@ and [server](https://github.com/hapijs/hapi/blob/master/API.md#server) interface
 
 ## Registration
 
-Vision can be registered multiple times and receives [`view manager options`](#options) as registration options.
+Vision can be registered multiple times and receives [`views manager options`](#options) as registration options.
 
 Example:
 ```
@@ -44,9 +44,9 @@ internals.provision = async () => {
 internals.provision();
 ```
 
-## View Manager
+## Views Manager
 
-The View Manager is configured with [`registration options`](#registration) or by calling [`server.views(options)`](#serverviewsoptions)
+The Views Manager is configured with [`registration options`](#registration) or by calling [`server.views(options)`](#serverviewsoptions)
 
 ## `options`
   - `engines` - required object where each key is a file extension (e.g. 'html', 'hbr'), mapped
