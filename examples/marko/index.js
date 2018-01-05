@@ -3,9 +3,10 @@
 
 const Hapi = require('hapi');
 const Vision = require('../..');
-const Path = require('path');
 const Marko = require('marko');
+const Path = require('path');
 
+require('marko/node-require')
 
 // Declare internals
 
@@ -28,33 +29,38 @@ const rootHandler = (request, h) => {
     });
 };
 
-internals.main = async () => {
+internals.main = async() => {
 
-    const server = Hapi.Server({ port: 3000 });
+    const server = Hapi.server({
+        port: 3000
+    });
 
     await server.register(Vision);
 
     server.views({
+        relativeTo: __dirname,
         engines: {
             marko: {
                 compile: (src, options) => {
-
-                    const opts = { preserveWhitespace: true, writeToDisk: false };
-
+                    const opts = {
+                        preserveWhitespace: true,
+                        writeToDisk: false
+                    };
                     const template = Marko.load(options.filename, opts);
-
                     return (context) => {
-
                         return template.renderToString(context);
                     };
                 }
             }
         },
-        relativeTo: __dirname,
         path: `templates/${internals.templatePath}`
     });
 
-    server.route({ method: 'GET', path: '/', handler: rootHandler });
+    server.route({
+        method: 'GET',
+        path: '/',
+        handler: rootHandler
+    });
 
     await server.start();
     console.log('Server is running at ' + server.info.uri);
