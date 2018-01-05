@@ -6,7 +6,7 @@ const Vision = require('../..');
 const Marko = require('marko');
 const Path = require('path');
 
-require('marko/node-require')
+require('marko/node-require');
 
 // Declare internals
 
@@ -29,7 +29,7 @@ const rootHandler = (request, h) => {
     });
 };
 
-internals.main = async() => {
+internals.main = async () => {
 
     const server = Hapi.server({
         port: 3000
