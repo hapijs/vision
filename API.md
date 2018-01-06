@@ -141,8 +141,8 @@ Renders a template. This is typically not needed and it is usually more convenie
 
 ### `server.views(options)`
 
-- Initializes a plugin's views manager by receiving [`manager options`](#options)
-- Returns the newly created [views manager](#views-manager) for the plugin that called it.
+- Initializes a plugin's view manager by receiving [`manager options`](#options)
+- Returns the newly created [view manager](#views-manager) for the plugin that called it.
 
 ### `server.render(template, context, [options], [callback])`
 
@@ -192,9 +192,9 @@ internals.provision();
 
 [`request.render()`](#requestrendertemplate-context-options-callback) works the same way as [`server.render()`](#serverrendertemplate-context-options-callback)
 but is for use inside of request handlers. [`server.render()`](#serverrendertemplate-context-options-callback)
-does not work inside request handlers when called via `request.server.render()` if the views manager was created
+does not work inside request handlers when called via `request.server.render()` if the view manager was created
 by a plugin. This is because the `request.server` object does not have access to the plugin realm where the
-views manager was configured. [`request.render()`](#requestrendertemplate-context-options-callback) gets its realm from the route that the request was bound to.
+view manager was configured. [`request.render()`](#requestrendertemplate-context-options-callback) gets its realm from the route that the request was bound to.
 
 Note that this will not work in `onRequest` extensions added by the plugin because the route isn't yet set at
 this point in the request lifecycle and the [`request.render()`](#requestrendertemplate-context-options-callback) method will produce the same limited results
@@ -230,7 +230,7 @@ internals.provision();
 
 ## The `view` [handler](https://github.com/hapijs/hapi/blob/master/API.md#serverdecoratetype-property-method-options)
 
-The `view` handler can be used with routes registered in the same realm as the views manager. The
+The `view` handler can be used with routes registered in the same realm as the view manager. The
 handler takes an `options` parameter that can be either a string or an object. When the `options`
 parameter is a string, it should be the filename and path of the template relative to the templates
 path configured via the views manager. When the `options` parameter is an object, it may have the
