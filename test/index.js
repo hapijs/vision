@@ -392,7 +392,7 @@ describe('render()', () => {
         expect(rendered).to.contain('<h1>default</h1>');
     });
 
-    it('does not pass the request to the global context function (request)', async () => {
+    it('passes the request to the global context function (request)', async () => {
 
         const server = Hapi.server();
         await server.register(Vision);
@@ -410,7 +410,7 @@ describe('render()', () => {
 
         server.route({ method: 'GET', path: '/', handler: (request) => request.render('testContext', null, null) });
         const res = await server.inject({ method: 'GET', url: '/' });
-        expect(res.result).to.contain('<h1>default</h1>');
+        expect(res.result).to.contain('<h1>/</h1>');
     });
 
     it('errors on missing manager', async () => {
