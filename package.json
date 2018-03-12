@@ -14,7 +14,7 @@
         "node": ">=8.9.0"
     },
     "scripts": {
-        "test": "lab -a code -t 100 -L",
+        "test": "lab -a code -t 100 -L -I '__core-js_shared__'",
         "test-cov-html": "lab -a code -r html -o coverage.html",
         "lint": "lab -L -d"
     },
