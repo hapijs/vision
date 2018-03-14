@@ -1415,6 +1415,30 @@ describe('Manager', () => {
             expect(rendered).to.equal('Nav:{{> nav}}|{{> nested/nav}}');
         });
 
+        it('loads ESM default export helpers and render them', async () => {
+
+            const tempView = new Manager({
+                engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
+                path: __dirname + '/templates/valid',
+                helpersPath: __dirname + '/templates/valid/helpers'
+            });
+
+            const rendered = await tempView.render('testHelpersESMDefault', { something: 'uppercase' });
+            expect(rendered).to.equal('<p>This is all UPPERCASE and this is how we like it!</p>\n');
+        });
+
+        it('loads ESM named export helpers and render them', async () => {
+
+            const tempView = new Manager({
+                engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
+                path: __dirname + '/templates/valid',
+                helpersPath: __dirname + '/templates/valid/helpers'
+            });
+
+            const rendered = await tempView.render('testHelpersESMNamedExport', { something: 'uppercase' });
+            expect(rendered).to.equal('<p>This is all UPPERCASE and this is how we like it!</p>\n');
+        });
+
         it('loads helpers and render them', async () => {
 
             const tempView = new Manager({
