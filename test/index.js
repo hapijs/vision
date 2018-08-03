@@ -620,6 +620,82 @@ describe('views()', () => {
     });
 });
 
+describe('Vision module', () => {
+
+    it('gets the views manager via "Vision.getManager", receives a server, request, or realm', async () => {
+
+        const rootServer = Hapi.server();
+        await rootServer.register(Vision);
+
+        // rootServer.views returns the manager
+        const rootViewsManager = rootServer.views({
+            engines: { 'html': Handlebars },
+            relativeTo: Path.join(__dirname, '/templates'),
+            path: 'valid'
+        });
+
+        let oneViewsManager;
+        let oneRealm;
+
+        const one = {
+            name: 'one',
+            register: async function (server, options) {
+
+                await server.register(Vision);
+
+                oneRealm = server.realm;
+
+                oneViewsManager = server.views({
+                    engines: { 'html': Handlebars },
+                    relativeTo: Path.join(__dirname, '/templates'),
+                    path: 'plugin'
+                });
+
+                server.route({
+                    path: '/viewPluginOne',
+                    method: 'GET',
+                    handler: (request, h) => {
+
+                        const oneRequestViewsManager = Vision.getManager(request);
+                        expect(oneRequestViewsManager).to.exist();
+                        return h.view('test', { message: 'Plugin One' });
+                    }
+                });
+            }
+        };
+
+        await rootServer.register(one);
+        rootServer.route({ path: '/view', method: 'GET', handler: (request, h) => h.view('test', { message: 'Hello!' }) });
+
+        const resPlugin1 = await rootServer.inject('/viewPluginOne');
+        const resRootServer = await rootServer.inject('/view');
+
+        expect(rootViewsManager).to.exist();
+        expect(oneViewsManager).to.exist();
+
+        expect(rootViewsManager).to.not.equal(oneViewsManager);
+
+        const getRootManager = Vision.getManager(rootServer);
+        const getOneRealmManager = Vision.getManager(oneRealm);
+
+        expect(getRootManager).to.equal(rootViewsManager);
+        expect(getOneRealmManager).to.equal(oneViewsManager);
+
+        expect(() => {
+
+            Vision.getManager(false);
+        }).to.throw(/Must pass a server, request, or realm to \"Vision.getManager\"/);
+
+        expect(() => {
+
+            Vision.getManager({});
+        }).to.throw(/Must pass a server, request, or realm to \"Vision.getManager\"/);
+
+        expect(resPlugin1.result).to.equal('<h1>Plugin One</h1>');
+        expect(resRootServer.result).to.equal('<div>\n    <h1>Hello!</h1>\n</div>\n');
+    });
+});
+
 describe('Plugin', () => {
 
     it('registers multiple times', async () => {
