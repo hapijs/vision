@@ -271,7 +271,7 @@ describe('render()', () => {
             register: async function (server, options) {
 
                 server.views({
-                    engines: { 'html': Handlebars },
+                    engines: { html: Handlebars },
                     relativeTo: Path.join(__dirname, '/templates/plugin')
                 });
 
@@ -304,7 +304,7 @@ describe('render()', () => {
         await server.register(Vision);
 
         server.views({
-            engines: { 'html': Handlebars },
+            engines: { html: Handlebars },
             relativeTo: Path.join(__dirname, '/templates/plugin')
         });
 
@@ -321,7 +321,7 @@ describe('render()', () => {
             register: async function (server, options) {
 
                 server.views({
-                    engines: { 'html': Handlebars }
+                    engines: { html: Handlebars }
                 });
 
                 const rendered = await server.render('test', { message: 'steve' }, { relativeTo: Path.join(__dirname, '/templates/plugin') });
@@ -353,7 +353,7 @@ describe('render()', () => {
             register: function (server, options) {
 
                 server.views({
-                    engines: { 'html': Handlebars },
+                    engines: { html: Handlebars },
                     relativeTo: Path.join(__dirname, '/templates/plugin')
                 });
 
@@ -444,7 +444,7 @@ describe('views()', () => {
                 await server.register(Vision);
 
                 const views = {
-                    engines: { 'html': Handlebars },
+                    engines: { html: Handlebars },
                     path: './templates/plugin'
                 };
 
@@ -474,7 +474,7 @@ describe('views()', () => {
             register: function (server, options) {
 
                 server.views({
-                    engines: { 'html': Handlebars },
+                    engines: { html: Handlebars },
                     relativeTo: Path.join(__dirname, '/templates/plugin')
                 });
 
@@ -502,7 +502,7 @@ describe('views()', () => {
                 await server.register(Vision);
 
                 const views = {
-                    engines: { 'html': Handlebars },
+                    engines: { html: Handlebars },
                     path: './templates/plugin2'
                 };
 
@@ -529,7 +529,7 @@ describe('views()', () => {
         await server.register({ plugin: test, options: { message: 'viewing it' } });
 
         server.views({
-            engines: { 'html': Handlebars },
+            engines: { html: Handlebars },
             path: __dirname + '/templates/valid'
         });
 
@@ -566,7 +566,7 @@ describe('views()', () => {
         server.path(__dirname);
 
         server.views({
-            engines: { 'html': Handlebars },
+            engines: { html: Handlebars },
             path: './templates/plugin'
         });
 
@@ -579,10 +579,10 @@ describe('views()', () => {
 
         const server = Hapi.server();
         await server.register(Vision);
-        server.views({ engines: { 'html': Handlebars } });
+        server.views({ engines: { html: Handlebars } });
         expect(() => {
 
-            server.views({ engines: { 'html': Handlebars } });
+            server.views({ engines: { html: Handlebars } });
         }).to.throw('Cannot set views manager more than once per realm');
     });
 
@@ -592,7 +592,7 @@ describe('views()', () => {
         await server.register(Vision);
 
         const manager = server.views({
-            engines: { 'html': Handlebars.create() },
+            engines: { html: Handlebars.create() },
             relativeTo: 'test/templates',
             path: 'valid'
         });
@@ -610,7 +610,7 @@ describe('views()', () => {
         await server.register(Vision);
 
         const manager = server.views({
-            engines: { 'html': Handlebars },
+            engines: { html: Handlebars },
             relativeTo: 'test/templates',
             path: 'valid'
         });
@@ -629,7 +629,7 @@ describe('Vision module', () => {
 
         // rootServer.views returns the manager
         const rootViewsManager = rootServer.views({
-            engines: { 'html': Handlebars },
+            engines: { html: Handlebars },
             relativeTo: Path.join(__dirname, '/templates'),
             path: 'valid'
         });
@@ -646,7 +646,7 @@ describe('Vision module', () => {
                 oneRealm = server.realm;
 
                 oneViewsManager = server.views({
-                    engines: { 'html': Handlebars },
+                    engines: { html: Handlebars },
                     relativeTo: Path.join(__dirname, '/templates'),
                     path: 'plugin'
                 });
@@ -707,7 +707,7 @@ describe('Plugin', () => {
                 await server.register({
                     plugin: Vision,
                     options: {
-                        engines: { 'html': Handlebars },
+                        engines: { html: Handlebars },
                         relativeTo: Path.join(__dirname, '/templates'),
                         path: 'plugin'
                     }
@@ -731,7 +731,7 @@ describe('Plugin', () => {
                 await server.register({
                     plugin: Vision,
                     options: {
-                        engines: { 'html': Handlebars },
+                        engines: { html: Handlebars },
                         relativeTo: Path.join(__dirname, '/templates'),
                         path: 'plugin'
                     }
@@ -754,7 +754,7 @@ describe('Plugin', () => {
         await server.register({
             plugin: Vision,
             options: {
-                engines: { 'html': Handlebars },
+                engines: { html: Handlebars },
                 relativeTo: Path.join(__dirname, '/templates'),
                 path: 'valid'
             }
@@ -778,6 +778,71 @@ describe('Plugin', () => {
         expect(resRootServer.result).to.equal('<div>\n    <h1>Root Server</h1>\n</div>\n');
     });
 
+    it('manager gives config via "getExtensionConfig"', async () => {
+
+        const rootServer = Hapi.server();
+
+        const relativeToPath = 'test/templates';
+
+        await rootServer.register({
+            plugin: Vision,
+            options: {
+                engines: { html: Handlebars.create() },
+                relativeTo: relativeToPath,
+                path: 'valid'
+            }
+        });
+
+        const one = {
+            name: 'one',
+            register: async function (server, options) {
+
+                await server.register({
+                    plugin: Vision,
+                    options: {
+                        engines: {
+                            html: Handlebars,
+                            pug: Pug
+                        },
+                        relativeTo: Path.join(__dirname, '/templates'),
+                        path: 'plugin'
+                    }
+                });
+
+                const manager = Vision.getManager(server);
+
+                expect(() => {
+
+                    manager.getExtensionConfig();
+                }).to.throw(/Must provide extension or must use only one extension in views options/);
+
+                expect(() => {
+
+                    manager.getExtensionConfig('bogusExtension');
+                }).to.throw('Extension "bogusExtension" not found on manager');
+
+                server.route({
+                    path: '/viewPluginOne',
+                    method: 'GET',
+                    handler: (request, h) => {
+
+                        return h.view('test', { message: 'Plugin One' });
+                    }
+                });
+            }
+        };
+
+        await rootServer.register(one);
+
+        const rootManager = Vision.getManager(rootServer);
+
+        const htmlConfig = rootManager.getExtensionConfig();
+        const htmlConfigByKey = rootManager.getExtensionConfig('html');
+
+        expect(htmlConfig.relativeTo).to.equal(relativeToPath);
+        expect(htmlConfig).to.equal(htmlConfigByKey);
+    });
+
     it('passes plugin options to manager', async () => {
 
         const server = Hapi.server();
@@ -785,7 +850,7 @@ describe('Plugin', () => {
         await server.register({
             plugin: Vision,
             options: {
-                engines: { 'html': Handlebars },
+                engines: { html: Handlebars },
                 relativeTo: Path.join(__dirname, '/templates'),
                 path: 'valid'
             }
@@ -821,7 +886,7 @@ describe('Plugin', () => {
                 await server.register({
                     plugin: Vision,
                     options: {
-                        engines: { 'html': Handlebars },
+                        engines: { html: Handlebars },
                         relativeTo: Path.join(__dirname, '/templates'),
                         path: 'plugin2'
                     }
@@ -847,7 +912,7 @@ describe('Plugin', () => {
                 await server.register(Vision);
 
                 server.views({
-                    engines: { 'html': Handlebars },
+                    engines: { html: Handlebars },
                     relativeTo: Path.join(__dirname, '/templates'),
                     path: 'plugin3'
                 });
@@ -900,7 +965,7 @@ describe('Plugin', () => {
         await server.register({
             plugin: Vision,
             options: {
-                engines: { 'html': Handlebars },
+                engines: { html: Handlebars },
                 relativeTo: Path.join(__dirname, '/templates'),
                 path: 'valid'
             }
