@@ -620,6 +620,77 @@ describe('views()', () => {
     });
 });
 
+describe('getViewsManager()', () => {
+
+    it('gets the views manager via the "getViewsManager" decoration on server, request, and toolkit', async () => {
+
+        const rootServer = Hapi.server();
+        await rootServer.register(Vision);
+
+        // rootServer.views returns the manager
+        const rootViewsManager = rootServer.views({
+            engines: { 'html': Handlebars },
+            relativeTo: Path.join(__dirname, '/templates'),
+            path: 'valid'
+        });
+
+        let oneViewsManager;
+
+        const one = {
+            name: 'one',
+            register: async function (server, options) {
+
+                await server.register(Vision);
+
+                const pluginManagerBeforeCallingViews = server.getViewsManager();
+                expect(pluginManagerBeforeCallingViews).to.equal(rootViewsManager);
+
+                oneViewsManager = server.views({
+                    engines: { 'html': Handlebars },
+                    relativeTo: Path.join(__dirname, '/templates'),
+                    path: 'plugin'
+                });
+
+                const pluginManager = server.getViewsManager();
+                expect(pluginManager).to.not.equal(pluginManagerBeforeCallingViews);
+                expect(pluginManager).to.equal(oneViewsManager);
+
+                server.route({
+                    path: '/viewPluginOne',
+                    method: 'GET',
+                    handler: (request, h) => {
+
+                        const hViewsManager = h.getViewsManager();
+                        const requestViewsManager = request.getViewsManager();
+
+                        expect(hViewsManager).to.equal(requestViewsManager);
+                        expect(pluginManager).to.equal(requestViewsManager);
+
+                        oneViewsManager = hViewsManager;
+
+                        return h.view('test', { message: 'Plugin One' });
+                    }
+                });
+            }
+        };
+
+        await rootServer.register(one);
+        rootServer.route({ path: '/view', method: 'GET', handler: (request, h) => h.view('test', { message: 'Hello!' }) });
+
+        const resPlugin1 = await rootServer.inject('/viewPluginOne');
+        const resRootServer = await rootServer.inject('/view');
+
+        expect(resPlugin1.result).to.equal('<h1>Plugin One</h1>');
+        expect(resRootServer.result).to.equal('<div>\n    <h1>Hello!</h1>\n</div>\n');
+
+        // Check the managers
+        expect(oneViewsManager._engines.html.config.path).to.equal('plugin');
+        expect(rootViewsManager).to.not.equal(oneViewsManager);
+        expect(rootViewsManager._engines.html.config.path).to.equal('valid');
+        expect(rootViewsManager).to.equal(rootServer.getViewsManager());
+    });
+});
+
 describe('Plugin', () => {
 
     it('registers multiple times', async () => {
