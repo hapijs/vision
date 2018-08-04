@@ -2,6 +2,7 @@
 // Load modules
 
 const Fs = require('fs');
+const Path = require('path');
 const Util = require('util');
 
 const Code = require('code');
@@ -871,6 +872,74 @@ describe('Manager', () => {
             const res = await server.inject('/');
             expect(res.statusCode).to.equal(500);
         });
+    });
+
+    it('manager gives config via "getExtensionConfig"', async () => {
+
+        const rootServer = Hapi.server();
+        const relativeToPath = 'test/templates';
+
+        await rootServer.register({
+            plugin: Vision,
+            options: {
+                engines: { html: Handlebars.create() },
+                relativeTo: relativeToPath,
+                path: 'valid'
+            }
+        });
+
+        const one = {
+            name: 'one',
+            register: async function (server, options) {
+
+                await server.register({
+                    plugin: Vision,
+                    options: {
+                        engines: {
+                            html: Handlebars,
+                            pug: Pug
+                        },
+                        relativeTo: Path.join(__dirname, '/templates'),
+                        path: 'plugin'
+                    }
+                });
+
+                const manager = server.getViewsManager();
+
+                expect(() => {
+
+                    manager.getExtensionConfig();
+                }).to.throw(/Must provide extension or must use only one extension in views options/);
+
+                expect(() => {
+
+                    manager.getExtensionConfig('bogusExtension');
+                }).to.throw(/Extension \"bogusExtension\" not found on manager/);
+
+
+                const htmlConfig = manager.getExtensionConfig('html');
+                expect(htmlConfig.path).to.equal('plugin');
+
+                server.route({
+                    path: '/viewPluginOne',
+                    method: 'GET',
+                    handler: (request, h) => {
+
+                        return h.view('test', { message: 'Plugin One' });
+                    }
+                });
+            }
+        };
+
+        await rootServer.register(one);
+        const rootManager = rootServer.getViewsManager();
+        const htmlConfig = rootManager.getExtensionConfig();
+        const htmlConfigByKey = rootManager.getExtensionConfig('html');
+
+        expect(htmlConfigByKey).to.equal(htmlConfig);
+        expect(htmlConfig.relativeTo).to.equal(relativeToPath);
+        expect(htmlConfig.path).to.equal('valid');
+        expect(rootServer.getViewsManager().getExtensionConfig()).to.equal(htmlConfig);
     });
 
     describe('render()', () => {
