@@ -2,6 +2,7 @@
 // Load modules
 
 const Fs = require('fs');
+const Path = require('path');
 const Util = require('util');
 
 const Code = require('code');
@@ -873,6 +874,74 @@ describe('Manager', () => {
         });
     });
 
+    it('manager gives engine via "getEngine"', async () => {
+
+        const rootServer = Hapi.server();
+        const relativeToPath = 'test/templates';
+
+        await rootServer.register({
+            plugin: Vision,
+            options: {
+                engines: { html: Handlebars.create() },
+                relativeTo: relativeToPath,
+                path: 'valid'
+            }
+        });
+
+        const one = {
+            name: 'one',
+            register: async function (server, options) {
+
+                await server.register({
+                    plugin: Vision,
+                    options: {
+                        engines: {
+                            html: Handlebars,
+                            pug: Pug
+                        },
+                        relativeTo: Path.join(__dirname, '/templates'),
+                        path: 'plugin'
+                    }
+                });
+
+                const manager = server.getViewsManager();
+
+                expect(() => {
+
+                    manager.getEngine().config;
+                }).to.throw(/Must provide an extension or set defaultExtension in manager options/);
+
+                expect(() => {
+
+                    manager.getEngine('bogusExtension').config;
+                }).to.throw(/Extension \"bogusExtension\" not found on manager/);
+
+
+                const htmlConfig = manager.getEngine('html').config;
+                expect(htmlConfig.path).to.equal('plugin');
+
+                server.route({
+                    path: '/viewPluginOne',
+                    method: 'GET',
+                    handler: (request, h) => {
+
+                        return h.view('test', { message: 'Plugin One' });
+                    }
+                });
+            }
+        };
+
+        await rootServer.register(one);
+        const rootManager = rootServer.getViewsManager();
+        const htmlConfig = rootManager.getEngine().config;
+        const htmlConfigByKey = rootManager.getEngine('html').config;
+
+        expect(htmlConfigByKey).to.equal(htmlConfig);
+        expect(htmlConfig.relativeTo).to.equal(relativeToPath);
+        expect(htmlConfig.path).to.equal('valid');
+        expect(rootServer.getViewsManager().getEngine().config).to.equal(htmlConfig);
+    });
+
     describe('render()', () => {
 
         it('renders with async compile', async () => {
@@ -1666,9 +1735,9 @@ describe('Manager', () => {
             expect(original).to.exist();
             expect(original).to.contain('Hapi');
 
-            const notCached = await views.render('valid/test', { title: 'test', message: 'Hapi' });
+            const notCached = await views.render('valid/test', { title: 'test', message: 'Joi' });
             expect(notCached).to.exist();
-            expect(notCached).to.contain('Hapi');
+            expect(notCached).to.contain('Joi');
 
             expect(gen).to.equal(2);
         });
@@ -1823,6 +1892,142 @@ describe('Manager', () => {
             });
 
             expect(changedBack).to.equal(originalPartialAndHelperValues);
+        });
+    });
+
+    describe('clearCache()', () => {
+
+        it('clears cache given a path', async () => {
+
+            let gen = 0;
+            let gen2 = 0;
+
+            const viewsManager = new Manager({
+                path: __dirname + '/templates',
+                engines: {
+                    html: {
+                        compileMode: 'async',
+                        module: {
+                            compile: function (string, options, callback) {
+
+                                ++gen;
+                                const compiled = Handlebars.compile(string, options);
+                                const renderer = function (context, opt, next) {
+
+                                    return next(null, compiled(context, opt));
+                                };
+
+                                return callback(null, renderer);
+                            }
+                        }
+                    },
+                    pug: Pug
+                },
+                isCached: true
+            });
+
+            const viewsManager2 = new Manager({
+                path: __dirname + '/templates',
+                engines: {
+                    html: {
+                        compileMode: 'async',
+                        module: {
+                            compile: function (string, options, callback) {
+
+                                ++gen2;
+                                const compiled = Handlebars.compile(string, options);
+                                const renderer = function (context, opt, next) {
+
+                                    return next(null, compiled(context, opt));
+                                };
+
+                                return callback(null, renderer);
+                            }
+                        }
+                    }
+                },
+                defaultExtension: 'html',
+                isCached: true
+            });
+
+            const original = await viewsManager.render('valid/test.html', { title: 'test', message: 'Hapi' });
+            expect(original).to.exist();
+            expect(original).to.contain('Hapi');
+
+            const cached = await viewsManager.render('valid/test.html', { title: 'test', message: 'Joi' });
+            expect(cached).to.exist();
+            expect(cached).to.contain('Joi');
+
+            expect(gen).to.equal(1);
+
+            const engine = viewsManager.getEngine('html');
+
+            viewsManager.clearCache('valid/test', engine);
+
+            const notCached = await viewsManager.render('valid/test.html', { title: 'test', message: 'Inert' });
+            expect(notCached).to.exist();
+            expect(notCached).to.contain('Inert');
+
+            expect(gen).to.equal(2);
+
+            // Err checks
+            expect(() => {
+
+                viewsManager.clearCache();
+            })
+                .to.throw(/template is required/);
+
+            expect(() => {
+
+                viewsManager.clearCache('valid/test');
+            })
+                .to.throw(/Must pass the engine, have a single engine on the manager, have an extension on the template name, or set defaultExtension on manager options/);
+
+            const original2 = await viewsManager2.render('valid/test', { title: 'test', message: 'Hapi' });
+            expect(original2).to.exist();
+            expect(original2).to.contain('Hapi');
+
+            const cached2 = await viewsManager2.render('valid/test', { title: 'test', message: 'Joi' });
+            expect(cached2).to.exist();
+            expect(cached2).to.contain('Joi');
+
+            expect(gen2).to.equal(1);
+
+            viewsManager2.clearCache('valid/test');
+
+            const notCached2 = await viewsManager2.render('valid/test', { title: 'test', message: 'Inert' });
+            expect(notCached2).to.exist();
+            expect(notCached2).to.contain('Inert');
+
+            expect(gen2).to.equal(2);
+
+            // Allow user-supplied suffix
+            viewsManager2.clearCache('valid/test.html');
+
+            const notCached3 = await viewsManager2.render('valid/test', { title: 'test', message: 'Vision' });
+            expect(notCached3).to.exist();
+            expect(notCached3).to.contain('Vision');
+
+            expect(gen2).to.equal(3);
+
+            // Warnings
+
+            const buffer = [];
+            const oldWarn = console.warn;
+
+            console.warn = (...args) => {
+
+                const message = Util.format(...args);
+
+                buffer.push(message);
+            };
+
+            viewsManager2.clearCache('some/bogus/path');
+
+            expect(buffer.length).to.equal(1);
+            expect(buffer[0]).to.equal('Template cache not found for path ' + __dirname + '/templates/some/bogus/path.html, cache not cleared');
+
+            console.warn = oldWarn;
         });
     });
 
