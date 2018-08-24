@@ -1,4 +1,4 @@
-# v5.3.x API Reference
+# v5.4.x API Reference
 
 Most interaction with **vision** is done via the `h` [response toolkit](https://github.com/hapijs/hapi/blob/master/API.md#response-toolkit)
 and [server](https://github.com/hapijs/hapi/blob/master/API.md#server) interfaces.
@@ -8,14 +8,19 @@ and [server](https://github.com/hapijs/hapi/blob/master/API.md#server) interface
   - [`options`](#options)
   - [`manager.registerHelper(name, helper)`](#managerregisterhelpername-helper)
   - [`manager.render(template, context, options, callback)`](#managerrendertemplate-context-options-callback)
+  - [`manager.getEngine(ext)`](#managergetengineext)
+  - [`manager.clearCache(template, [engine])`](#managerclearcachetemplate-engine)
 - [Server](#server)
   - [`server.views(options)`](#serverviewsoptions)
   - [`server.render(template, context, [options], [callback])`](#serverrendertemplate-context-options-callback)
+  - [`server.getViewsManager()`](#servergetviewsmanager)
 - [Requests](#requests)
   - [`request.render(template, context, [options], [callback])`](#requestrendertemplate-context-options-callback)
-  - [The `view` handler](#the-view-handler)
+  - [`request.getViewsManager()`](#requestgetviewsmanager)
+- [The `view` handler](#the-view-handler)
 - [`h` response toolkit interface](#response-toolkit-interface)
   - [`h.view(template, [context], [options]])`](#hviewtemplate-context-options)
+  - [`h.getViewsManager()`](#hgetviewsmanager)
 
 ## Registration
 
@@ -137,6 +142,16 @@ Registers a helper, on all configured engines that have a `registerHelper()` met
 
 Renders a template. This is typically not needed and it is usually more convenient to use [`server.render()`](#serverrendertemplate-context-options-callback).
 
+## `manager.getEngine(ext)`
+
+- `ext`- The extension used when registering the engine -- check the keys used when configuring `engines` in [`views manager options`](#options)
+
+## `manager.clearCache(template, [engine])`
+
+- `template` - the template filename and path, relative to the views manager templates path (`path`
+  or `relativeTo`).
+- `engine` - the engine returned by `manager.getEngine(ext)`
+
 ## [Server](https://github.com/hapijs/hapi/blob/master/API.md#server)
 
 ### `server.views(options)`
@@ -186,6 +201,9 @@ internals.provision = async () => {
 internals.provision();
 ```
 
+### `server.getViewsManager()`
+Returns the closest [Views manager](#views-manager) to your `realm` (either on your realm or inherited from an ancestor realm)
+
 ## [Requests](https://github.com/hapijs/hapi/blob/master/API.md#requests)
 
 ### `request.render(template, context, [options], [callback])`
@@ -227,6 +245,9 @@ internals.provision = async () => {
 
 internals.provision();
 ```
+
+### `request.getViewsManager()`
+Returns the closest [Views manager](#views-manager) to your `realm` (either on your realm or inherited from an ancestor realm)
 
 ## The `view` [handler](https://github.com/hapijs/hapi/blob/master/API.md#serverdecoratetype-property-method-options)
 
@@ -331,6 +352,12 @@ internals.provision = async () => {
 
 internals.provision();
 ```
+
+### `h.getViewsManager()`
+Returns the closest [Views manager](#views-manager) to your `realm` (either on your realm or inherited from an ancestor realm)
+
+
+#### Ex template used in these docs
 
 **templates/hello.html**
 
