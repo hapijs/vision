@@ -20,7 +20,7 @@
     },
     "dependencies": {
         "boom": "7.x.x",
-        "hoek": "5.x.x",
+        "hoek": "6.x.x",
         "items": "2.x.x",
         "joi": "14.x.x"
     },
