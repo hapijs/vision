@@ -10,9 +10,6 @@
         "template",
         "hapi"
     ],
-    "engines": {
-        "node": ">=8.12.0"
-    },
     "scripts": {
         "test": "lab -a code -t 100 -L -I '__core-js_shared__'",
         "test-cov-html": "lab -a code -r html -o coverage.html",
@@ -23,9 +20,6 @@
         "hoek": "6.x.x",
         "items": "2.x.x",
         "joi": "14.x.x"
-    },
-    "peerDependencies": {
-        "hapi": "17.x.x"
     },
     "devDependencies": {
         "babel-core": "6.x.x",
@@ -40,7 +34,7 @@
         "marko": "4.x.x",
         "mustache": "^2.3.x",
         "nunjucks": "3.x.x",
-        "pug": ">=2.0.0-rc.4",
+        "pug": "2.x.x",
         "react": "16.x.x",
         "react-dom": "16.x.x",
         "twig": "1.x.x"

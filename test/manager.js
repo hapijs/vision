@@ -1,5 +1,4 @@
 'use strict';
-// Load modules
 
 const Fs = require('fs');
 const Path = require('path');
@@ -16,12 +15,8 @@ const Mustache = require('mustache');
 const Manager = require('../lib/manager');
 
 
-// Declare internals
-
 const internals = {};
 
-
-// Test shortcuts
 
 const lab = exports.lab = Lab.script();
 const describe = lab.describe;
