@@ -5,6 +5,7 @@ const Hapi = require('hapi');
 const Vision = require('../..');
 const Path = require('path');
 const Pug = require('pug');
+const Path = require('path');
 
 
 // Declare internals
@@ -37,7 +38,10 @@ internals.main = async () => {
     server.views({
         engines: { pug: Pug },
         relativeTo: __dirname,
-        path: `templates/${internals.templatePath}`
+        path: `templates/${internals.templatePath}`,
+        compileOptions: {
+            basedir: Path.join(__dirname, 'examples/pug/templates'),
+        }
     });
 
     server.route({ method: 'GET', path: '/', handler: rootHandler });
