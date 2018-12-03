@@ -178,6 +178,8 @@ const provision = async () => {
         relativeTo: __dirname,
         path: 'examples/pug/templates',
         compileOptions: {
+            // By default Pug uses relative paths (e.g. ../root.pug), when using absolute paths (e.g. include /root.pug), basedir is prepended.
+            // https://pugjs.org/language/includes.html
             basedir: Path.join(__dirname, 'examples/pug/templates'),
         }
     });

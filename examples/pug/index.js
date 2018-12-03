@@ -5,7 +5,6 @@ const Hapi = require('hapi');
 const Vision = require('../..');
 const Path = require('path');
 const Pug = require('pug');
-const Path = require('path');
 
 
 // Declare internals
@@ -40,6 +39,8 @@ internals.main = async () => {
         relativeTo: __dirname,
         path: `templates/${internals.templatePath}`,
         compileOptions: {
+            // By default Pug uses relative paths (e.g. ../root.pug), when using absolute paths (e.g. include /root.pug), basedir is prepended.
+            // https://pugjs.org/language/includes.html
             basedir: Path.join(__dirname, 'examples/pug/templates'),
         }
     });
