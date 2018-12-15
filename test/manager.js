@@ -2117,4 +2117,57 @@ describe('Manager', () => {
             expect(res.payload).to.contain('<h1>global</h1>');
         });
     });
+
+    describe('_bustRequireChache()', () => {
+
+        it('check that if a file was loaded and is in cache - it is removed correctly', () => {
+
+            const modulePath = Path.resolve(__dirname, 'testModule');
+            require(modulePath);
+            const options = {
+                engines: {
+                    html: {
+                        module: require('handlebars'),
+                        path: __dirname + '/templates/valid'
+                    }
+                },
+                context: {
+                    a: 1
+                }
+            };
+
+            const manager = new Manager(options);
+            const moduleKey = require.resolve(modulePath);
+            const moduleRef = require.cache[moduleKey];
+
+            expect(require.cache[moduleKey]).to.exist();
+            const parentRef = require.cache[moduleKey].parent;
+            expect(parentRef.children).to.include(moduleRef);
+            manager._bustRequireCache(modulePath);
+            expect(require.cache[moduleKey]).to.not.exist();
+            expect(parentRef.children).to.not.include(moduleRef);
+        });
+
+        it('calling with module that was already removed does not throw', () => {
+
+            const modulePath = Path.resolve(__dirname, 'testModule');
+            require(modulePath);
+            const options = {
+                engines: {
+                    html: {
+                        module: require('handlebars'),
+                        path: __dirname + '/templates/valid'
+                    }
+                },
+                context: {
+                    a: 1
+                }
+            };
+
+            const manager = new Manager(options);
+            manager._bustRequireCache(modulePath);
+            expect(manager._bustRequireCache.bind(manager,modulePath)).to.not.throw();
+
+        });
+    });
 });
