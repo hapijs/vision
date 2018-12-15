@@ -2120,7 +2120,7 @@ describe('Manager', () => {
 
     describe('_bustRequireChache()', () => {
 
-        it('check that if a file was loaded and is in cache - it is removed correctly', () => {
+        it('checks that if a file was loaded and is in cache - it is removed correctly', () => {
 
             const modulePath = Path.resolve(__dirname, 'testModule');
             require(modulePath);
@@ -2148,7 +2148,7 @@ describe('Manager', () => {
             expect(parentRef.children).to.not.include(moduleRef);
         });
 
-        it('calling with module that was already removed does not throw', () => {
+        it('does not throw when calling with module that was already removed', () => {
 
             const modulePath = Path.resolve(__dirname, 'testModule');
             require(modulePath);
@@ -2166,8 +2166,7 @@ describe('Manager', () => {
 
             const manager = new Manager(options);
             manager._bustRequireCache(modulePath);
-            expect(manager._bustRequireCache.bind(manager,modulePath)).to.not.throw();
-
+            expect(manager._bustRequireCache.bind(manager, modulePath)).to.not.throw();
         });
     });
 });
