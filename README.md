@@ -2,6 +2,8 @@
 
 Templates rendering plugin support for hapi.js.
 
+Supports hapi **v17.x.x, v18.x.x**
+
 [![Build Status](https://travis-ci.org/hapijs/vision.svg)](http://travis-ci.org/hapijs/vision) [![Coverage Status](https://coveralls.io/repos/github/hapijs/vision/badge.svg?branch=master)](https://coveralls.io/github/hapijs/vision?branch=master)
 
 Lead Maintainer - [William Woodruff](https://github.com/wswoodruff)
@@ -34,7 +36,7 @@ provision();
 ```
 
 ### Note:
-- Vision `5.x.x` requires hapi `17.x.x`. For use with hapi `16.x.x`, use vision `4.x.x`.
+- Vision `5.x.x` requires at least hapi `17.x.x`. For use with hapi `16.x.x`, use vision `4.x.x`.
 - Vision is included with and loaded by default in Hapi < `9.0`.
 
 
