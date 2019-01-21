@@ -28,7 +28,7 @@
         "coveralls": "3.x.x",
         "ejs": "^2.5.5",
         "handlebars": "4.x.x",
-        "hapi": "17.x.x",
+        "hapi": "18.x.x",
         "hapi-react-views": "10.x.x",
         "lab": "17.x.x",
         "marko": "4.x.x",
