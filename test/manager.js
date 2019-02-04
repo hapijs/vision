@@ -1091,6 +1091,32 @@ describe('Manager', () => {
             expect(rendered).to.contain('<h1>default message</h1>');
         });
 
+        it('renders with an async global context function (no request)', async () => {
+
+            const asyncFn = () => Promise.resolve('global');
+
+            const testView = new Manager({
+                engines: { html: require('handlebars') },
+                path: __dirname + '/templates',
+
+                context: async function (request) {
+
+                    return {
+                        message: request ? request.route.path : 'default message',
+
+                        query: {
+                            test: await asyncFn()
+                        }
+                    };
+                }
+            });
+
+            const rendered = await testView.render('valid/testContext');
+            expect(rendered).to.exist();
+            expect(rendered).to.contain('<h1>global</h1>');
+            expect(rendered).to.contain('<h1>default message</h1>');
+        });
+
         it('overrides the global context function values with local values', async () => {
 
             const testView = new Manager({
