@@ -125,7 +125,7 @@ The Views Manager is configured with [`registration options`](#registration) or 
     Defaults to empty options `{}`.
   - `contentType` - the content type of the engine results. Defaults to `'text/html'`.
   - `context` - a global context used with all templates. The global context option can be either
-    an object or a function (can be async) that takes the [`request`](https://github.com/hapijs/hapi/blob/master/API.md#request)
+    an object or a function (can be async or return a promise) that takes the [`request`](https://github.com/hapijs/hapi/blob/master/API.md#request)
     as its only argument and returns a context object. The [`request`](https://github.com/hapijs/hapi/blob/master/API.md#request) object is only provided when using
     the [view handler](#the-view-handler) or [`h.view()`](#hviewtemplate-context-options). When using
     [`server.render()`](#serverrendertemplate-context-options-callback) or

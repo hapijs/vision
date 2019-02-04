@@ -1093,7 +1093,7 @@ describe('Manager', () => {
 
         it('renders with an async global context function (no request)', async () => {
 
-            const asyncFn = () => Promise.resolve('global');
+            const asyncFn = () => Promise.resolve('from async');
 
             const testView = new Manager({
                 engines: { html: require('handlebars') },
@@ -1113,7 +1113,31 @@ describe('Manager', () => {
 
             const rendered = await testView.render('valid/testContext');
             expect(rendered).to.exist();
-            expect(rendered).to.contain('<h1>global</h1>');
+            expect(rendered).to.contain('<h1>from async</h1>');
+            expect(rendered).to.contain('<h1>default message</h1>');
+        });
+
+        it('renders with a global context function that returns a pomise (no request)', async () => {
+
+            const testView = new Manager({
+                engines: { html: require('handlebars') },
+                path: __dirname + '/templates',
+
+                context: function (request) {
+
+                    return Promise.resolve({
+                        message: request ? request.route.path : 'default message',
+
+                        query: {
+                            test: 'from promise'
+                        }
+                    });
+                }
+            });
+
+            const rendered = await testView.render('valid/testContext');
+            expect(rendered).to.exist();
+            expect(rendered).to.contain('<h1>from promise</h1>');
             expect(rendered).to.contain('<h1>default message</h1>');
         });
 
