@@ -1076,7 +1076,7 @@ describe('Manager', () => {
                 context: function (request) {
 
                     return {
-                        message: request ? request.route.path : 'default message',
+                        message: 'default message',
 
                         query: {
                             test: 'global'
@@ -1102,7 +1102,7 @@ describe('Manager', () => {
                 context: async function (request) {
 
                     return {
-                        message: request ? request.route.path : 'default message',
+                        message: 'default message',
 
                         query: {
                             test: await asyncFn()
@@ -1117,7 +1117,7 @@ describe('Manager', () => {
             expect(rendered).to.contain('<h1>default message</h1>');
         });
 
-        it('renders with a global context function that returns a pomise (no request)', async () => {
+        it('renders with a global context function that returns a promise (no request)', async () => {
 
             const testView = new Manager({
                 engines: { html: require('handlebars') },
@@ -1126,7 +1126,7 @@ describe('Manager', () => {
                 context: function (request) {
 
                     return Promise.resolve({
-                        message: request ? request.route.path : 'default message',
+                        message: 'default message',
 
                         query: {
                             test: 'from promise'
