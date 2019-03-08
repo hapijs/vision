@@ -947,15 +947,16 @@ describe('Manager', () => {
                     html: {
                         compileMode: 'async',
                         module: {
-                            compile: function (string, options, callback) {
+                            compile: function (string, options) {
+
 
                                 const compiled = Handlebars.compile(string, options);
-                                const renderer = function (context, opt, next) {
+                                const renderer = function (context, opt) {
 
-                                    return next(null, compiled(context, opt));
+                                    return compiled(context, opt);
                                 };
 
-                                return callback(null, renderer);
+                                return renderer;
                             }
                         }
                     }
@@ -1280,7 +1281,11 @@ describe('Manager', () => {
                 layout: 'badlayout'
             });
 
-            await expect(views.render('valid/test', { title: 'test', message: 'Hapi' })).to.reject('Parse error on line 1:\n{{}\n--^\nExpecting \'ID\', \'STRING\', \'NUMBER\', \'BOOLEAN\', \'UNDEFINED\', \'NULL\', \'DATA\', got \'INVALID\': Parse error on line 1:\n{{}\n--^\nExpecting \'ID\', \'STRING\', \'NUMBER\', \'BOOLEAN\', \'UNDEFINED\', \'NULL\', \'DATA\', got \'INVALID\'');
+            await expect(
+                views.render('valid/test', { title: 'test', message: 'Hapi' })
+            ).to.reject(
+                'Parse error on line 1:\n{{}\n--^\nExpecting \'ID\', \'STRING\', \'NUMBER\', \'BOOLEAN\', \'UNDEFINED\', \'NULL\', \'DATA\', got \'INVALID\''
+            );
         });
 
         it('errors on layout compile error', async () => {
@@ -1722,16 +1727,16 @@ describe('Manager', () => {
                     html: {
                         compileMode: 'async',
                         module: {
-                            compile: function (string, options, callback) {
+                            compile: function (string, options) {
 
                                 ++gen;
                                 const compiled = Handlebars.compile(string, options);
-                                const renderer = function (context, opt, next) {
+                                const renderer = function (context, opt) {
 
-                                    return next(null, compiled(context, opt));
+                                    return compiled(context, opt);
                                 };
 
-                                return callback(null, renderer);
+                                return renderer;
                             }
                         }
                     }
@@ -1759,16 +1764,16 @@ describe('Manager', () => {
                     html: {
                         compileMode: 'async',
                         module: {
-                            compile: function (string, options, callback) {
+                            compile: function (string, options) {
 
                                 ++gen;
                                 const compiled = Handlebars.compile(string, options);
-                                const renderer = function (context, opt, next) {
+                                const renderer = function (context, opt) {
 
-                                    return next(null, compiled(context, opt));
+                                    return compiled(context, opt);
                                 };
 
-                                return callback(null, renderer);
+                                return renderer;
                             }
                         }
                     }
@@ -1953,16 +1958,16 @@ describe('Manager', () => {
                     html: {
                         compileMode: 'async',
                         module: {
-                            compile: function (string, options, callback) {
+                            compile: function (string, options) {
 
                                 ++gen;
                                 const compiled = Handlebars.compile(string, options);
-                                const renderer = function (context, opt, next) {
+                                const renderer = function (context, opt) {
 
-                                    return next(null, compiled(context, opt));
+                                    return compiled(context, opt);
                                 };
 
-                                return callback(null, renderer);
+                                return renderer;
                             }
                         }
                     },
@@ -1977,16 +1982,16 @@ describe('Manager', () => {
                     html: {
                         compileMode: 'async',
                         module: {
-                            compile: function (string, options, callback) {
+                            compile: function (string, options, ) {
 
                                 ++gen2;
                                 const compiled = Handlebars.compile(string, options);
-                                const renderer = function (context, opt, next) {
+                                const renderer = function (context, opt) {
 
-                                    return next(null, compiled(context, opt));
+                                    return compiled(context, opt);
                                 };
 
-                                return callback(null, renderer);
+                                return renderer;
                             }
                         }
                     }

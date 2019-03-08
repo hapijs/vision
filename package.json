@@ -10,6 +10,9 @@
         "template",
         "hapi"
     ],
+    "eslintConfig": {
+        "extends": "eslint-config-hapi"
+    },
     "scripts": {
         "test": "lab -a code -t 100 -L -I '__core-js_shared__'",
         "test-cov-html": "lab -a code -r html -o coverage.html",
