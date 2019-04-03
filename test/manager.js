@@ -1378,7 +1378,7 @@ describe('Manager', () => {
             expect(rendered).to.contain('Hapi');
         });
 
-        it('errors when referencing non existant partial (with layouts)', async () => {
+        it('errors when referencing non existent partial (with layouts)', async () => {
 
             const testViewWithLayouts = new Manager({
                 engines: { html: require('handlebars') },
@@ -1389,7 +1389,7 @@ describe('Manager', () => {
             await expect(testViewWithLayouts.render('invalid/test', { title: 'test', message: 'Hapi' })).to.reject();
         });
 
-        it('errors when referencing non existant partial (no layouts)', async () => {
+        it('errors when referencing non existent partial (no layouts)', async () => {
 
             const testView = new Manager({
                 engines: { html: require('handlebars') },
@@ -1459,7 +1459,7 @@ describe('Manager', () => {
             expect(rendered).to.equal(' Nav:<nav>Nav</nav>|<nav>Nested</nav>');
         });
 
-        it('loads partals from multiple relative paths without base', async () => {
+        it('loads partials from multiple relative paths without base', async () => {
 
             const tempView = new Manager({
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
@@ -1471,7 +1471,7 @@ describe('Manager', () => {
             expect(rendered).to.equal(' Nav:<nav>Nav</nav>|<nav>Nested</nav>');
         });
 
-        it('loads partals from multiple relative paths with base', async () => {
+        it('loads partials from multiple relative paths with base', async () => {
 
             const tempView = new Manager({
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
