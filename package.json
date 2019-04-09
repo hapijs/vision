@@ -1,10 +1,15 @@
 {
     "name": "@hapi/vision",
     "description": "Templates rendering plugin support for hapi.js",
-    "version": "5.4.4",
+    "version": "5.5.0",
     "repository": "git://github.com/hapijs/vision",
     "main": "lib/index.js",
-    "keywords": ["view", "render", "template", "hapi"],
+    "keywords": [
+        "view",
+        "render",
+        "template",
+        "hapi"
+    ],
     "dependencies": {
         "@hapi/boom": "7.x.x",
         "@hapi/bounce": "1.x.x",
