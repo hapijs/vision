@@ -1304,7 +1304,7 @@ describe('Manager', () => {
                 layout: 'layout'
             });
 
-            await expect(views.render('valid/test', { title: 'test', message: 'Hapi' })).to.reject(/valid\/test\.html/);
+            await expect(views.render('valid/test', { title: 'test', message: 'Hapi' })).to.reject(/valid[\\\/]test\.html/);
         });
 
         it('errors on invalid layout path', async () => {
