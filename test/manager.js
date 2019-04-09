@@ -12,6 +12,7 @@ const Pug = require('pug');
 const Vision = require('..');
 
 const Manager = require('../lib/manager');
+const Utils = require('../lib/utils');
 
 
 const internals = {};
@@ -1283,7 +1284,18 @@ describe('Manager', () => {
             await expect(views.render('valid/test', { title: 'test', message: 'Hapi' })).to.reject('Parse error on line 1:\n{{}\n--^\nExpecting \'ID\', \'STRING\', \'NUMBER\', \'BOOLEAN\', \'UNDEFINED\', \'NULL\', \'DATA\', got \'INVALID\': Parse error on line 1:\n{{}\n--^\nExpecting \'ID\', \'STRING\', \'NUMBER\', \'BOOLEAN\', \'UNDEFINED\', \'NULL\', \'DATA\', got \'INVALID\'');
         });
 
-        it('errors on layout compile error', async () => {
+        it('errors on layout compile error', async (flags) => {
+
+            const orig = Utils.readFile;
+            Utils.readFile = (file, encoding) => {
+
+                throw new Error('Invalid file');
+            };
+
+            flags.onCleanup = () => {
+
+                Utils.readFile = orig;
+            };
 
             const server = Hapi.server();
             const views = new Manager(server, {
@@ -1292,16 +1304,7 @@ describe('Manager', () => {
                 layout: 'layout'
             });
 
-            const layout = __dirname + '/templates/layout.html';
-            const mode = Fs.statSync(layout).mode;
-
-            Fs.chmodSync(layout, '0300');
-            try {
-                await expect(views.render('valid/test', { title: 'test', message: 'Hapi' })).to.reject('Failed to read view file: ' + layout);
-            }
-            finally {
-                Fs.chmodSync(layout, mode);
-            }
+            await expect(views.render('valid/test', { title: 'test', message: 'Hapi' })).to.reject(/valid\/test\.html/);
         });
 
         it('errors on invalid layout path', async () => {
