@@ -20,7 +20,3 @@ os:
   - "linux"
   - "osx"
   - "windows"
-
-before_install:
-  - git config core.autocrlf false
-
