@@ -1,23 +1,21 @@
 'use strict';
-// Load modules
 
 const Path = require('path');
-const Hapi = require('hapi');
-const PagesClass = require('./pages');
-const Vision = require('../..');
+
 const Handlebars = require('handlebars');
+const Hapi = require('@hapi/hapi');
+const Vision = require('../..');
 
-const Pages = new PagesClass(`${__dirname}/_pages`);
-
-// Declare internals
-
-const internals = {};
-
-const today = new Date();
-internals.thisYear = today.getFullYear();
+const PagesClass = require('./pages');
 
 
-const getTplArgs = (argsToAppend) => {
+const internals = {
+    pages: new PagesClass(`${__dirname}/_pages`),
+    thisYear: new Date().getFullYear()
+};
+
+
+internals.getTplArgs = (argsToAppend) => {
 
     return Object.assign(
         {},
@@ -31,8 +29,8 @@ const getViewSimpleHandler = (viewName) => {
 
     return (request, h) => {
 
-        return h.view(viewName, getTplArgs({
-            page: Pages.getPage(request.params.page),
+        return h.view(viewName, internals.getTplArgs({
+            page: internals.pages.getPage(request.params.page),
             title: viewName
         }));
     };
@@ -41,8 +39,8 @@ const getViewSimpleHandler = (viewName) => {
 
 const getPages = (request, h) => {
 
-    return h.view('index', getTplArgs({
-        pages: Object.keys(Pages.getAll()),
+    return h.view('index', internals.getTplArgs({
+        pages: Object.keys(internals.pages.getAll()),
         title: 'All pages'
     }));
 };
@@ -50,8 +48,8 @@ const getPages = (request, h) => {
 
 const getPage = (request, h) => {
 
-    return h.view('page', getTplArgs({
-        page: Pages.getPage(request.params.page),
+    return h.view('page', internals.getTplArgs({
+        page: internals.pages.getPage(request.params.page),
         title: request.params.page
     }));
 };
@@ -59,9 +57,9 @@ const getPage = (request, h) => {
 
 const createPage = (request, h) => {
 
-    Pages.savePage(request.payload.name, request.payload.contents);
-    return h.view('page', getTplArgs({
-        page: Pages.getPage(request.payload.name),
+    internals.pages.savePage(request.payload.name, request.payload.contents);
+    return h.view('page', internals.getTplArgs({
+        page: internals.pages.getPage(request.payload.name),
         title: 'Create page'
     }));
 };
@@ -69,8 +67,8 @@ const createPage = (request, h) => {
 
 const showEditForm = (request, h) => {
 
-    return h.view('edit', getTplArgs({
-        page: Pages.getPage(request.params.page),
+    return h.view('edit', internals.getTplArgs({
+        page: internals.pages.getPage(request.params.page),
         title: 'Edit: ' + request.params.page
     }));
 };
@@ -78,9 +76,9 @@ const showEditForm = (request, h) => {
 
 const updatePage = (request, h) => {
 
-    Pages.savePage(request.params.page, request.payload.contents);
-    return h.view('page', getTplArgs({
-        page: Pages.getPage(request.params.page),
+    internals.pages.savePage(request.params.page, request.payload.contents);
+    return h.view('page', internals.getTplArgs({
+        page: internals.pages.getPage(request.params.page),
         title: request.params.page
     }));
 };

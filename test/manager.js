@@ -2,15 +2,14 @@
 
 const Fs = require('fs');
 const Path = require('path');
-const Util = require('util');
 
-const Code = require('code');
+const Code = require('@hapi/code');
 const Handlebars = require('handlebars');
-const Hapi = require('hapi');
-const Pug = require('pug');
-const Lab = require('lab');
-const Vision = require('..');
+const Hapi = require('@hapi/hapi');
+const Lab = require('@hapi/lab');
 const Mustache = require('mustache');
+const Pug = require('pug');
+const Vision = require('..');
 
 const Manager = require('../lib/manager');
 
@@ -18,9 +17,7 @@ const Manager = require('../lib/manager');
 const internals = {};
 
 
-const lab = exports.lab = Lab.script();
-const describe = lab.describe;
-const it = lab.it;
+const { it, describe } = exports.lab = Lab.script();
 const expect = Code.expect;
 
 
@@ -62,7 +59,8 @@ describe('Manager', () => {
             }
         };
 
-        const manager = new Manager(options);
+        const server = Hapi.server();
+        const manager = new Manager(server, options);
         expect(manager._context).to.equal(options.context);
     });
 
@@ -147,7 +145,7 @@ describe('Manager', () => {
         const res = await server.inject('/');
         expect(res.result).to.exist();
         expect(res.statusCode).to.equal(500);
-        expect(error).to.be.an.instanceof(Error);
+        expect(error).to.be.an.error();
     });
 
     it('errors if path given includes ../ and allowInsecureAccess is false (by default)', async () => {
@@ -177,7 +175,7 @@ describe('Manager', () => {
         const res = await server.inject('/');
         expect(res.result).to.exist();
         expect(res.statusCode).to.equal(500);
-        expect(error).to.be.an.instanceof(Error);
+        expect(error).to.be.an.error();
     });
 
     it('allows if path given includes ../ and allowInsecureAccess is true', async () => {
@@ -198,7 +196,7 @@ describe('Manager', () => {
         expect(res.statusCode).to.equal(200);
     });
 
-    it('errors if template does not exist()', async () => {
+    it('errors if template does not exist', async () => {
 
         const server = Hapi.server({ debug: false });
         await server.register(Vision);
@@ -225,7 +223,37 @@ describe('Manager', () => {
         const res = await server.inject('/');
         expect(res.result).to.exist();
         expect(res.statusCode).to.equal(500);
-        expect(error).to.be.an.instanceof(Error);
+        expect(error).to.be.an.error();
+    });
+
+    it('errors if template is a directory', async () => {
+
+        const server = Hapi.server({ debug: false });
+        await server.register(Vision);
+        server.views({
+            engines: { 'html': require('handlebars') },
+            path: __dirname + '/templates/invalid'
+        });
+
+        // Compilation errors sould be available for extensions.
+
+        let error = null;
+        server.ext('onPreResponse', (request, h) => {
+
+            const response = request.response;
+            if (response.isBoom) {
+                error = response;
+            }
+
+            return h.continue;
+        });
+
+        server.route({ method: 'GET', path: '/', handler: { view: { template: 'dir' } } });
+
+        const res = await server.inject('/');
+        expect(res.result).to.exist();
+        expect(res.statusCode).to.equal(500);
+        expect(error).to.be.an.error();
     });
 
     it('errors if engine.compile throws', async () => {
@@ -255,7 +283,7 @@ describe('Manager', () => {
         const res = await server.inject('/');
         expect(res.result).to.exist();
         expect(res.statusCode).to.equal(500);
-        expect(error).to.be.an.instanceof(Error);
+        expect(error).to.be.an.error();
     });
 
     it('should not fail if rendered template returns undefined', async () => {
@@ -317,7 +345,8 @@ describe('Manager', () => {
             let compileOptions;
             let runtimeOptions;
 
-            const manager = new Manager({
+            const server = Hapi.server();
+            const manager = new Manager(server, {
                 path: __dirname + '/templates',
                 engines: {
                     html: {
@@ -349,7 +378,8 @@ describe('Manager', () => {
 
         it('errors if initialization fails', async () => {
 
-            const manager = new Manager({
+            const server = Hapi.server();
+            const manager = new Manager(server, {
                 path: __dirname + '/templates',
                 engines: {
                     html: {
@@ -374,7 +404,8 @@ describe('Manager', () => {
 
         it('errors if initialization throws', async () => {
 
-            const manager = new Manager({
+            const server = Hapi.server();
+            const manager = new Manager(server, {
                 path: __dirname + '/templates',
                 engines: {
                     html: {
@@ -397,12 +428,12 @@ describe('Manager', () => {
             await expect(manager.render('valid/test')).to.reject('Initialization error');
         });
 
-
         it('throws on invalid options', () => {
 
             expect(() => {
 
-                new Manager({
+                const server = Hapi.server();
+                new Manager(server, {
                     path: __dirname + '/templates',
                     engines: {
                         html: {
@@ -426,12 +457,12 @@ describe('Manager', () => {
                 .to.throw(/"badValue" is not allowed/);
         });
 
-
         it('only initializes once before rendering', async () => {
 
             let initialized = 0;
 
-            const manager = new Manager({
+            const server = Hapi.server();
+            const manager = new Manager(server, {
                 path: __dirname + '/templates',
                 engines: {
                     html: {
@@ -467,7 +498,8 @@ describe('Manager', () => {
             let htmlOptions;
             let jadeOptions;
 
-            const manager = new Manager({
+            const server = Hapi.server();
+            const manager = new Manager(server, {
                 path: __dirname + '/templates',
                 engines: {
                     html: {
@@ -658,7 +690,7 @@ describe('Manager', () => {
 
             const res = await server.inject('/');
             expect(res.statusCode).to.equal(500);
-            expect(error).to.be.an.instanceof(Error);
+            expect(error).to.be.an.error();
         });
 
         it('errors on invalid layout', async () => {
@@ -688,7 +720,7 @@ describe('Manager', () => {
 
             const res = await server.inject('/');
             expect(res.statusCode).to.equal(500);
-            expect(error).to.be.an.instanceof(Error);
+            expect(error).to.be.an.error();
         });
 
         it('returns response without layout', async () => {
@@ -756,7 +788,7 @@ describe('Manager', () => {
             const res = await server.inject('/');
             expect(res.result).to.exist();
             expect(res.statusCode).to.equal(500);
-            expect(error).to.be.an.instanceof(Error);
+            expect(error).to.be.an.error();
         });
     });
 
@@ -941,7 +973,8 @@ describe('Manager', () => {
 
         it('renders with async compile', async () => {
 
-            const views = new Manager({
+            const server = Hapi.server();
+            const views = new Manager(server, {
                 path: __dirname + '/templates',
                 engines: {
                     html: {
@@ -969,7 +1002,8 @@ describe('Manager', () => {
 
         it('errors on sync compile that throws', async () => {
 
-            const views = new Manager({
+            const server = Hapi.server();
+            const views = new Manager(server, {
                 path: __dirname + '/templates',
                 engines: {
                     html: {
@@ -989,7 +1023,8 @@ describe('Manager', () => {
 
         it('allows valid (no layouts)', async () => {
 
-            const testView = new Manager({
+            const server = Hapi.server();
+            const testView = new Manager(server, {
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates',
                 layout: false
@@ -1002,7 +1037,8 @@ describe('Manager', () => {
 
         it('renders without context', async () => {
 
-            const testView = new Manager({
+            const server = Hapi.server();
+            const testView = new Manager(server, {
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates'
             });
@@ -1014,7 +1050,8 @@ describe('Manager', () => {
 
         it('renders without handler/global-context (with layout)', async () => {
 
-            const testView = new Manager({
+            const server = Hapi.server();
+            const testView = new Manager(server, {
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates',
                 layout: true
@@ -1027,7 +1064,8 @@ describe('Manager', () => {
 
         it('renders with a global context object', async () => {
 
-            const testView = new Manager({
+            const server = Hapi.server();
+            const testView = new Manager(server, {
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates',
 
@@ -1048,7 +1086,8 @@ describe('Manager', () => {
 
         it('overrides the global context object with local values', async () => {
 
-            const testView = new Manager({
+            const server = Hapi.server();
+            const testView = new Manager(server, {
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates',
 
@@ -1069,7 +1108,8 @@ describe('Manager', () => {
 
         it('renders with a global context function (no request)', async () => {
 
-            const testView = new Manager({
+            const server = Hapi.server();
+            const testView = new Manager(server, {
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates',
 
@@ -1093,7 +1133,8 @@ describe('Manager', () => {
 
         it('overrides the global context function values with local values', async () => {
 
-            const testView = new Manager({
+            const server = Hapi.server();
+            const testView = new Manager(server, {
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates',
 
@@ -1117,7 +1158,8 @@ describe('Manager', () => {
 
         it('uses specified default ext', async () => {
 
-            const testView = new Manager({
+            const server = Hapi.server();
+            const testView = new Manager(server, {
                 defaultExtension: 'html',
                 engines: { html: require('handlebars'), pug: Pug },
                 path: __dirname + '/templates'
@@ -1130,7 +1172,8 @@ describe('Manager', () => {
 
         it('allows relative path with no base', async () => {
 
-            const testView = new Manager({
+            const server = Hapi.server();
+            const testView = new Manager(server, {
                 engines: { html: require('handlebars') },
                 path: './test/templates',
                 layout: false
@@ -1143,7 +1186,8 @@ describe('Manager', () => {
 
         it('allows multiple relative paths with no base', async () => {
 
-            const testView = new Manager({
+            const server = Hapi.server();
+            const testView = new Manager(server, {
                 engines: { html: require('handlebars') },
                 path: ['./test/templates/layout', './test/templates/valid'],
                 layout: false
@@ -1156,7 +1200,8 @@ describe('Manager', () => {
 
         it('allows multiple relative paths with a base', async () => {
 
-            const testView = new Manager({
+            const server = Hapi.server();
+            const testView = new Manager(server, {
                 engines: { html: require('handlebars') },
                 relativeTo: __dirname + '/templates',
                 path: ['layout', 'valid'],
@@ -1170,7 +1215,8 @@ describe('Manager', () => {
 
         it('uses the first matching template', async () => {
 
-            const testView = new Manager({
+            const server = Hapi.server();
+            const testView = new Manager(server, {
                 engines: { html: require('handlebars') },
                 relativeTo: __dirname + '/templates',
                 path: ['valid', 'invalid'],
@@ -1184,7 +1230,8 @@ describe('Manager', () => {
 
         it('allows multiple absolute paths', async () => {
 
-            const testView = new Manager({
+            const server = Hapi.server();
+            const testView = new Manager(server, {
                 engines: { html: require('handlebars') },
                 path: [__dirname + '/templates/layout', __dirname + '/templates/valid'],
                 layout: false
@@ -1197,7 +1244,8 @@ describe('Manager', () => {
 
         it('allows valid (with layouts)', async () => {
 
-            const testViewWithLayouts = new Manager({
+            const server = Hapi.server();
+            const testViewWithLayouts = new Manager(server, {
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates',
                 layout: true
@@ -1210,7 +1258,8 @@ describe('Manager', () => {
 
         it('allows absolute path', async () => {
 
-            const testViewWithLayouts = new Manager({
+            const server = Hapi.server();
+            const testViewWithLayouts = new Manager(server, {
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates',
                 layout: __dirname + '/templates/layout',
@@ -1224,7 +1273,8 @@ describe('Manager', () => {
 
         it('errors on invalid layout', async () => {
 
-            const views = new Manager({
+            const server = Hapi.server();
+            const views = new Manager(server, {
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates',
                 layout: 'badlayout'
@@ -1235,7 +1285,8 @@ describe('Manager', () => {
 
         it('errors on layout compile error', async () => {
 
-            const views = new Manager({
+            const server = Hapi.server();
+            const views = new Manager(server, {
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates',
                 layout: 'layout'
@@ -1255,7 +1306,8 @@ describe('Manager', () => {
 
         it('errors on invalid layout path', async () => {
 
-            const views = new Manager({
+            const server = Hapi.server();
+            const views = new Manager(server, {
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates',
                 layout: '/badlayout'
@@ -1266,7 +1318,8 @@ describe('Manager', () => {
 
         it('allows multiple layout paths', async () => {
 
-            const views = new Manager({
+            const server = Hapi.server();
+            const views = new Manager(server, {
                 engines: { html: require('handlebars') },
                 relativeTo: __dirname + '/templates',
                 path: 'valid',
@@ -1280,7 +1333,8 @@ describe('Manager', () => {
 
         it('uses the first matching layout', async () => {
 
-            const views = new Manager({
+            const server = Hapi.server();
+            const views = new Manager(server, {
                 engines: { html: require('handlebars') },
                 relativeTo: __dirname,
                 path: 'templates/valid',
@@ -1294,7 +1348,8 @@ describe('Manager', () => {
 
         it('allows valid pug layouts', async () => {
 
-            const testViewWithJadeLayouts = new Manager({
+            const server = Hapi.server();
+            const testViewWithJadeLayouts = new Manager(server, {
                 engines: { pug: Pug },
                 path: __dirname + '/templates' + '/valid/',
                 layout: true
@@ -1306,7 +1361,8 @@ describe('Manager', () => {
 
         it('should work and not throw without pug layouts', async () => {
 
-            const testViewWithoutJadeLayouts = new Manager({
+            const server = Hapi.server();
+            const testViewWithoutJadeLayouts = new Manager(server, {
                 engines: { pug: Pug },
                 path: __dirname + '/templates' + '/valid/',
                 layout: false
@@ -1318,14 +1374,16 @@ describe('Manager', () => {
 
         it('allows relativeTo, template name, and no path', async () => {
 
-            const views = new Manager({ engines: { html: require('handlebars') } });
+            const server = Hapi.server();
+            const views = new Manager(server, { engines: { html: require('handlebars') } });
             const rendered = await views.render('test', { title: 'test', message: 'Hapi' }, { relativeTo: __dirname + '/templates/valid' });
             expect(rendered).to.contain('Hapi');
         });
 
         it('errors when referencing non existant partial (with layouts)', async () => {
 
-            const testViewWithLayouts = new Manager({
+            const server = Hapi.server();
+            const testViewWithLayouts = new Manager(server, {
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates',
                 layout: true
@@ -1336,7 +1394,8 @@ describe('Manager', () => {
 
         it('errors when referencing non existant partial (no layouts)', async () => {
 
-            const testView = new Manager({
+            const server = Hapi.server();
+            const testView = new Manager(server, {
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates',
                 layout: false
@@ -1347,7 +1406,8 @@ describe('Manager', () => {
 
         it('errors if context uses layoutKeyword as a key', async () => {
 
-            const testViewWithLayouts = new Manager({
+            const server = Hapi.server();
+            const testViewWithLayouts = new Manager(server, {
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates',
                 layout: true
@@ -1359,7 +1419,8 @@ describe('Manager', () => {
 
         it('errors on compile error (invalid template code)', async () => {
 
-            const testView = new Manager({
+            const server = Hapi.server();
+            const testView = new Manager(server, {
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates',
                 layout: false
@@ -1370,7 +1431,8 @@ describe('Manager', () => {
 
         it('loads partials and be able to render them', async () => {
 
-            const tempView = new Manager({
+            const server = Hapi.server();
+            const tempView = new Manager(server, {
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
                 path: __dirname + '/templates/valid',
                 partialsPath: __dirname + '/templates/valid/partials'
@@ -1382,7 +1444,8 @@ describe('Manager', () => {
 
         it('normalizes full partial name (windows)', async () => {
 
-            const tempView = new Manager({
+            const server = Hapi.server();
+            const tempView = new Manager(server, {
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
                 path: __dirname + '/templates/valid',
                 partialsPath: __dirname + '/templates/valid/partials'
@@ -1394,7 +1457,8 @@ describe('Manager', () => {
 
         it('loads partials from relative path without base', async () => {
 
-            const tempView = new Manager({
+            const server = Hapi.server();
+            const tempView = new Manager(server, {
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
                 path: __dirname + '/templates/valid',
                 partialsPath: './test/templates/valid/partials'
@@ -1406,7 +1470,8 @@ describe('Manager', () => {
 
         it('loads partals from multiple relative paths without base', async () => {
 
-            const tempView = new Manager({
+            const server = Hapi.server();
+            const tempView = new Manager(server, {
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
                 path: __dirname + '/templates/valid',
                 partialsPath: ['./test/templates/invalid', './test/templates/valid/partials']
@@ -1418,7 +1483,8 @@ describe('Manager', () => {
 
         it('loads partals from multiple relative paths with base', async () => {
 
-            const tempView = new Manager({
+            const server = Hapi.server();
+            const tempView = new Manager(server, {
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
                 relativeTo: __dirname + '/templates',
                 path: 'valid',
@@ -1431,7 +1497,8 @@ describe('Manager', () => {
 
         it('loads partials from multiple absolute paths', async () => {
 
-            const tempView = new Manager({
+            const server = Hapi.server();
+            const tempView = new Manager(server, {
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
                 path: __dirname + '/templates/valid',
                 partialsPath: [__dirname + '/templates/invalid', __dirname + '/templates/valid/partials']
@@ -1443,7 +1510,8 @@ describe('Manager', () => {
 
         it('loads partials from relative path without base (no dot)', async () => {
 
-            const tempView = new Manager({
+            const server = Hapi.server();
+            const tempView = new Manager(server, {
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
                 path: __dirname + '/templates/valid',
                 partialsPath: 'test/templates/valid/partials'
@@ -1455,7 +1523,8 @@ describe('Manager', () => {
 
         it('loads partials and render them EVEN if viewsPath has trailing slash', async () => {
 
-            const tempView = new Manager({
+            const server = Hapi.server();
+            const tempView = new Manager(server, {
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
                 path: __dirname + '/templates/valid',
                 partialsPath: __dirname + '/templates/valid/partials/'
@@ -1468,7 +1537,8 @@ describe('Manager', () => {
 
         it('skips loading partials and helpers if engine does not support them', async () => {
 
-            const tempView = new Manager({
+            const server = Hapi.server();
+            const tempView = new Manager(server, {
                 path: __dirname + '/templates/valid',
                 partialsPath: __dirname + '/templates/valid/partials',
                 helpersPath: __dirname + '/templates/valid/helpers',
@@ -1481,7 +1551,8 @@ describe('Manager', () => {
 
         it('loads ESM default export helpers and render them', async () => {
 
-            const tempView = new Manager({
+            const server = Hapi.server();
+            const tempView = new Manager(server, {
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
                 path: __dirname + '/templates/valid',
                 helpersPath: __dirname + '/templates/valid/helpers'
@@ -1493,7 +1564,8 @@ describe('Manager', () => {
 
         it('loads ESM named export helpers and render them', async () => {
 
-            const tempView = new Manager({
+            const server = Hapi.server();
+            const tempView = new Manager(server, {
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
                 path: __dirname + '/templates/valid',
                 helpersPath: __dirname + '/templates/valid/helpers'
@@ -1505,7 +1577,8 @@ describe('Manager', () => {
 
         it('loads helpers and render them', async () => {
 
-            const tempView = new Manager({
+            const server = Hapi.server();
+            const tempView = new Manager(server, {
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
                 path: __dirname + '/templates/valid',
                 helpersPath: __dirname + '/templates/valid/helpers'
@@ -1517,7 +1590,8 @@ describe('Manager', () => {
 
         it('loads helpers and render them when helpersPath ends with a slash', async () => {
 
-            const tempView = new Manager({
+            const server = Hapi.server();
+            const tempView = new Manager(server, {
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
                 path: __dirname + '/templates/valid',
                 helpersPath: __dirname + '/templates/valid/helpers/'
@@ -1529,7 +1603,8 @@ describe('Manager', () => {
 
         it('loads helpers using relative paths', async () => {
 
-            const tempView = new Manager({
+            const server = Hapi.server();
+            const tempView = new Manager(server, {
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
                 relativeTo: './test/templates',
                 path: './valid',
@@ -1542,7 +1617,8 @@ describe('Manager', () => {
 
         it('loads helpers from multiple paths without a base', async () => {
 
-            const tempView = new Manager({
+            const server = Hapi.server();
+            const tempView = new Manager(server, {
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
                 path: './test/templates/valid',
                 helpersPath: ['./test/templates/valid/helpers/tools', './test/templates/valid/helpers']
@@ -1554,7 +1630,8 @@ describe('Manager', () => {
 
         it('loads helpers from multiple paths with a base', async () => {
 
-            const tempView = new Manager({
+            const server = Hapi.server();
+            const tempView = new Manager(server, {
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
                 relativeTo: './test/templates',
                 path: './valid',
@@ -1567,7 +1644,8 @@ describe('Manager', () => {
 
         it('loads helpers using relative paths (without dots)', async () => {
 
-            const tempView = new Manager({
+            const server = Hapi.server();
+            const tempView = new Manager(server, {
                 engines: { html: { module: Handlebars.create() } },    // Clear environment from other tests
                 relativeTo: 'test/templates',
                 path: 'valid',
@@ -1580,7 +1658,8 @@ describe('Manager', () => {
 
         it('registers helpers programmatically', async () => {
 
-            const tempView = new Manager({
+            const server = Hapi.server();
+            const tempView = new Manager(server, {
                 engines: {
                     html: { module: Handlebars.create() },
                     txt: { module: Handlebars.create() }
@@ -1601,7 +1680,8 @@ describe('Manager', () => {
 
         it('does not register helpers on engines that don\'t have helper support', async () => {
 
-            const tempView = new Manager({
+            const server = Hapi.server();
+            const tempView = new Manager(server, {
                 engines: {
                     html: {
                         compile: function (template) {
@@ -1626,47 +1706,28 @@ describe('Manager', () => {
             expect(rendered).to.equal('<p>This is all  and this is  we like it!</p>');
         });
 
-        it('prints a warning message when helpers fail to load', () => {
+        it('logs an error when helpers fail to load', async () => {
 
-            const buffer = [];
-            const oldWarn = console.warn;
+            const server = Hapi.server();
 
-            console.warn = (...args) => {
+            const log = server.events.once('log');
 
-                const message = Util.format(...args);
+            new Manager(server, {
+                engines: { html: { module: Handlebars.create() } },
+                relativeTo: 'test/templates',
+                path: 'valid',
+                helpersPath: 'invalid/helpers'
+            });
 
-                buffer.push(message);
-            };
-
-            try {
-                new Manager({
-                    engines: { html: { module: Handlebars.create() } },
-                    relativeTo: 'test/templates',
-                    path: 'valid',
-                    helpersPath: 'invalid/helpers'
-                });
-            }
-            finally {
-                console.warn = oldWarn;
-            }
-
-            const output = buffer.join('\n');
-
-            expect(output).to.match(/^WARNING:/);
-            expect(output).to.contain('vision failed to load helper');
-
-            expect(output).to.contain('invalid/helpers/bad1.js');
-            expect(output).to.contain('invalid/helpers/bad1.json');
-
-            // Ignore non-requirable file extensions
-            expect(output).to.not.contain('invalid/helpers/bad1.foo');
-            expect(output).to.not.contain('invalid/helpers/README.md');
+            const [event] = await log;
+            expect(event.tags).to.equal(['vision', 'helper', 'load', 'error']);
         });
 
         it('reuses cached compilation', async () => {
 
             let gen = 0;
-            const views = new Manager({
+            const server = Hapi.server();
+            const views = new Manager(server, {
                 path: __dirname + '/templates',
                 engines: {
                     html: {
@@ -1703,7 +1764,8 @@ describe('Manager', () => {
         it('disables caching', async () => {
 
             let gen = 0;
-            const views = new Manager({
+            const server = Hapi.server();
+            const views = new Manager(server, {
                 path: __dirname + '/templates',
                 engines: {
                     html: {
@@ -1765,7 +1827,8 @@ describe('Manager', () => {
 
             await resetMutatedValues();
 
-            const views = new Manager({
+            const server = Hapi.server();
+            const views = new Manager(server, {
                 path: __dirname + '/templates/valid',
                 partialsPath,
                 helpersPath,
@@ -1841,7 +1904,8 @@ describe('Manager', () => {
 
             await resetMutatedValues();
 
-            const views = new Manager({
+            const server = Hapi.server();
+            const views = new Manager(server, {
                 path: __dirname + '/templates/valid',
                 partialsPath,
                 helpersPath,
@@ -1897,7 +1961,8 @@ describe('Manager', () => {
             let gen = 0;
             let gen2 = 0;
 
-            const viewsManager = new Manager({
+            const server = Hapi.server();
+            const viewsManager = new Manager(server, {
                 path: __dirname + '/templates',
                 engines: {
                     html: {
@@ -1921,7 +1986,7 @@ describe('Manager', () => {
                 isCached: true
             });
 
-            const viewsManager2 = new Manager({
+            const viewsManager2 = new Manager(server, {
                 path: __dirname + '/templates',
                 engines: {
                     html: {
@@ -2007,22 +2072,12 @@ describe('Manager', () => {
 
             // Warnings
 
-            const buffer = [];
-            const oldWarn = console.warn;
-
-            console.warn = (...args) => {
-
-                const message = Util.format(...args);
-
-                buffer.push(message);
-            };
+            const log = server.events.once('log');
 
             viewsManager2.clearCache('some/bogus/path');
 
-            expect(buffer.length).to.equal(1);
-            expect(buffer[0]).to.equal('Template cache not found for path ' + __dirname + '/templates/some/bogus/path.html, cache not cleared');
-
-            console.warn = oldWarn;
+            const [event] = await log;
+            expect(event.tags).to.equal(['vision', 'cache', 'clear', 'error']);
         });
     });
 
@@ -2136,7 +2191,8 @@ describe('Manager', () => {
                 }
             };
 
-            const manager = new Manager(options);
+            const server = Hapi.server();
+            const manager = new Manager(server, options);
             const moduleKey = require.resolve(modulePath);
             const moduleRef = require.cache[moduleKey];
 
@@ -2164,7 +2220,8 @@ describe('Manager', () => {
                 }
             };
 
-            const manager = new Manager(options);
+            const server = Hapi.server();
+            const manager = new Manager(server, options);
             manager._bustRequireCache(modulePath);
             expect(manager._bustRequireCache.bind(manager, modulePath)).to.not.throw();
         });

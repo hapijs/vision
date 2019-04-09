@@ -8,4 +8,10 @@ node_js:
 
 sudo: false
 
-after_script: "npm run coveralls"
+install:
+  - "npm install"
+
+os:
+  - "linux"
+  - "osx"
+  - "windows"

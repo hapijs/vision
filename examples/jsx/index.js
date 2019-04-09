@@ -1,39 +1,35 @@
 'use strict';
-// Load modules
 
-const Hapi = require('hapi');
-const Vision = require('../..');
 const Path = require('path');
+
+const Hapi = require('@hapi/hapi');
 const HapiReactViews = require('hapi-react-views');
+const Vision = require('../..');
 
 require('babel-core/register')({
     plugins: ['transform-react-jsx']
 });
 
 
-// Declare internals
-
 const internals = {
-    templatePath: '.'
+    templatePath: '.',
+    thisYear: new Date().getFullYear()
 };
 
-const today = new Date();
-internals.thisYear = today.getFullYear();
 
-
-const rootHandler = (request, h) => {
+internals.rootHandler = function (request, h) {
 
     const relativePath = Path.relative(`${__dirname}/../..`, `${__dirname}/templates/${internals.templatePath}`);
 
     return h.view('index', {
-        title: `Running ${relativePath} | Hapi ${request.server.version}`,
+        title: `Running ${relativePath} | hapi ${request.server.version}`,
         message: 'Hello Jsx!',
         year: internals.thisYear
     });
 };
 
 
-const aboutHandler = (request, h) => {
+internals.aboutHandler = function (request, h) {
 
     const relativePath = Path.relative(`${__dirname}/../..`, `${__dirname}/templates/${internals.templatePath}`);
 
@@ -45,7 +41,7 @@ const aboutHandler = (request, h) => {
 };
 
 
-internals.main = async () => {
+internals.main = async function () {
 
     const server = Hapi.Server({ port: 3000 });
 
@@ -57,8 +53,8 @@ internals.main = async () => {
         path: `templates/${internals.templatePath}`
     });
 
-    server.route({ method: 'GET', path: '/', handler: rootHandler });
-    server.route({ method: 'GET', path: '/about', handler: aboutHandler });
+    server.route({ method: 'GET', path: '/', handler: internals.rootHandler });
+    server.route({ method: 'GET', path: '/about', handler: internals.aboutHandler });
 
     await server.start();
     console.log('Server is running at ' + server.info.uri);

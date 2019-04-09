@@ -2,20 +2,18 @@
 
 const Path = require('path');
 
-const Code = require('code');
+const Code = require('@hapi/code');
 const Handlebars = require('handlebars');
-const Hapi = require('hapi');
+const Hapi = require('@hapi/hapi');
+const Lab = require('@hapi/lab');
 const Pug = require('pug');
-const Lab = require('lab');
 const Vision = require('..');
 
 
 const internals = {};
 
 
-const lab = exports.lab = Lab.script();
-const describe = lab.describe;
-const it = lab.it;
+const { it, describe } = exports.lab = Lab.script();
 const expect = Code.expect;
 
 

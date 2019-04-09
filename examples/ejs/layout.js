@@ -1,35 +1,31 @@
 'use strict';
-// Load modules
 
-const Hapi = require('hapi');
-const Vision = require('../..');
 const Path = require('path');
+
 const Ejs = require('ejs');
+const Hapi = require('@hapi/hapi');
+const Vision = require('../..');
 
-
-// Declare internals
 
 const internals = {
-    templatePath: 'withLayout'
+    templatePath: 'withLayout',
+    thisYear: new Date().getFullYear()
 };
 
-const today = new Date();
-internals.thisYear = today.getFullYear();
 
-
-const rootHandler = (request, h) => {
+internals.rootHandler = function (request, h) {
 
     const relativePath = Path.relative(`${__dirname}/../..`, `${__dirname}/templates/${internals.templatePath}`);
 
     return h.view('index', {
-        title: `Running ${relativePath} | Hapi ${request.server.version}`,
+        title: `Running ${relativePath} | hapi ${request.server.version}`,
         message: 'Hello Ejs Layout!',
         year: internals.thisYear
     });
 };
 
 
-internals.main = async () => {
+internals.main = async function () {
 
     const server = Hapi.Server({ port: 3000 });
 
@@ -42,11 +38,10 @@ internals.main = async () => {
         layout: true
     });
 
-    server.route({ method: 'GET', path: '/', handler: rootHandler });
+    server.route({ method: 'GET', path: '/', handler: internals.rootHandler });
 
     await server.start();
     console.log('Server is running at ' + server.info.uri);
 };
-
 
 internals.main();

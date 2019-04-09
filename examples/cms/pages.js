@@ -1,13 +1,11 @@
 'use strict';
-// Load modules
 
 const Fs = require('fs');
 const Path = require('path');
 
 
-// Declare internals
-
 const internals = {};
+
 
 module.exports = class Pages {
 

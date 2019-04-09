@@ -1,12 +1,10 @@
+<a href="http://hapijs.com"><img src="https://github.com/hapijs/assets/blob/master/images/family.svg" width="180px" align="right" /></a>
+
 # vision
 
-Templates rendering plugin support for hapi.js.
-
-vision `5.x.x` Supports hapi `v17.x.x`, `v18.x.x`. For use with hapi `16.x.x`, use vision `4.x.x`
+Templates rendering plugin.
 
 [![Build Status](https://travis-ci.org/hapijs/vision.svg)](http://travis-ci.org/hapijs/vision) [![Coverage Status](https://coveralls.io/repos/github/hapijs/vision/badge.svg?branch=master)](https://coveralls.io/github/hapijs/vision?branch=master)
-
-Lead Maintainer - [William Woodruff](https://github.com/wswoodruff)
 
 **vision** decorates the [server](https://github.com/hapijs/hapi/blob/master/API.md#server),
 [request](https://github.com/hapijs/hapi/blob/master/API.md#request), and
@@ -19,8 +17,8 @@ methods for managing view engines that can be used to render templated responses
 > See also the [API Reference](./API.md)
 
 ```js
-const Hapi = require('hapi');
-const Vision = require('vision');
+const Hapi = require('@hapi/hapi');
+const Vision = require('@hapi/vision');
 
 const server = Hapi.Server({ port: 3000 });
 
@@ -35,13 +33,10 @@ const provision = async () => {
 provision();
 ```
 
-### Note:
-- Vision is included with and loaded by default in Hapi < `9.0`.
-
-
 ## Examples
 
 The examples in the `examples` folder can be run with `node`.
+
 ```
 git clone https://github.com/hapijs/vision.git && cd vision
 npm install
@@ -84,9 +79,9 @@ the normal API pattern can still be used by mapping their API to the [**vision**
 ### EJS
 
 ```js
-const Hapi = require('hapi');
-const Vision = require('vision');
 const Ejs = require('ejs');
+const Hapi = require('@hapi/hapi');
+const Vision = require('@hapi/vision');
 
 const server = Hapi.Server({ port: 3000 });
 
@@ -119,16 +114,16 @@ provision();
 
 ### Handlebars
 ```js
-const Hapi = require('hapi');
-const Vision = require('vision');
 const Handlebars = require('handlebars');
+const Hapi = require('@hapi/hapi');
+const Vision = require('@hapi/vision');
 
 const server = Hapi.Server({ port: 3000 });
 
 const rootHandler = (request, h) => {
 
     return h.view('index', {
-        title: 'examples/handlebars/templates/basic | Hapi ' + request.server.version,
+        title: 'examples/handlebars/templates/basic | hapi ' + request.server.version,
         message: 'Hello Handlebars!'
     });
 };
@@ -155,10 +150,11 @@ provision();
 ### Pug
 
 ```js
-const Hapi = require('hapi');
-const Vision = require('vision');
-const Pug = require('pug');
 const Path = require('path');
+
+const Hapi = require('@hapi/hapi');
+const Pug = require('pug');
+const Vision = require('@hapi/vision');
 
 const server = Hapi.Server({ port: 3000 });
 
@@ -197,9 +193,9 @@ provision();
 ### Marko
 
 ```js
-const Hapi = require('hapi');
-const Vision = require('vision');
+const Hapi = require('@hapi/hapi');
 const Marko = require('marko');
+const Vision = require('@hapi/vision');
 
 const server = Hapi.Server({ port: 3000 });
 
@@ -247,9 +243,9 @@ provision();
 ### Mustache
 
 ```js
-const Hapi = require('hapi');
-const Vision = require('vision');
+const Hapi = require('@hapi/hapi');
 const Mustache = require('mustache');
+const Vision = require('@hapi/vision');
 
 const server = Hapi.Server({ port: 3000 });
 
@@ -295,9 +291,9 @@ provision();
 ### Nunjucks
 
 ```js
-const Hapi = require('hapi');
-const Vision = require('vision');
+const Hapi = require('@hapi/hapi');
 const Nunjucks = require('nunjucks');
+const Vision = require('@hapi/vision');
 
 const server = Hapi.Server({ port: 3000 });
 
@@ -350,9 +346,9 @@ provision();
 ### Twig
 
 ```js
-const Hapi = require('hapi');
-const Vision = require('vision');
+const Hapi = require('@hapi/hapi');
 const Twig = require('twig');
+const Vision = require('@hapi/vision');
 
 const server = Hapi.Server({ port: 3000 });
 

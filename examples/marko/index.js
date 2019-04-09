@@ -1,39 +1,35 @@
 'use strict';
-// Load modules
+
+const Path = require('path');
 
 const Hapi = require('hapi');
-const Vision = require('../..');
 const Marko = require('marko');
-const Path = require('path');
+const Vision = require('../..');
 
 require('marko/node-require');
 
-// Declare internals
 
 const internals = {
-    templatePath: '.'
+    templatePath: '.',
+    thisYear: new Date().getFullYear()
 };
 
-const today = new Date();
-internals.thisYear = today.getFullYear();
 
-
-const rootHandler = (request, h) => {
+internals.rootHandler = function (request, h) {
 
     const relativePath = Path.relative(`${__dirname}/../..`, `${__dirname}/templates/${internals.templatePath}`);
 
     return h.view('index', {
-        title: `Running ${relativePath} | Hapi ${request.server.version}`,
+        title: `Running ${relativePath} | hapi ${request.server.version}`,
         message: 'Hello Marko!',
         year: internals.thisYear
     });
 };
 
-internals.main = async () => {
 
-    const server = Hapi.server({
-        port: 3000
-    });
+internals.main = async function () {
+
+    const server = Hapi.server({ port: 3000 });
 
     await server.register(Vision);
 
@@ -63,7 +59,7 @@ internals.main = async () => {
     server.route({
         method: 'GET',
         path: '/',
-        handler: rootHandler
+        handler: internals.rootHandler
     });
 
     await server.start();

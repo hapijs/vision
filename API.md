@@ -1,4 +1,4 @@
-# v5.4.x API Reference
+# API Reference
 
 Most interaction with **vision** is done via the `h` [response toolkit](https://github.com/hapijs/hapi/blob/master/API.md#response-toolkit)
 and [server](https://github.com/hapijs/hapi/blob/master/API.md#server) interfaces.
@@ -31,7 +31,7 @@ Example:
 internals.provision = async () => {
 
     await server.register({
-        plugin: require('vision'),
+        plugin: require('@hapi/vision'),
         options: {
             engines: { html: require('handlebars') },
             path: __dirname + '/templates'
@@ -176,14 +176,14 @@ If no `callback` is provided, a `Promise` object is returned. The returned promi
 rendered content and not the configuration object.
 
 ```js
-const Hapi = require('hapi');
+const Hapi = require('@hapi/hapi');
 const server = Hapi.Server({ port: 3000 });
 
 const internals = {};
 
 internals.provision = async () => {
 
-    await server.register(require('vision'));
+    await server.register(require('@vision/vision'));
 
     server.views({
         engines: { html: require('handlebars') },
@@ -219,14 +219,14 @@ this point in the request lifecycle and the [`request.render()`](#requestrendert
 [`server.render()`](#serverrendertemplate-context-options-callback) can. When using the `onRequest` extension, use the [`h` response toolkit interface](#response-toolkit-interface) instead.
 
 ```js
-const Hapi = require('hapi');
+const Hapi = require('@hapi/hapi');
 const server = Hapi.Server({ port: 3000 });
 
 const internals = {};
 
 internals.provision = async () => {
 
-    await server.register(require('vision'));
+    await server.register(require('@hapi/vision'));
 
     server.views({
         engines: { html: require('handlebars') },
@@ -270,14 +270,14 @@ The rendering `context` contains the `params`, `payload`, `query`, and `pre` val
 can be overriden by values explicitly set via the `options`).
 
 ```js
-const Hapi = require('hapi');
+const Hapi = require('@hapi/hapi');
 const server = Hapi.Server({ port: 3000 });
 
 const internals = {};
 
 internals.provision = async () => {
 
-    await server.register(require('vision'));
+    await server.register(require('@hapi/vision'));
 
     server.views({
         engines: { html: require('handlebars') },
@@ -323,14 +323,14 @@ The generated response will have the `variety` property set to `view`.
 The same [lifecycle workflow](https://github.com/hapijs/hapi/blob/master/API.md#lifecycle-workflow) applies.
 
 ```js
-const Hapi = require('hapi');
+const Hapi = require('@hapi/hapi');
 const server = Hapi.Server({ port: 3000 });
 
 const internals = {};
 
 internals.provision = async () => {
 
-    await server.register(require('vision'));
+    await server.register(require('@hapi/vision'));
 
     server.views({
         engines: { html: require('handlebars') },
