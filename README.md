@@ -4,7 +4,7 @@
 
 Templates rendering plugin.
 
-[![Build Status](https://travis-ci.org/hapijs/vision.svg)](http://travis-ci.org/hapijs/vision) [![Coverage Status](https://coveralls.io/repos/github/hapijs/vision/badge.svg?branch=master)](https://coveralls.io/github/hapijs/vision?branch=master)
+[![Build Status](https://travis-ci.org/hapijs/vision.svg)](http://travis-ci.org/hapijs/vision)
 
 **vision** decorates the [server](https://github.com/hapijs/hapi/blob/master/API.md#server),
 [request](https://github.com/hapijs/hapi/blob/master/API.md#request), and
