@@ -183,7 +183,7 @@ const internals = {};
 
 internals.provision = async () => {
 
-    await server.register(require('@vision/vision'));
+    await server.register(require('@hapi/vision'));
 
     server.views({
         engines: { html: require('handlebars') },
