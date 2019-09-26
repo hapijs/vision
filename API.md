@@ -1,26 +1,6 @@
-# API Reference
 
 Most interaction with **vision** is done via the `h` [response toolkit](https://github.com/hapijs/hapi/blob/master/API.md#response-toolkit)
 and [server](https://github.com/hapijs/hapi/blob/master/API.md#server) interfaces.
-
-- [Registration](#registration)
-- [Views Manager](#views-manager)
-  - [`options`](#options)
-  - [`manager.registerHelper(name, helper)`](#managerregisterhelpername-helper)
-  - [`manager.render(template, context, options, callback)`](#managerrendertemplate-context-options-callback)
-  - [`manager.getEngine(ext)`](#managergetengineext)
-  - [`manager.clearCache(template, [engine])`](#managerclearcachetemplate-engine)
-- [Server](#server)
-  - [`server.views(options)`](#serverviewsoptions)
-  - [`server.render(template, context, [options], [callback])`](#serverrendertemplate-context-options-callback)
-  - [`server.getViewsManager()`](#servergetviewsmanager)
-- [Requests](#requests)
-  - [`request.render(template, context, [options], [callback])`](#requestrendertemplate-context-options-callback)
-  - [`request.getViewsManager()`](#requestgetviewsmanager)
-- [The `view` handler](#the-view-handler)
-- [`h` response toolkit interface](#response-toolkit-interface)
-  - [`h.view(template, [context], [options]])`](#hviewtemplate-context-options)
-  - [`h.getViewsManager()`](#hgetviewsmanager)
 
 ## Registration
 
