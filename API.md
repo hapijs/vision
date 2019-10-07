@@ -1,15 +1,15 @@
 
 ## Introduction
 
-**vision** decorates the [server](https://hapi.div/api#server),
-[request](https://hapi.div/api#request), and
-`h` response [toolkit](https://hapi.div/api#response-toolkit) interfaces with additional
+**vision** decorates the [server](https://hapi.dev/api#server),
+[request](https://hapi.dev/api#request), and
+`h` response [toolkit](https://hapi.dev/api#response-toolkit) interfaces with additional
 methods for managing view engines that can be used to render templated responses.
 
-**vision** also provides a built-in [handler](https://hapi.div/api#-serverdecoratetype-property-method-options) implementation for creating templated responses.
+**vision** also provides a built-in [handler](https://hapi.dev/api#-serverdecoratetype-property-method-options) implementation for creating templated responses.
 
-Most interaction with **vision** is done via the `h` [response toolkit](https://hapi.div/api#response-toolkit)
-and [server](https://hapi.div/api#server) interfaces.
+Most interaction with **vision** is done via the `h` [response toolkit](https://hapi.dev/api#response-toolkit)
+and [server](https://hapi.dev/api#server) interfaces.
 
 ## Usage
 
@@ -71,7 +71,7 @@ node examples/jsx
 ```
 
 **vision** is compatible with most major templating engines out of the box. Engines that don't follow
-the normal API pattern can still be used by mapping their API to the [**vision** API](https://hapi.div/family/vision/). Some of the examples below use the `compile` and `prepare` methods which are part of the API.
+the normal API pattern can still be used by mapping their API to the [**vision** API](https://hapi.dev/family/vision/). Some of the examples below use the `compile` and `prepare` methods which are part of the API.
 
 ### EJS
 
