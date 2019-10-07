@@ -11,7 +11,7 @@ methods for managing view engines that can be used to render templated responses
 Most interaction with **vision** is done via the `h` [response toolkit](https://hapi.dev/api#response-toolkit)
 and [server](https://hapi.dev/api#server) interfaces.
 
-## Usage
+## Example
 
 ```js
 const Hapi = require('@hapi/hapi');
@@ -29,8 +29,6 @@ const provision = async () => {
 
 provision();
 ```
-
-## Examples
 
 The examples in the `examples` folder can be run with `node`.
 
