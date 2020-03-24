@@ -516,7 +516,7 @@ Renders a template. This is typically not needed and it is usually more convenie
   or `relativeTo`).
 - `engine` - the engine returned by `manager.getEngine(ext)`
 
-## [Server](https://github.com/hapijs/hapi/blob/master/API.md#server)
+## Server
 
 ### `server.views(options)`
 
@@ -568,7 +568,7 @@ internals.provision();
 ### `server.getViewsManager()`
 Returns the closest [Views manager](#views-manager) to your `realm` (either on your realm or inherited from an ancestor realm)
 
-## [Requests](https://github.com/hapijs/hapi/blob/master/API.md#requests)
+## Requests
 
 ### `request.render(template, context, [options], [callback])`
 
@@ -613,9 +613,9 @@ internals.provision();
 ### `request.getViewsManager()`
 Returns the closest [Views manager](#views-manager) to your `realm` (either on your realm or inherited from an ancestor realm)
 
-## The `view` [handler](https://github.com/hapijs/hapi/blob/master/API.md#serverdecoratetype-property-method-options)
+## The view handler
 
-The `view` handler can be used with routes registered in the same realm as the view manager. The
+The `view` [handler](https://github.com/hapijs/hapi/blob/master/API.md#serverdecoratetype-property-method-options) can be used with routes registered in the same realm as the view manager. The
 handler takes an `options` parameter that can be either a string or an object. When the `options`
 parameter is a string, it should be the filename and path of the template relative to the templates
 path configured via the views manager. When the `options` parameter is an object, it may have the
@@ -666,7 +666,7 @@ internals.provision = async () => {
 internals.provision();
 ```
 
-## [Response Toolkit Interface](https://github.com/hapijs/hapi/blob/master/API.md#response-toolkit)
+## Response Toolkit Interface
 
 ### `h.view(template, [context, [options]])`
 
