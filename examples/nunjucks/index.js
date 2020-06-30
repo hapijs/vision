@@ -36,7 +36,7 @@ internals.main = async function () {
             html: {
                 compile: (src, options) => {
 
-                    const template = Nunjucks.compile(src, options.environment);
+                    const template = Nunjucks.compile(src, options.environment, options.filename);
 
                     return (context) => {
 
