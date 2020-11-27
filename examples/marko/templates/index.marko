@@ -1,10 +1,10 @@
 
 import layout from './layout'
-<include(layout) title="Title from layout.marko">
+<${layout} title="Title from layout.marko">
     <@body>
     <h1>${data.title}</h1>
             <div>${data.message}</div>
             <app-component prop="MarkoJS"></app-component>
        <include('./footer') year=input.year/>       
     </@body>
-</include>
+</>
