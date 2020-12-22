@@ -1136,7 +1136,8 @@ describe('Manager', () => {
 
             const asyncFn = () => Promise.resolve('from async');
 
-            const testView = new Manager({
+            const server = Hapi.server();
+            const testView = new Manager(server, {
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates',
 
@@ -1160,7 +1161,8 @@ describe('Manager', () => {
 
         it('renders with a global context function that returns a promise (no request)', async () => {
 
-            const testView = new Manager({
+            const server = Hapi.server();
+            const testView = new Manager(server, {
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates',
 
