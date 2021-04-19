@@ -1161,21 +1161,20 @@ describe('Manager', () => {
 
         it('renders with a global context function that returns a promise (no request)', async () => {
 
+            const renderPromise = Promise.resolve({
+                message: 'default message',
+
+                query: {
+                    test: 'from promise'
+                }
+            });
+
             const server = Hapi.server();
             const testView = new Manager(server, {
                 engines: { html: require('handlebars') },
                 path: __dirname + '/templates',
 
-                context: async () => {
-
-                    return await {
-                        message: 'default message',
-
-                        query: {
-                            test: 'from promise'
-                        }
-                    };
-                }
+                context: () => renderPromise
             });
 
             const rendered = await testView.render('valid/testContext');
