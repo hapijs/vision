@@ -1117,7 +1117,7 @@ describe('Manager', () => {
                 context: function (request) {
 
                     return {
-                        message: request ? request.route.path : 'default message',
+                        message: 'default message',
 
                         query: {
                             test: 'global'
@@ -1129,6 +1129,57 @@ describe('Manager', () => {
             const rendered = await testView.render('valid/testContext');
             expect(rendered).to.exist();
             expect(rendered).to.contain('<h1>global</h1>');
+            expect(rendered).to.contain('<h1>default message</h1>');
+        });
+
+        it('renders with an async global context function (no request)', async () => {
+
+            const asyncFn = async () => await 'from async';
+
+            const server = Hapi.server();
+            const testView = new Manager(server, {
+                engines: { html: require('handlebars') },
+                path: __dirname + '/templates',
+
+                context: async function (request) {
+
+                    return {
+                        message: 'default message',
+
+                        query: {
+                            test: await asyncFn()
+                        }
+                    };
+                }
+            });
+
+            const rendered = await testView.render('valid/testContext');
+            expect(rendered).to.exist();
+            expect(rendered).to.contain('<h1>from async</h1>');
+            expect(rendered).to.contain('<h1>default message</h1>');
+        });
+
+        it('renders with a global context function that returns a promise (no request)', async () => {
+
+            const renderPromise = Promise.resolve({
+                message: 'default message',
+
+                query: {
+                    test: 'from promise'
+                }
+            });
+
+            const server = Hapi.server();
+            const testView = new Manager(server, {
+                engines: { html: require('handlebars') },
+                path: __dirname + '/templates',
+
+                context: () => renderPromise
+            });
+
+            const rendered = await testView.render('valid/testContext');
+            expect(rendered).to.exist();
+            expect(rendered).to.contain('<h1>from promise</h1>');
             expect(rendered).to.contain('<h1>default message</h1>');
         });
 
