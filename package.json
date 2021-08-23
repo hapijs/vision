@@ -1,45 +1,51 @@
 {
-    "name": "@hapi/vision",
-    "description": "Templates rendering plugin support for hapi.js",
-    "version": "6.1.0",
-    "repository": "git://github.com/hapijs/vision",
-    "main": "lib/index.js",
-    "files": [
-        "lib"
-    ],
-    "keywords": [
-        "view",
-        "render",
-        "template",
-        "hapi"
-    ],
-    "dependencies": {
-        "@hapi/boom": "9.x.x",
-        "@hapi/bounce": "2.x.x",
-        "@hapi/hoek": "9.x.x",
-        "@hapi/validate": "1.x.x"
-    },
-    "devDependencies": {
-        "@hapi/code": "8.x.x",
-        "@hapi/hapi": "20.x.x",
-        "@hapi/lab": "24.x.x",
-        "babel-core": "6.x.x",
-        "babel-plugin-transform-react-jsx": "6.x.x",
-        "coveralls": "3.x.x",
-        "ejs": "^3.1.3",
-        "handlebars": "^4.5.3",
-        "hapi-react-views": "10.x.x",
-        "marko": "4.x.x",
-        "mustache": "^4.0.1",
-        "nunjucks": "3.x.x",
-        "pug": "3.x.x",
-        "react": "16.x.x",
-        "react-dom": "16.x.x",
-        "twig": "1.x.x"
-    },
-    "scripts": {
-        "test": "lab -a @hapi/code -t 100 -L -I __core-js_shared__ -m 5000",
-        "test-cov-html": "lab -a @hapi/code -r html -o coverage.html"
-    },
-    "license": "BSD-3-Clause"
+  "name": "@hapi/vision",
+  "description": "Templates rendering plugin support for hapi.js",
+  "version": "6.1.0",
+  "repository": "git://github.com/hapijs/vision",
+  "main": "lib/index.js",
+  "files": [
+    "lib"
+  ],
+  "keywords": [
+    "view",
+    "render",
+    "template",
+    "hapi"
+  ],
+  "eslintConfig": {
+    "extends": [
+      "plugin:@hapi/module"
+    ]
+  },
+  "dependencies": {
+    "@hapi/boom": "9.x.x",
+    "@hapi/bounce": "2.x.x",
+    "@hapi/hoek": "9.x.x",
+    "@hapi/validate": "1.x.x"
+  },
+  "devDependencies": {
+    "@hapi/code": "8.x.x",
+    "@hapi/eslint-plugin": "*",
+    "@hapi/hapi": "20.x.x",
+    "@hapi/lab": "24.x.x",
+    "babel-core": "6.x.x",
+    "babel-plugin-transform-react-jsx": "6.x.x",
+    "coveralls": "3.x.x",
+    "ejs": "^3.1.3",
+    "handlebars": "^4.5.3",
+    "hapi-react-views": "10.x.x",
+    "marko": "4.x.x",
+    "mustache": "^4.0.1",
+    "nunjucks": "3.x.x",
+    "pug": "3.x.x",
+    "react": "16.x.x",
+    "react-dom": "16.x.x",
+    "twig": "1.x.x"
+  },
+  "scripts": {
+    "test": "lab -a @hapi/code -t 100 -L -I __core-js_shared__ -m 5000",
+    "test-cov-html": "lab -a @hapi/code -r html -o coverage.html"
+  },
+  "license": "BSD-3-Clause"
 }
