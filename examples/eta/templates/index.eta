@@ -1,0 +1,9 @@
+<html>
+    <body>
+        <div>
+            <h1><%= it.title %></h1>
+            <div><%= it.message %></div>
+            <p>@ hapi visionaries <%= it.year %></p>
+        </div>
+    </body>
+</html>
