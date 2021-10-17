@@ -386,6 +386,54 @@ const provision = async () => {
 provision();
 ```
 
+### Eta
+
+```js
+const Hapi = require('@hapi/hapi');
+const Eta = require('Eta');
+const Vision = require('@hapi/vision');
+
+const server = Hapi.Server({ port: 3000 });
+
+const rootHandler = (request, h) => {
+
+    return h.view('index', {
+        title: 'examples/eta/templates | Hapi ' + request.server.version,
+        message: 'Hello Eta!'
+    });
+};
+
+const provision = async () => {
+
+    await server.register(Vision);
+
+    server.views({
+        engines: {
+            eta: {
+                compile: (src, options) => {
+
+                    const compiled = Eta.compile(src);
+
+                    return (context) => {
+
+                        return Eta.render(compiled, context);
+                    };
+                }
+            }
+        },
+        relativeTo: __dirname,
+        path: 'examples/eta/templates'
+    });
+
+    server.route({ method: 'GET', path: '/', handler: rootHandler });
+
+    await server.start();
+    console.log('Server running at:', server.info.uri);
+};
+
+provision();
+```
+
 ## Registration
 
 Vision can be registered multiple times and receives [`views manager options`](#options) as registration options.
