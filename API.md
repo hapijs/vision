@@ -390,7 +390,7 @@ provision();
 
 ```js
 const Hapi = require('@hapi/hapi');
-const Eta = require('Eta');
+const Eta = require('eta');
 const Vision = require('@hapi/vision');
 
 const server = Hapi.Server({ port: 3000 });
