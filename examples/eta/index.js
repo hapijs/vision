@@ -36,7 +36,7 @@ internals.main = async function () {
             eta: {
                 compile: (src, options) => {
 
-                    const compiled = Eta.compile(src);
+                    const compiled = Eta.compile(src, options);
 
                     return (context) => {
 
@@ -44,6 +44,16 @@ internals.main = async function () {
                     };
                 }
             }
+        },
+        /**
+         * This is the config object that gets passed to the compile function
+         * defined above. This should contain the eta configuration object
+         * described at https://eta.js.org/docs/api/configuration Only some of
+         * the configuration are relevant when using with hapijs.
+         */
+        compileOptions: {
+            autoEscape: true,
+            tags: ['{{', '}}']
         },
         relativeTo: __dirname,
         path: `templates/${internals.templatePath}`

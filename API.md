@@ -390,7 +390,7 @@ provision();
 
 ```js
 const Hapi = require('@hapi/hapi');
-const Eta = require('Eta');
+const Eta = require('eta');
 const Vision = require('@hapi/vision');
 
 const server = Hapi.Server({ port: 3000 });
@@ -412,7 +412,7 @@ const provision = async () => {
             eta: {
                 compile: (src, options) => {
 
-                    const compiled = Eta.compile(src);
+                    const compiled = Eta.compile(src, options);
 
                     return (context) => {
 
@@ -420,6 +420,16 @@ const provision = async () => {
                     };
                 }
             }
+        },
+        /**
+         * This is the config object that gets passed to the compile function
+         * defined above. This should contain the eta configuration object
+         * described at https://eta.js.org/docs/api/configuration Only some of
+         * the configuration are relevant when using with hapijs.
+         */
+        compileOptions: {
+            autoEscape: true,
+            tags: ['{{', '}}']
         },
         relativeTo: __dirname,
         path: 'examples/eta/templates'
