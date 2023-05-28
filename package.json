@@ -4,6 +4,7 @@
   "version": "7.0.1",
   "repository": "git://github.com/hapijs/vision",
   "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "files": [
     "lib"
   ],
@@ -29,6 +30,7 @@
     "@hapi/eslint-plugin": "^6.0.0",
     "@hapi/hapi": "^21.2.1",
     "@hapi/lab": "^25.1.2",
+    "@types/node": "^20.2.5",
     "babel-core": "^6.0.0",
     "babel-plugin-transform-react-jsx": "^6.0.0",
     "coveralls": "^3.0.0",
