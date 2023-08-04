@@ -2,6 +2,7 @@ import {
   Server,
   Request,
   ResponseToolkit,
+  ResponseObject,
 } from '@hapi/hapi';
 import { types } from '@hapi/lab';
 
@@ -13,6 +14,31 @@ import type { ViewManager } from '..';
 const server = new Server({
   port: 80,
 });
+
+type CustomTemplates = (
+  'test' | 'hello' | 'temp1'
+  );
+
+type CustomLayout = (
+  'auth' | 'unauth' | 'admin'
+  )
+
+declare module '..' {
+
+  interface RenderMethod {
+    (template: CustomTemplates, context?: string, options?: ServerViewsConfiguration): Promise<string>
+  }
+
+  interface ToolkitRenderMethod {
+    (template: CustomTemplates, context?: string, options?: ViewHandlerOrReplyOptions): ResponseObject
+  }
+
+  interface ViewTypes {
+    template: CustomTemplates
+    layout: CustomLayout
+  }
+}
+
 
 const provision = async () => {
   await server.register({
@@ -45,8 +71,8 @@ const provision = async () => {
     method: 'GET',
     path: '/view',
     handler: async (request: Request, h: ResponseToolkit) => {
-      types.expect.type<Function>(request.render);
-      return request.render('test', { message: 'hello' });
+      types.expect.type<Function>(h.view);
+      return request.render('test', { message: 'hello' }, { layout: 'admin' });
     },
   });
 
@@ -69,7 +95,6 @@ const provision = async () => {
       title: 'Views Example',
       message: 'Hello, World',
     };
-    types.expect.type<Function>(h.view);
     return h.view('hello', context);
   };
 
@@ -85,6 +110,7 @@ const provision = async () => {
           compileOptions: {
             noEscape: true,
           },
+          layout: 'admin'
         },
       },
     },

@@ -795,3 +795,88 @@ Returns the closest [Views manager](#views-manager) to your `realm` (either on y
     </body>
 </html>
 ```
+
+
+## Typescript
+
+If you'd like to type out the way Vision is used, you can do so with the following interfaces:
+
+```typescript
+declare module '@hapi/vision' {
+
+    // User defined
+    type CustomTemplates = (
+        'test' | 'hello' | 'temp1'
+    );
+
+    // User defined
+    type CustomLayout = (
+        'auth' | 'unauth' | 'admin'
+    )
+
+    interface ViewTypes {
+        template: CustomTemplates
+        layout: CustomLayout
+    }
+}
+```
+
+You should now get typings on your response handler (only), and anywhere where layouts is an option
+
+```ts
+
+const route = {
+    ...
+    handler: {
+        view: {
+            template: 'test', // should autocomplete
+            options: { layout: 'auth' } // should autocomplete
+        }
+    }
+}
+```
+
+If you'd like to also type check the decorated handlers, you can augment the following interfaces:
+
+```typescript
+declare module '@hapi/vision' {
+
+    // User defined
+    type CustomTemplates = (
+        'test' | 'hello' | 'temp1'
+    );
+
+    // User defined
+    type CustomLayout = (
+        'auth' | 'unauth' | 'admin'
+    )
+
+    // server.render(...)
+    interface RenderMethod {
+        (template: CustomTemplates, context?: string): Promise<string>
+    }
+
+    // { handler: (req) => req.render(...) }
+    interface RequestRenderMethod {
+        (template: CustomTemplates, context?: string): Promise<string>
+    }
+
+    // { handler: (req, h) => h.view(...) }
+    interface ToolkitRenderMethod {
+        (template: CustomTemplates, context?: string): ResponseObject
+    }
+
+}
+```
+
+This is useful for when you may want to make strict checks against template / context combinations:
+
+```typescript
+
+    // { handler: (req, h) => h.view(...) }
+    interface ToolkitRenderMethod {
+        (template: 'test', context: { apples: 5 }): ResponseObject
+        (template: 'hello', context: { oranges: true }): ResponseObject
+        (template: 'temp1', context: { bananas: 'green' }): ResponseObject
+    }
+```
