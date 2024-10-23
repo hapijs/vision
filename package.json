@@ -14,11 +14,6 @@
     "template",
     "hapi"
   ],
-  "eslintConfig": {
-    "extends": [
-      "plugin:@hapi/module"
-    ]
-  },
   "dependencies": {
     "@hapi/boom": "^10.0.1",
     "@hapi/bounce": "^3.0.1",
@@ -27,9 +22,9 @@
   },
   "devDependencies": {
     "@hapi/code": "^9.0.3",
-    "@hapi/eslint-plugin": "^6.0.0",
-    "@hapi/hapi": "^21.2.1",
-    "@hapi/lab": "^25.1.2",
+    "@hapi/eslint-plugin": "^7.0.0",
+    "@hapi/hapi": "^21.3.10",
+    "@hapi/lab": "^26.0.0",
     "@types/node": "^14.18.48",
     "babel-core": "^6.0.0",
     "babel-plugin-transform-react-jsx": "^6.0.0",
