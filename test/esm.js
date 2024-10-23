@@ -19,7 +19,7 @@ describe('import()', () => {
 
     it('exposes all methods and classes as named imports', () => {
 
-        expect(Object.keys(Vision)).to.equal([
+        expect(Object.keys(Vision).filter((k) => k !== 'module.exports')).to.equal([
             'default',
             'plugin'
         ]);
